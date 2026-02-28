@@ -1,10 +1,10 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom'
 import {
-  LayoutDashboard, Megaphone, TrendingUp, FileText,
+  LayoutDashboard, Megaphone, FileText,
   Users, Bot, Search, Settings, LogOut, Bell,
-  ChevronRight, TrendingDown, Building2, Shield, MessageSquare,
-  BarChart3
+  ChevronRight, Building2, Shield, MessageSquare,
+  BarChart3, Plug, Workflow
 } from 'lucide-react'
 
 // Pages
@@ -20,6 +20,8 @@ import PalavrasChave from './pages/PalavrasChave'
 import Configuracoes from './pages/Configuracoes'
 import Plantonista from './pages/Plantonista'
 import DrBenIntegracao from './pages/DrBenIntegracao'
+import Integracoes from './pages/Integracoes'
+import FlowBuilder from './pages/FlowBuilder'
 
 const navGroups = [
   {
@@ -34,6 +36,7 @@ const navGroups = [
       { to: '/crm', icon: Users, label: 'CRM — Pipeline' },
       { to: '/plantonista', icon: Shield, label: 'Plantonista & Alertas' },
       { to: '/dr-ben', icon: MessageSquare, label: 'Dr. Ben — IA' },
+      { to: '/flow-builder', icon: Workflow, label: 'Dr. Ben Flow' },
     ],
   },
   {
@@ -50,6 +53,12 @@ const navGroups = [
     items: [
       { to: '/agentes', icon: Bot, label: 'Agentes IA' },
       { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard Ads' },
+    ],
+  },
+  {
+    label: 'SISTEMA',
+    items: [
+      { to: '/integracoes', icon: Plug, label: 'Integrações' },
       { to: '/configuracoes', icon: Settings, label: 'Configurações' },
     ],
   },
@@ -205,6 +214,8 @@ export default function App() {
           <Route path="/palavras-chave" element={<PalavrasChave />} />
           <Route path="/agentes" element={<Agentes />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/integracoes" element={<Integracoes />} />
+          <Route path="/flow-builder" element={<FlowBuilder />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
         </Routes>
       </Layout>
