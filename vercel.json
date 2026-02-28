@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index.js" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ],
+  "crons": [
+    { "path": "/api/cron/lex-conteudo", "schedule": "0 7 * * *" },
+    { "path": "/api/cron/lex-campanhas", "schedule": "0 8,18 * * *" },
+    { "path": "/api/cron/lex-relatorio", "schedule": "0 9 * * 1" },
+    { "path": "/api/cron/lex-monitor", "schedule": "0 */2 * * *" }
+  ]
+}
