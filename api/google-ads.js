@@ -87,23 +87,27 @@ export default async function handler(req, res) {
   const tokens = getTokens(req)
 
   // ── Sem credenciais: retornar status ─────────────────────
-  if (!tokens.accessToken && !tokens.refreshToken) {
+  if (!tokens.refreshToken && !tokens.accessToken) {
     return res.status(200).json({
       status:   'pending_credentials',
       accounts: Object.values(ACCOUNTS).map(a => ({ id: a.id, label: a.label })),
       mccId:    tokens.mccId,
-      message:  'Configure GOOGLE_ADS_ACCESS_TOKEN ou GOOGLE_REFRESH_TOKEN no Vercel',
+      message:  'Configure GOOGLE_REFRESH_TOKEN no Vercel',
     })
   }
 
-  // ── Obter access token (refresh se necessário) ───────────
+  // ── Sempre renovar access token via refresh token ────────
   let accessToken = tokens.accessToken
-  if (!accessToken && tokens.refreshToken) {
+  if (tokens.refreshToken && tokens.clientId && tokens.clientSecret) {
     try {
       accessToken = await refreshAccessToken(tokens.clientId, tokens.clientSecret, tokens.refreshToken)
     } catch (e) {
       return res.status(401).json({ error: 'Falha ao renovar access token', detail: e.message })
     }
+  }
+
+  if (!accessToken) {
+    return res.status(401).json({ error: 'Sem access token disponível' })
   }
 
   const acct = ACCOUNTS[account] || ACCOUNTS.escritorio
@@ -112,12 +116,19 @@ export default async function handler(req, res) {
   try {
     // ── TESTE ────────────────────────────────────────────────
     if (action === 'teste') {
-      const data = await queryGoogleAds(
-        customerId,
-        'SELECT customer.id, customer.descriptive_name, customer.currency_code, customer.time_zone FROM customer LIMIT 1',
-        accessToken, tokens.developerToken, tokens.mccId
-      )
-      return res.json({ status: 'ok', customer: data[0]?.customer, account: acct.label })
+      // Verificar se o token funciona com uma chamada simples
+      const testUrl = `https://googleads.googleapis.com/${GOOGLE_ADS_API_VERSION}/customers:listAccessibleCustomers`
+      const testHeaders = {
+        Authorization:     `Bearer ${accessToken}`,
+        'developer-token': tokens.developerToken,
+      }
+      const testRes = await fetch(testUrl, { headers: testHeaders })
+      if (!testRes.ok) {
+        const err = await testRes.json()
+        throw { status: testRes.status, error: err }
+      }
+      const testData = await testRes.json()
+      return res.json({ status: 'ok', account: acct.label, customers: testData.resourceNames })
     }
 
     // ── CAMPANHAS ────────────────────────────────────────────
