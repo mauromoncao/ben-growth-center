@@ -1,5 +1,7 @@
 import React from 'react'
-import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom'
+import { AuthProvider, useAuth } from './context/AuthContext'
+import LoginPage from './pages/LoginPage'
 import {
   LayoutDashboard, Megaphone, FileText,
   Users, Bot, Search, Settings, LogOut, Bell,
@@ -23,6 +25,12 @@ import DrBenIntegracao from './pages/DrBenIntegracao'
 import Integracoes     from './pages/Integracoes'
 import FlowBuilder       from './pages/FlowBuilder'
 import IntegracaoJuris   from './pages/IntegracaoJuris'
+
+// ─── Rota privada ─────────────────────────────────────────────
+function PrivateRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth()
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />
+}
 
 const navGroups = [
   {
@@ -188,11 +196,8 @@ function TopBar() {
           <Bell className="w-5 h-5" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full" />
         </button>
-        {/* Avatar */}
-        <div className="w-8 h-8 rounded-full flex items-center justify-center"
-          style={{ background: '#D4A017', color: '#0f2044' }}>
-          <span className="text-xs font-bold">MM</span>
-        </div>
+        {/* Avatar + Logout */}
+        <LogoutButton />
       </div>
     </header>
   )
@@ -212,27 +217,68 @@ function Layout({ children }: { children: React.ReactNode }) {
   )
 }
 
+function LogoutButton() {
+  const { user, logout } = useAuth()
+  const initials = user?.nome?.split(' ').map(n => n[0]).slice(0, 2).join('') || 'MM'
+  return (
+    <div className="flex items-center gap-2">
+      <div className="w-8 h-8 rounded-full flex items-center justify-center"
+        style={{ background: '#D4A017', color: '#0f2044' }}>
+        <span className="text-xs font-bold">{initials}</span>
+      </div>
+      <button
+        onClick={logout}
+        title="Sair"
+        className="p-1.5 rounded-lg transition-colors"
+        style={{ color: 'rgba(159,176,215,0.60)' }}
+        onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
+        onMouseLeave={e => (e.currentTarget.style.color = 'rgba(159,176,215,0.60)')}>
+        <LogOut className="w-4 h-4" />
+      </button>
+    </div>
+  )
+}
+
+function AppRoutes() {
+  const { isAuthenticated } = useAuth()
+  return (
+    <Routes>
+      <Route path="/login" element={
+        isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />
+      } />
+      <Route path="/*" element={
+        <PrivateRoute>
+          <Layout>
+            <Routes>
+              <Route path="/"                   element={<HubComercial />} />
+              <Route path="/crm"                element={<CRM />} />
+              <Route path="/plantonista"         element={<Plantonista />} />
+              <Route path="/dr-ben"             element={<DrBenIntegracao />} />
+              <Route path="/campanhas"          element={<Campanhas />} />
+              <Route path="/analytics"          element={<Analytics />} />
+              <Route path="/conteudo"           element={<Conteudo />} />
+              <Route path="/palavras-chave"     element={<PalavrasChave />} />
+              <Route path="/agentes"            element={<Agentes />} />
+              <Route path="/dashboard"          element={<Dashboard />} />
+              <Route path="/integracoes"        element={<Integracoes />} />
+              <Route path="/flow-builder"       element={<FlowBuilder />} />
+              <Route path="/integracao-juris"   element={<IntegracaoJuris />} />
+              <Route path="/configuracoes"      element={<Configuracoes />} />
+              <Route path="*"                   element={<Navigate to="/" replace />} />
+            </Routes>
+          </Layout>
+        </PrivateRoute>
+      } />
+    </Routes>
+  )
+}
+
 export default function App() {
   return (
     <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/"             element={<HubComercial />} />
-          <Route path="/crm"          element={<CRM />} />
-          <Route path="/plantonista"  element={<Plantonista />} />
-          <Route path="/dr-ben"       element={<DrBenIntegracao />} />
-          <Route path="/campanhas"    element={<Campanhas />} />
-          <Route path="/analytics"    element={<Analytics />} />
-          <Route path="/conteudo"     element={<Conteudo />} />
-          <Route path="/palavras-chave" element={<PalavrasChave />} />
-          <Route path="/agentes"      element={<Agentes />} />
-          <Route path="/dashboard"    element={<Dashboard />} />
-          <Route path="/integracoes"       element={<Integracoes />} />
-          <Route path="/flow-builder"       element={<FlowBuilder />} />
-          <Route path="/integracao-juris"   element={<IntegracaoJuris />} />
-          <Route path="/configuracoes" element={<Configuracoes />} />
-        </Routes>
-      </Layout>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </BrowserRouter>
   )
 }
