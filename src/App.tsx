@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Megaphone, FileText,
   Users, Bot, Search, Settings, LogOut, Bell,
   ChevronRight, Building2, Shield, MessageSquare,
-  BarChart3, Plug, Workflow, TrendingUp
+  BarChart3, Plug, Workflow, TrendingUp, Scale
 } from 'lucide-react'
 
 // Pages
@@ -21,7 +21,8 @@ import Configuracoes   from './pages/Configuracoes'
 import Plantonista     from './pages/Plantonista'
 import DrBenIntegracao from './pages/DrBenIntegracao'
 import Integracoes     from './pages/Integracoes'
-import FlowBuilder     from './pages/FlowBuilder'
+import FlowBuilder       from './pages/FlowBuilder'
+import IntegracaoJuris   from './pages/IntegracaoJuris'
 
 const navGroups = [
   {
@@ -56,9 +57,15 @@ const navGroups = [
     ],
   },
   {
+    label: 'ECOSSISTEMA',
+    items: [
+      { to: '/integracao-juris', icon: Scale,   label: 'Ben Juris Center' },
+      { to: '/integracoes',      icon: Plug,    label: 'Integrações' },
+    ],
+  },
+  {
     label: 'SISTEMA',
     items: [
-      { to: '/integracoes',   icon: Plug,     label: 'Integrações' },
       { to: '/configuracoes', icon: Settings, label: 'Configurações' },
     ],
   },
@@ -220,8 +227,9 @@ export default function App() {
           <Route path="/palavras-chave" element={<PalavrasChave />} />
           <Route path="/agentes"      element={<Agentes />} />
           <Route path="/dashboard"    element={<Dashboard />} />
-          <Route path="/integracoes"  element={<Integracoes />} />
-          <Route path="/flow-builder" element={<FlowBuilder />} />
+          <Route path="/integracoes"       element={<Integracoes />} />
+          <Route path="/flow-builder"       element={<FlowBuilder />} />
+          <Route path="/integracao-juris"   element={<IntegracaoJuris />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
         </Routes>
       </Layout>

@@ -64,9 +64,9 @@ export const AGENTS: Record<AgentID, AgentConfig> = {
   // ── Dr. Ben — Atendimento e Qualificação ──────────────────
   'dr-ben': {
     id: 'dr-ben',
-    nome: 'Dr. Ben',
+    nome: 'Dr. Ben Atendimento',
     emoji: '🤖',
-    descricao: 'Assistente de atendimento e qualificação de leads via chat e WhatsApp. Opera 24/7.',
+    descricao: 'Dr. Ben Atendimento — Qualificação de leads e triagem inteligente via chat e WhatsApp. Opera 24/7.',
     modelo: 'gemini-2.5-flash',
     modeloFallback: 'gpt-5',
     temperatura: 0.7,
@@ -102,9 +102,9 @@ ESTILO: Mensagens curtas (máx. 3 linhas), empático, sem juridiquês.`,
   // ── Lex Conteúdo — Blog e SEO ────────────────────────────
   'lex-conteudo': {
     id: 'lex-conteudo',
-    nome: 'Lex Conteúdo',
+    nome: 'Dr. Ben Conteúdo',
     emoji: '📝',
-    descricao: 'Gera artigos de blog SEO-otimizados, newsletters e conteúdo orgânico diariamente.',
+    descricao: 'Dr. Ben Conteúdo — Gera artigos de blog SEO-otimizados, newsletters e conteúdo jurídico orgânico diariamente.',
     modelo: 'gemini-2.5-pro',
     modeloFallback: 'gpt-5',
     temperatura: 0.6,
@@ -112,7 +112,7 @@ ESTILO: Mensagens curtas (máx. 3 linhas), empático, sem juridiquês.`,
     area: 'marketing',
     ativo: true,
     schedule: 'Diário — 07:00',
-    systemPrompt: `Você é o Lex Conteúdo, especialista em marketing de conteúdo jurídico.
+    systemPrompt: `Você é o Dr. Ben Conteúdo, especialista em marketing de conteúdo jurídico.
 
 ${CONTEXTO_ESCRITORIO}
 
@@ -142,7 +142,7 @@ TAMANHO: 1.000 a 1.500 palavras.`,
   // ── Lex Campanhas — Google Ads + Meta Ads ────────────────
   'lex-campanhas': {
     id: 'lex-campanhas',
-    nome: 'Lex Campanhas',
+    nome: 'Dr. Ben Campanhas',
     emoji: '🎯',
     descricao: 'Otimiza campanhas no Google Ads e Meta Ads. Ajusta lances, pausa keywords ruins e escala o que converte.',
     modelo: 'gpt-5',
@@ -152,7 +152,7 @@ TAMANHO: 1.000 a 1.500 palavras.`,
     area: 'marketing',
     ativo: true,
     schedule: 'Diário — 08:00 e 18:00',
-    systemPrompt: `Você é o Lex Campanhas, especialista em tráfego pago jurídico.
+    systemPrompt: `Você é o Dr. Ben Campanhas, especialista em tráfego pago jurídico.
 
 ${CONTEXTO_ESCRITORIO}
 
@@ -185,7 +185,7 @@ LINGUAGEM: Objetiva, baseada em dados, sem rodeios.`,
   // ── Lex Marketing — Redes Sociais e Copies ───────────────
   'lex-marketing': {
     id: 'lex-marketing',
-    nome: 'Lex Marketing',
+    nome: 'Dr. Ben Marketing',
     emoji: '📱',
     descricao: 'Cria posts para Instagram, Facebook, LinkedIn e copies para anúncios pagos.',
     modelo: 'gpt-5',
@@ -195,7 +195,7 @@ LINGUAGEM: Objetiva, baseada em dados, sem rodeios.`,
     area: 'marketing',
     ativo: true,
     schedule: 'Diário — 07:05',
-    systemPrompt: `Você é o Lex Marketing, especialista em marketing jurídico para redes sociais.
+    systemPrompt: `Você é o Dr. Ben Marketing, especialista em marketing jurídico para redes sociais.
 
 ${CONTEXTO_ESCRITORIO}
 
@@ -230,7 +230,7 @@ NUNCA incluir: Valores de honorários, promessa de resultado, comparações`,
   // ── Lex Relatório — Análise e Relatórios ─────────────────
   'lex-relatorio': {
     id: 'lex-relatorio',
-    nome: 'Lex Relatório',
+    nome: 'Dr. Ben Relatório',
     emoji: '📊',
     descricao: 'Gera relatórios semanais de performance com análise profunda e recomendações estratégicas.',
     modelo: 'gemini-2.5-pro',
@@ -240,7 +240,7 @@ NUNCA incluir: Valores de honorários, promessa de resultado, comparações`,
     area: 'sistema',
     ativo: true,
     schedule: 'Segunda — 09:00',
-    systemPrompt: `Você é o Lex Relatório, analista de performance do escritório Mauro Monção.
+    systemPrompt: `Você é o Dr. Ben Relatório, analista de performance do escritório Mauro Monção.
 
 ${CONTEXTO_ESCRITORIO}
 
@@ -280,7 +280,7 @@ LINGUAGEM: Executiva, direta, com dados concretos.`,
   // ── Lex Criativo — Imagens e Vídeos ──────────────────────
   'lex-criativo': {
     id: 'lex-criativo',
-    nome: 'Lex Criativo',
+    nome: 'Dr. Ben Criativo',
     emoji: '🎨',
     descricao: 'Gera imagens profissionais para anúncios e scripts de vídeo para Reels e Stories.',
     modelo: 'flux-2-pro',
@@ -290,7 +290,7 @@ LINGUAGEM: Executiva, direta, com dados concretos.`,
     area: 'marketing',
     ativo: true,
     schedule: 'Sob demanda',
-    systemPrompt: `Você é o Lex Criativo, diretor de arte do escritório Mauro Monção.
+    systemPrompt: `Você é o Dr. Ben Criativo, diretor de arte do escritório Mauro Monção.
 
 ${CONTEXTO_ESCRITORIO}
 
@@ -315,7 +315,7 @@ FORMATO: Prompt em inglês para geração de imagem + script em português para 
   // ── Lex Monitor — Alertas e Monitoramento ────────────────
   'lex-monitor': {
     id: 'lex-monitor',
-    nome: 'Lex Monitor',
+    nome: 'Dr. Ben Monitor',
     emoji: '🔔',
     descricao: 'Monitora KPIs 24/7 e dispara alertas quando métricas saem do padrão esperado.',
     modelo: 'gemini-2.5-flash',
@@ -325,7 +325,7 @@ FORMATO: Prompt em inglês para geração de imagem + script em português para 
     area: 'sistema',
     ativo: true,
     schedule: 'A cada 2 horas',
-    systemPrompt: `Você é o Lex Monitor, sistema de vigilância de KPIs do escritório Mauro Monção.
+    systemPrompt: `Você é o Dr. Ben Monitor, sistema de vigilância de KPIs do escritório Mauro Monção.
 
 ${CONTEXTO_ESCRITORIO}
 
@@ -361,7 +361,7 @@ LINGUAGEM: Ultra-concisa. Máximo 2 linhas por alerta.`,
   // ── Lex Jurídico — Análise de Casos ──────────────────────
   'lex-juridico': {
     id: 'lex-juridico',
-    nome: 'Lex Jurídico',
+    nome: 'Dr. Ben Jurídico',
     emoji: '⚖️',
     descricao: 'Analisa casos recebidos no CRM, sugere estratégia e estima chances de êxito. (Fase 2)',
     modelo: 'claude-opus-4',
@@ -371,7 +371,7 @@ LINGUAGEM: Ultra-concisa. Máximo 2 linhas por alerta.`,
     area: 'juridico',
     ativo: false,
     schedule: 'Sob demanda',
-    systemPrompt: `Você é o Lex Jurídico, assistente de análise jurídica especializado em Direito Tributário, Previdenciário e Bancário.
+    systemPrompt: `Você é o Dr. Ben Jurídico, assistente de análise jurídica especializado em Direito Tributário, Previdenciário e Bancário.
 
 ${CONTEXTO_ESCRITORIO}
 
@@ -398,7 +398,7 @@ Sempre finalizar com: "Análise preliminar — sujeita à revisão do Dr. Mauro 
   // ── Lex Petições — Geração de Documentos ─────────────────
   'lex-peticoes': {
     id: 'lex-peticoes',
-    nome: 'Lex Petições',
+    nome: 'Dr. Ben Petições',
     emoji: '📄',
     descricao: 'Gera minutas de petições, recursos e peças processuais. (Fase 2)',
     modelo: 'claude-opus-4',
@@ -408,7 +408,7 @@ Sempre finalizar com: "Análise preliminar — sujeita à revisão do Dr. Mauro 
     area: 'juridico',
     ativo: false,
     schedule: 'Sob demanda',
-    systemPrompt: `Você é o Lex Petições, especialista em redação jurídica processual.
+    systemPrompt: `Você é o Dr. Ben Petições, especialista em redação jurídica processual.
 
 ${CONTEXTO_ESCRITORIO}
 
