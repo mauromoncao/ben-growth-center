@@ -56,19 +56,38 @@ const configSections = [
     ] as ConfigField[],
   },
   {
-    title: '🤖 Inteligência Artificial',
-    description: 'Chaves de API para os modelos de IA usados pelos agentes Dr. Ben.',
+    title: '🤖 Inteligência Artificial — Stack Enterprise',
+    description: 'Gemini · OpenAI GPT-4o · Claude Haiku · Perplexity — cada agente usa o modelo ideal.',
     fields: [
-      { key: 'GEMINI_API_KEY',   label: 'Gemini API Key',   placeholder: 'AIza...', type: 'password', status: 'configured', hint: 'Já configurado no Vercel ✅' },
-      { key: 'GENSPARK_API_KEY', label: 'Genspark API Key', placeholder: 'gsk_...',  type: 'password', status: 'pending' },
+      { key: 'GEMINI_API_KEY',     label: 'Gemini API Key (Google)',        placeholder: 'AIza...',       type: 'password', status: 'configured', hint: 'Dr. Ben + Lex Monitor + Lex Relatório + Lex Conteúdo — aistudio.google.com ✅' },
+      { key: 'OPENAI_API_KEY',     label: 'OpenAI API Key (GPT-4o)',        placeholder: 'sk-...',        type: 'password', status: 'pending',    hint: 'Lex Campanhas + Lex Marketing + Lex Criativo — platform.openai.com' },
+      { key: 'ANTHROPIC_API_KEY',  label: 'Anthropic API Key (Claude)',     placeholder: 'sk-ant-...',    type: 'password', status: 'pending',    hint: 'Lex Jurídico + Lex Petições — console.anthropic.com' },
+      { key: 'PERPLEXITY_API_KEY', label: 'Perplexity API Key',             placeholder: 'pplx-...',      type: 'password', status: 'pending',    hint: 'Pesquisa jurisprudência STJ/STF em tempo real — perplexity.ai/api' },
+    ] as ConfigField[],
+  },
+  {
+    title: '🎙️ Voz & Memória — ElevenLabs + Pinecone',
+    description: 'Dr. Ben fala com sua voz clonada e lembra de cada cliente.',
+    fields: [
+      { key: 'ELEVENLABS_API_KEY', label: 'ElevenLabs API Key',             placeholder: 'sk_...',        type: 'password', status: 'pending',    hint: 'Voz clonada do Dr. Ben — elevenlabs.io/app/settings/api-keys' },
+      { key: 'ELEVENLABS_VOICE_ID',label: 'ElevenLabs Voice ID',            placeholder: 'abc123xyz...',  type: 'text',     status: 'pending',    hint: 'ID da voz clonada — elevenlabs.io/voice-lab' },
+      { key: 'PINECONE_API_KEY',   label: 'Pinecone API Key',               placeholder: 'pcsk_...',      type: 'password', status: 'pending',    hint: 'Memória vetorial — Dr. Ben lembra clientes — pinecone.io' },
+      { key: 'PINECONE_INDEX_HOST',label: 'Pinecone Index Host URL',        placeholder: 'https://xxx.svc.pinecone.io', type: 'text', status: 'pending', hint: 'URL do index criado no Pinecone' },
+    ] as ConfigField[],
+  },
+  {
+    title: '📧 Email & Notificações — Resend',
+    description: 'Emails profissionais automáticos: confirmação de reunião, follow-up 24h, leads.',
+    fields: [
+      { key: 'RESEND_API_KEY',     label: 'Resend API Key',                 placeholder: 're_...',        type: 'password', status: 'pending',    hint: 'Emails transacionais gratuitos (3k/mês) — resend.com' },
     ] as ConfigField[],
   },
   {
     title: '🗄️ Banco de Dados',
     description: 'PostgreSQL Neon para armazenar leads, contratos e logs dos agentes.',
     fields: [
-      { key: 'DATABASE_URL', label: 'Database URL (Neon)', placeholder: 'postgresql://...', type: 'password', status: 'pending', hint: 'Criar em neon.tech (gratuito)' },
-      { key: 'JWT_SECRET',   label: 'JWT Secret',          placeholder: 'string-aleatoria-32-chars', type: 'password', status: 'pending' },
+      { key: 'DATABASE_URL',       label: 'Database URL (Neon)',            placeholder: 'postgresql://...', type: 'password', status: 'pending', hint: 'Criar em neon.tech (gratuito até 3GB)' },
+      { key: 'JWT_SECRET',         label: 'JWT Secret',                     placeholder: 'string-aleatoria-32-chars', type: 'password', status: 'pending' },
     ] as ConfigField[],
   },
 ]

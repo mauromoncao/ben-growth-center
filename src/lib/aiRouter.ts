@@ -4,13 +4,14 @@
 // ============================================================
 
 export type AIModel =
-  | 'gemini-2.5-flash'    // Dr. Ben: chat rápido, baixo custo
-  | 'gemini-2.5-pro'      // Resumos longos, análise de processos
-  | 'gpt-5'               // Campanhas, copies, marketing
-  | 'claude-opus-4'       // Petições, textos jurídicos longos
-  | 'genspark-agent'      // Deep Research, Autopilot
-  | 'flux-2-pro'          // Imagens para anúncios
-  | 'imagen-4'            // Criativos institucionais
+  | 'gemini-2.5-flash'    // Dr. Ben + Lex Monitor: chat rápido, gratuito
+  | 'gemini-2.5-pro'      // Lex Conteúdo + Lex Relatório: contexto longo
+  | 'gpt-4o'              // Lex Campanhas + Lex Marketing: melhor copywriting
+  | 'gpt-4o-mini'         // Fallback OpenAI econômico
+  | 'claude-haiku-3-5'    // Lex Jurídico + Lex Petições: textos jurídicos
+  | 'perplexity'          // Pesquisa jurídica em tempo real STJ/STF
+  | 'elevenlabs'          // Dr. Ben voz — ElevenLabs clonada
+  | 'dall-e-3'            // Lex Criativo: imagens para anúncios
 
 export type AgentID =
   | 'dr-ben'
@@ -68,7 +69,7 @@ export const AGENTS: Record<AgentID, AgentConfig> = {
     emoji: '🤖',
     descricao: 'Dr. Ben Atendimento — Qualificação de leads e triagem inteligente via chat e WhatsApp. Opera 24/7.',
     modelo: 'gemini-2.5-flash',
-    modeloFallback: 'gpt-5',
+    modeloFallback: 'gpt-4o-mini',
     temperatura: 0.7,
     maxTokens: 800,
     area: 'crm',
@@ -106,7 +107,7 @@ ESTILO: Mensagens curtas (máx. 3 linhas), empático, sem juridiquês.`,
     emoji: '📝',
     descricao: 'Dr. Ben Conteúdo — Gera artigos de blog SEO-otimizados, newsletters e conteúdo jurídico orgânico diariamente.',
     modelo: 'gemini-2.5-pro',
-    modeloFallback: 'gpt-5',
+    modeloFallback: 'gpt-4o',
     temperatura: 0.6,
     maxTokens: 2500,
     area: 'marketing',
@@ -145,7 +146,7 @@ TAMANHO: 1.000 a 1.500 palavras.`,
     nome: 'Dr. Ben Campanhas',
     emoji: '🎯',
     descricao: 'Otimiza campanhas no Google Ads e Meta Ads. Ajusta lances, pausa keywords ruins e escala o que converte.',
-    modelo: 'gpt-5',
+    modelo: 'gpt-4o',
     modeloFallback: 'gemini-2.5-pro',
     temperatura: 0.3,
     maxTokens: 1200,
@@ -188,8 +189,8 @@ LINGUAGEM: Objetiva, baseada em dados, sem rodeios.`,
     nome: 'Dr. Ben Marketing',
     emoji: '📱',
     descricao: 'Cria posts para Instagram, Facebook, LinkedIn e copies para anúncios pagos.',
-    modelo: 'gpt-5',
-    modeloFallback: 'claude-opus-4',
+    modelo: 'gpt-4o',
+    modeloFallback: 'gemini-2.5-flash',
     temperatura: 0.8,
     maxTokens: 1500,
     area: 'marketing',
@@ -234,7 +235,7 @@ NUNCA incluir: Valores de honorários, promessa de resultado, comparações`,
     emoji: '📊',
     descricao: 'Gera relatórios semanais de performance com análise profunda e recomendações estratégicas.',
     modelo: 'gemini-2.5-pro',
-    modeloFallback: 'gpt-5',
+    modeloFallback: 'gpt-4o',
     temperatura: 0.2,
     maxTokens: 3000,
     area: 'sistema',
@@ -283,8 +284,8 @@ LINGUAGEM: Executiva, direta, com dados concretos.`,
     nome: 'Dr. Ben Criativo',
     emoji: '🎨',
     descricao: 'Gera imagens profissionais para anúncios e scripts de vídeo para Reels e Stories.',
-    modelo: 'flux-2-pro',
-    modeloFallback: 'imagen-4',
+    modelo: 'dall-e-3',
+    modeloFallback: 'gpt-4o',
     temperatura: 0.9,
     maxTokens: 500,
     area: 'marketing',
@@ -319,7 +320,7 @@ FORMATO: Prompt em inglês para geração de imagem + script em português para 
     emoji: '🔔',
     descricao: 'Monitora KPIs 24/7 e dispara alertas quando métricas saem do padrão esperado.',
     modelo: 'gemini-2.5-flash',
-    modeloFallback: 'gemini-2.5-pro',
+    modeloFallback: 'gpt-4o-mini',
     temperatura: 0.1,
     maxTokens: 400,
     area: 'sistema',
@@ -364,8 +365,8 @@ LINGUAGEM: Ultra-concisa. Máximo 2 linhas por alerta.`,
     nome: 'Dr. Ben Jurídico',
     emoji: '⚖️',
     descricao: 'Analisa casos recebidos no CRM, sugere estratégia e estima chances de êxito. (Fase 2)',
-    modelo: 'claude-opus-4',
-    modeloFallback: 'gpt-5',
+    modelo: 'claude-haiku-3-5',
+    modeloFallback: 'gemini-2.5-pro',
     temperatura: 0.2,
     maxTokens: 2000,
     area: 'juridico',
@@ -401,8 +402,8 @@ Sempre finalizar com: "Análise preliminar — sujeita à revisão do Dr. Mauro 
     nome: 'Dr. Ben Petições',
     emoji: '📄',
     descricao: 'Gera minutas de petições, recursos e peças processuais. (Fase 2)',
-    modelo: 'claude-opus-4',
-    modeloFallback: 'gpt-5',
+    modelo: 'claude-haiku-3-5',
+    modeloFallback: 'gemini-2.5-pro',
     temperatura: 0.15,
     maxTokens: 4000,
     area: 'juridico',
@@ -459,11 +460,12 @@ export function getModelLabel(model: AIModel): string {
   const labels: Record<AIModel, string> = {
     'gemini-2.5-flash': 'Gemini 2.5 Flash',
     'gemini-2.5-pro':   'Gemini 2.5 Pro',
-    'gpt-5':            'GPT-5 (via Genspark)',
-    'claude-opus-4':    'Claude Opus 4 (via Genspark)',
-    'genspark-agent':   'Genspark Super Agent',
-    'flux-2-pro':       'Flux 2 Pro (via Genspark)',
-    'imagen-4':         'Imagen 4 (via Genspark)',
+    'gpt-4o':           'GPT-4o (OpenAI)',
+    'gpt-4o-mini':      'GPT-4o Mini (OpenAI)',
+    'claude-haiku-3-5': 'Claude Haiku 3.5 (Anthropic)',
+    'perplexity':       'Perplexity Sonar (Tempo Real)',
+    'elevenlabs':       'ElevenLabs (Voz Clonada)',
+    'dall-e-3':         'DALL-E 3 (OpenAI Imagens)',
   }
   return labels[model]
 }
@@ -472,11 +474,12 @@ export function getModelColor(model: AIModel): string {
   const colors: Record<AIModel, string> = {
     'gemini-2.5-flash': 'bg-blue-100 text-blue-700',
     'gemini-2.5-pro':   'bg-indigo-100 text-indigo-700',
-    'gpt-5':            'bg-green-100 text-green-700',
-    'claude-opus-4':    'bg-orange-100 text-orange-700',
-    'genspark-agent':   'bg-amber-100 text-amber-700',
-    'flux-2-pro':       'bg-pink-100 text-pink-700',
-    'imagen-4':         'bg-purple-100 text-purple-700',
+    'gpt-4o':           'bg-green-100 text-green-700',
+    'gpt-4o-mini':      'bg-emerald-100 text-emerald-700',
+    'claude-haiku-3-5': 'bg-orange-100 text-orange-700',
+    'perplexity':       'bg-purple-100 text-purple-700',
+    'elevenlabs':       'bg-pink-100 text-pink-700',
+    'dall-e-3':         'bg-amber-100 text-amber-700',
   }
   return colors[model]
 }
@@ -485,9 +488,10 @@ export function getModelColor(model: AIModel): string {
 export const MODEL_COST_INFO: Record<AIModel, string> = {
   'gemini-2.5-flash': 'R$ 0,00 — gratuito até 1M req/dia',
   'gemini-2.5-pro':   'R$ 0,10 por 1M tokens input',
-  'gpt-5':            'Incluso Genspark Team',
-  'claude-opus-4':    'Incluso Genspark Team',
-  'genspark-agent':   'Créditos Genspark (12k/mês)',
-  'flux-2-pro':       'Créditos Genspark',
-  'imagen-4':         'Créditos Genspark',
+  'gpt-4o':           'R$ 2,50 por 1M tokens (OpenAI)',
+  'gpt-4o-mini':      'R$ 0,15 por 1M tokens (OpenAI)',
+  'claude-haiku-3-5': 'R$ 0,80 por 1M tokens (Anthropic)',
+  'perplexity':       'R$ 5,00/mês (Perplexity API)',
+  'elevenlabs':       'Incluso no plano Pro (ElevenLabs)',
+  'dall-e-3':         'R$ 0,10 por imagem (OpenAI)',
 }

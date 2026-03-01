@@ -12,6 +12,11 @@
     { "source": "/api/meta-ads/:path*", "destination": "/api/meta-ads.js" },
     { "source": "/api/google-ads", "destination": "/api/google-ads.js" },
     { "source": "/api/google-ads/:path*", "destination": "/api/google-ads.js" },
+    { "source": "/api/agents/run", "destination": "/api/agents/run.js" },
+    { "source": "/api/voice", "destination": "/api/voice.js" },
+    { "source": "/api/memory", "destination": "/api/memory.js" },
+    { "source": "/api/search", "destination": "/api/search.js" },
+    { "source": "/api/email", "destination": "/api/email.js" },
     { "source": "/api/:path*", "destination": "/api/index.js" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
