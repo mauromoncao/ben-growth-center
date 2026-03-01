@@ -97,7 +97,7 @@ function Sidebar() {
   return (
     <aside
       className="w-64 min-h-screen flex flex-col fixed left-0 top-0 z-40 overflow-y-auto"
-      style={{ background: '#0a1628', borderRight: '1px solid rgba(255,255,255,0.07)' }}
+      style={{ background: '#0f2044', borderRight: '1px solid rgba(255,255,255,0.07)' }}
     >
       {/* Logo */}
       <div className="p-5 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
@@ -120,7 +120,7 @@ function Sidebar() {
         {navGroups.map(group => (
           <div key={group.label}>
             <p className="text-xs font-semibold px-3 mb-1.5 font-sans tracking-wider"
-              style={{ color: 'rgba(159,176,215,0.50)' }}>
+              style={{ color: 'rgba(255,255,255,0.90)' }}>
               {group.label}
             </p>
             <div className="space-y-0.5">
