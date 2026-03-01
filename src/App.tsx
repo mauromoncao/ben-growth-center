@@ -28,6 +28,7 @@ import IntegracaoJuris   from './pages/IntegracaoJuris'
 import Assinaturas       from './pages/Assinaturas'
 import Financeiro        from './pages/Financeiro'
 import MetaAds          from './pages/MetaAds'
+import GoogleAds        from './pages/GoogleAds'
 
 // ─── Rota privada ─────────────────────────────────────────────
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -56,6 +57,7 @@ const navGroups = [
     items: [
       { to: '/campanhas',     icon: Megaphone,      label: 'Campanhas' },
       { to: '/meta-ads',      icon: BarChart3,      label: 'Meta Ads' },
+      { to: '/google-ads',    icon: TrendingUp,     label: 'Google Ads' },
       { to: '/analytics',     icon: BarChart3,      label: 'Analytics' },
       { to: '/conteudo',      icon: FileText,       label: 'Conteúdo IA' },
       { to: '/palavras-chave',icon: Search,         label: 'Palavras-chave' },
@@ -277,6 +279,7 @@ function AppRoutes() {
               <Route path="/assinaturas"         element={<Assinaturas />} />
               <Route path="/financeiro"          element={<Financeiro />} />
               <Route path="/meta-ads"            element={<MetaAds />} />
+              <Route path="/google-ads"          element={<GoogleAds />} />
               <Route path="/configuracoes"      element={<Configuracoes />} />
               <Route path="*"                   element={<Navigate to="/" replace />} />
             </Routes>

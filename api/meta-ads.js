@@ -3,15 +3,17 @@
 // Ad Account: act_446623386807925 (Mauro Moncao)
 // ============================================================
 
-const AD_ACCOUNT_ID = 'act_446623386807925'
-const META_VERSION  = 'v19.0'
-const BASE_URL      = `https://graph.facebook.com/${META_VERSION}`
+const AD_ACCOUNT_ID   = 'act_4244231065854550' // Dr Mauro Monção (conta principal)
+const AD_ACCOUNT_ID_2 = 'act_446623386807925'  // Conta anterior
+const META_VERSION    = 'v19.0'
+const BASE_URL        = `https://graph.facebook.com/${META_VERSION}`
+const META_TOKEN_HARD = 'EAAUIUscNG3wBQxgOOao1VehQePlNGT259uzzyB3eZBM31321mKxaKZCsZCsC83KUKBaUmM6KZATRJ4mrMZBlxwciZCzk0WFYoJCpLWANngIAAH5rvRLK1hEnh0CDfufZCH3vfKHliZCcbixm2ZAMKu4VhifhufihWBlOxaQ37aS9JuZBKX3BVsIsF1QQPJYcYgg1cWfAZDZD'
 
-// Token vem do header Authorization ou da env var
+// Token vem do header Authorization, env var ou hardcoded
 function getToken(req) {
   const auth = req.headers['authorization']
   if (auth && auth.startsWith('Bearer ')) return auth.slice(7)
-  return process.env.META_ACCESS_TOKEN || ''
+  return process.env.META_ACCESS_TOKEN || META_TOKEN_HARD
 }
 
 export default async function handler(req, res) {

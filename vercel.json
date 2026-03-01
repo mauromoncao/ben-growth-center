@@ -10,6 +10,8 @@
     { "source": "/api/asaas/:path*", "destination": "/api/asaas.js" },
     { "source": "/api/meta-ads", "destination": "/api/meta-ads.js" },
     { "source": "/api/meta-ads/:path*", "destination": "/api/meta-ads.js" },
+    { "source": "/api/google-ads", "destination": "/api/google-ads.js" },
+    { "source": "/api/google-ads/:path*", "destination": "/api/google-ads.js" },
     { "source": "/api/:path*", "destination": "/api/index.js" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
