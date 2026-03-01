@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Bot, Send, User, Zap, Bell, CheckCircle2, AlertCircle, Phone, ExternalLink } from 'lucide-react'
+import { DR_BEN_PROFILE } from '../lib/drBenProfile'
 
 // ─── Tipos ───────────────────────────────────────────────────
 interface Msg {
@@ -105,9 +106,8 @@ export default function DrBenIntegracao() {
         {/* Chat simulado */}
         <div className="card flex flex-col h-[520px]">
           <div className="flex items-center gap-3 mb-4 pb-4 border-b border-white/8">
-            <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-              <Bot className="w-6 h-6 text-amber-600" />
-            </div>
+            <img src={DR_BEN_PROFILE.avatar} alt="Dr. Ben"
+              className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
             <div>
               <h2 className="font-semibold text-white">Dr. Ben — Chat ao Vivo</h2>
               <div className="flex items-center gap-1.5">
@@ -126,16 +126,15 @@ export default function DrBenIntegracao() {
           <div ref={chatRef} className="flex-1 overflow-y-auto space-y-3 mb-4">
             {mensagens.length === 0 && (
               <div className="text-center py-12">
-                <Bot className="w-12 h-12 text-slate-200 mx-auto mb-3" />
+                <img src={DR_BEN_PROFILE.avatar} alt="Dr. Ben" className="w-12 h-12 rounded-full object-cover mx-auto mb-3" />
                 <p className="text-white/50 text-sm">Clique em "Simular Conversa" para ver o Dr. Ben qualificando um lead em tempo real</p>
               </div>
             )}
             {mensagens.map((msg, i) => (
               <div key={i} className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {msg.role === 'bot' && (
-                  <div className="w-7 h-7 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <Bot className="w-4 h-4 text-amber-600" />
-                  </div>
+                  <img src={DR_BEN_PROFILE.avatar} alt="Dr. Ben"
+                    className="w-7 h-7 rounded-full object-cover flex-shrink-0 mt-1" />
                 )}
                 <div className={`max-w-xs rounded-2xl px-3 py-2 text-sm ${
                   msg.role === 'user'
@@ -158,9 +157,8 @@ export default function DrBenIntegracao() {
             ))}
             {rodando && (
               <div className="flex gap-2">
-                <div className="w-7 h-7 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-4 h-4 text-amber-600" />
-                </div>
+                <img src={DR_BEN_PROFILE.avatar} alt="Dr. Ben"
+                  className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
                 <div className="bg-white/6 rounded-2xl rounded-tl-sm px-4 py-3">
                   <div className="flex gap-1">
                     <div className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" />

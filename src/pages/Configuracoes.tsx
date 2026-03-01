@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Save, Eye, EyeOff, CheckCircle2 } from 'lucide-react'
+import { Save, Eye, EyeOff, CheckCircle2, Bot, MapPin, Phone, Mail, Globe, Clock, MessageCircle } from 'lucide-react'
+import { DR_BEN_PROFILE } from '../lib/drBenProfile'
 
 interface ConfigField {
   key: string
@@ -12,59 +13,66 @@ interface ConfigField {
 
 const configSections = [
   {
-    title: '🔵 Google Ads',
-    description: 'Conecte sua conta Google Ads via OAuth2 para gerenciar campanhas automaticamente.',
+    title: '💬 WhatsApp Business API (Meta)',
+    description: 'Token oficial Meta para envio real de mensagens pelo Dr. Ben.',
     fields: [
-      { key: 'GOOGLE_ADS_CLIENT_ID', label: 'Client ID', placeholder: 'xxx.apps.googleusercontent.com', type: 'text', status: 'pending' },
-      { key: 'GOOGLE_ADS_CLIENT_SECRET', label: 'Client Secret', placeholder: 'GOCSPX-...', type: 'password', status: 'pending' },
-      { key: 'GOOGLE_ADS_DEVELOPER_TOKEN', label: 'Developer Token', placeholder: 'ABcd...', type: 'password', status: 'pending' },
-      { key: 'GOOGLE_ADS_REFRESH_TOKEN', label: 'Refresh Token', placeholder: '1//0g...', type: 'password', status: 'pending', hint: 'Gerado via OAuth2 flow' },
+      { key: 'WHATSAPP_TOKEN',          label: 'Access Token (Meta)',       placeholder: 'EAAb...', type: 'password', status: 'pending', hint: 'Meta Business Suite → Configurações → Acesso à API do WhatsApp' },
+      { key: 'WHATSAPP_PHONE_NUMBER_ID',label: 'Phone Number ID',           placeholder: '12345678901234', type: 'text', status: 'pending', hint: 'ID do número: 888304720788200 (já verificado ✅)' },
+      { key: 'WHATSAPP_WABA_ID',        label: 'WABA ID',                   placeholder: '888304720788200', type: 'text', status: 'configured', hint: 'Conta Dr. Mauro Monção — Meta Verificado ✅' },
     ] as ConfigField[],
   },
   {
-    title: '🟣 Meta Ads',
-    description: 'Conecte sua conta Meta Business para gerenciar campanhas no Facebook e Instagram.',
+    title: '🟣 Meta Ads (Facebook & Instagram)',
+    description: 'Conecte sua conta Meta Business para gerenciar campanhas e leads automaticamente.',
     fields: [
-      { key: 'META_APP_ID', label: 'App ID', placeholder: '123456789', type: 'text', status: 'pending' },
-      { key: 'META_APP_SECRET', label: 'App Secret', placeholder: 'abc123...', type: 'password', status: 'pending' },
-      { key: 'META_ACCESS_TOKEN', label: 'Access Token (Long-lived)', placeholder: 'EAAb...', type: 'password', status: 'pending' },
-      { key: 'META_AD_ACCOUNT_ID', label: 'Ad Account ID', placeholder: 'act_123456789', type: 'text', status: 'pending' },
+      { key: 'META_APP_ID',        label: 'App ID',                    placeholder: '123456789',       type: 'text',     status: 'pending' },
+      { key: 'META_APP_SECRET',    label: 'App Secret',                placeholder: 'abc123...',       type: 'password', status: 'pending' },
+      { key: 'META_ACCESS_TOKEN',  label: 'Access Token (Long-lived)', placeholder: 'EAAb...',         type: 'password', status: 'pending' },
+      { key: 'META_AD_ACCOUNT_ID', label: 'Ad Account ID',             placeholder: 'act_123456789',  type: 'text',     status: 'pending' },
+    ] as ConfigField[],
+  },
+  {
+    title: '🔵 Google Ads',
+    description: 'Conecte sua conta Google Ads para gerenciar campanhas e keywords automaticamente.',
+    fields: [
+      { key: 'GOOGLE_ADS_CLIENT_ID',       label: 'Client ID',        placeholder: 'xxx.apps.googleusercontent.com', type: 'text',     status: 'pending' },
+      { key: 'GOOGLE_ADS_CLIENT_SECRET',   label: 'Client Secret',    placeholder: 'GOCSPX-...',                    type: 'password', status: 'pending' },
+      { key: 'GOOGLE_ADS_DEVELOPER_TOKEN', label: 'Developer Token',  placeholder: 'ABcd...',                       type: 'password', status: 'pending' },
+      { key: 'GOOGLE_ADS_REFRESH_TOKEN',   label: 'Refresh Token',    placeholder: '1//0g...',                      type: 'password', status: 'pending', hint: 'Gerado via OAuth2 flow' },
+    ] as ConfigField[],
+  },
+  {
+    title: '✍️ ZapSign',
+    description: 'Assinatura eletrônica de contratos — token já configurado e ativo.',
+    fields: [
+      { key: 'ZAPSIGN_TOKEN', label: 'ZapSign API Token', placeholder: '426e787a-...', type: 'password', status: 'configured', hint: 'Token ativo: 426e787a-3446-4341-bbd2-2b88e544ad39 ✅' },
     ] as ConfigField[],
   },
   {
     title: '🤖 Inteligência Artificial',
-    description: 'Chaves de API para os modelos de IA usados pelos agentes Lex.',
+    description: 'Chaves de API para os modelos de IA usados pelos agentes Dr. Ben.',
     fields: [
-      { key: 'GEMINI_API_KEY', label: 'Gemini API Key', placeholder: 'AIza...', type: 'password', status: 'configured', hint: 'Já configurado no Vercel' },
-      { key: 'GENSPARK_API_KEY', label: 'Genspark API Key', placeholder: 'gsk_...', type: 'password', status: 'pending', hint: 'Plano Team — 12k créditos/mês' },
-    ] as ConfigField[],
-  },
-  {
-    title: '💬 WhatsApp & Kommo',
-    description: 'Integração com WhatsApp para envio de alertas e relatórios automáticos.',
-    fields: [
-      { key: 'WHATSAPP_TOKEN', label: 'WhatsApp Token', placeholder: 'EAAb...', type: 'password', status: 'configured', hint: 'Dr. Ben já configurado' },
-      { key: 'KOMMO_API_KEY', label: 'Kommo API Key', placeholder: 'kommo_...', type: 'password', status: 'pending' },
-      { key: 'WHATSAPP_NUMBER', label: 'Número WhatsApp', placeholder: '+55 86 9xxxx-xxxx', type: 'text', status: 'pending' },
+      { key: 'GEMINI_API_KEY',   label: 'Gemini API Key',   placeholder: 'AIza...', type: 'password', status: 'configured', hint: 'Já configurado no Vercel ✅' },
+      { key: 'GENSPARK_API_KEY', label: 'Genspark API Key', placeholder: 'gsk_...',  type: 'password', status: 'pending' },
     ] as ConfigField[],
   },
   {
     title: '🗄️ Banco de Dados',
-    description: 'PostgreSQL Neon para armazenar campanhas, leads e logs dos agentes.',
+    description: 'PostgreSQL Neon para armazenar leads, contratos e logs dos agentes.',
     fields: [
       { key: 'DATABASE_URL', label: 'Database URL (Neon)', placeholder: 'postgresql://...', type: 'password', status: 'pending', hint: 'Criar em neon.tech (gratuito)' },
-      { key: 'JWT_SECRET', label: 'JWT Secret', placeholder: 'random-secret-32-chars', type: 'password', status: 'pending' },
+      { key: 'JWT_SECRET',   label: 'JWT Secret',          placeholder: 'string-aleatoria-32-chars', type: 'password', status: 'pending' },
     ] as ConfigField[],
   },
 ]
 
 export default function Configuracoes() {
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({})
-  const [saved, setSaved] = useState(false)
+  const [saved, setSaved]       = useState(false)
+  const [abaAtiva, setAbaAtiva] = useState<'perfil' | 'integrações'>('perfil')
 
-  const toggleKey = (key: string) => {
+  const toggleKey = (key: string) =>
     setShowKeys(prev => ({ ...prev, [key]: !prev[key] }))
-  }
 
   const handleSave = async () => {
     setSaved(true)
@@ -73,111 +81,234 @@ export default function Configuracoes() {
   }
 
   const totalConfigured = configSections.flatMap(s => s.fields).filter(f => f.status === 'configured').length
-  const totalFields = configSections.flatMap(s => s.fields).length
+  const totalFields     = configSections.flatMap(s => s.fields).length
 
   return (
     <div className="space-y-6">
+
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Configurações</h1>
-          <p className="text-white/60 text-sm mt-1">Variáveis de ambiente e integrações do Lex Traffic</p>
+          <p className="text-white/60 text-sm mt-1">Perfil Dr. Ben · Integrações · Variáveis de ambiente</p>
         </div>
-        <button onClick={handleSave} className="btn-primary flex items-center gap-2 text-sm">
+        <button onClick={handleSave}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all"
+          style={{ background: '#D4A017', color: '#0f2044' }}>
           {saved ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
-          {saved ? 'Salvo!' : 'Salvar Configurações'}
+          {saved ? 'Salvo!' : 'Salvar'}
         </button>
       </div>
 
-      {/* Progress */}
-      <div className="card">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-medium text-white/90">Progresso da Configuração</h2>
-          <span className="text-white/60 text-sm">{totalConfigured}/{totalFields} configurados</span>
-        </div>
-        <div className="h-3 bg-white/6 rounded-full">
-          <div className="h-full bg-gradient-to-r from-primary to-gold rounded-full transition-all"
-            style={{ width: `${(totalConfigured / totalFields) * 100}%` }} />
-        </div>
-        <div className="grid grid-cols-3 gap-3 mt-4">
-          <div className="text-center">
-            <p className="text-green-600 font-bold">{totalConfigured}</p>
-            <p className="text-white/50 text-xs">Configurados</p>
-          </div>
-          <div className="text-center">
-            <p className="text-amber-600 font-bold">{totalFields - totalConfigured}</p>
-            <p className="text-white/50 text-xs">Pendentes</p>
-          </div>
-          <div className="text-center">
-            <p className="text-white font-bold">{totalFields}</p>
-            <p className="text-white/50 text-xs">Total</p>
-          </div>
-        </div>
+      {/* Abas */}
+      <div className="flex gap-2">
+        {(['perfil', 'integrações'] as const).map(aba => (
+          <button key={aba} onClick={() => setAbaAtiva(aba)}
+            className={`px-5 py-2 rounded-xl text-sm font-semibold border capitalize transition-all ${
+              abaAtiva === aba
+                ? 'border-[#D4A017] text-[#D4A017] bg-[#D4A017]/10'
+                : 'border-white/10 text-white/50 hover:border-white/20'
+            }`}>
+            {aba === 'perfil' ? '🤖 Perfil Dr. Ben' : '🔌 Integrações'}
+          </button>
+        ))}
       </div>
 
-      {/* Config sections */}
-      {configSections.map((section) => (
-        <div key={section.title} className="card">
-          <h2 className="font-semibold text-white mb-1">{section.title}</h2>
-          <p className="text-white/60 text-sm mb-4">{section.description}</p>
-          <div className="space-y-3">
-            {section.fields.map((field) => (
-              <div key={field.key}>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-sm font-medium text-white/90">{field.label}</label>
-                  <span className={field.status === 'configured' ? 'badge-green' : 'badge-yellow'}>
-                    {field.status === 'configured' ? '✅ Configurado' : '⏳ Pendente'}
-                  </span>
-                </div>
-                <div className="relative">
-                  <input
-                    type={field.type === 'password' && !showKeys[field.key] ? 'password' : 'text'}
-                    placeholder={field.placeholder}
-                    defaultValue={field.status === 'configured' ? '••••••••••••••••' : ''}
-                    className="w-full px-3 py-2 pr-10 bg-white/6 border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-white/55 font-mono"
-                  />
-                  {field.type === 'password' && (
-                    <button type="button" onClick={() => toggleKey(field.key)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80">
-                      {showKeys[field.key] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  )}
-                </div>
-                {field.hint && <p className="text-white/50 text-xs mt-1">💡 {field.hint}</p>}
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
+      {/* ── ABA PERFIL DR. BEN ── */}
+      {abaAtiva === 'perfil' && (
+        <div className="space-y-6">
 
-      {/* Guia de configuração rápida */}
-      <div className="card bg-gradient-to-r from-primary-900 to-primary-700 text-white">
-        <h2 className="font-semibold mb-3">🚀 Guia de Configuração Rápida</h2>
-        <div className="space-y-2 text-sm text-gold-200">
-          {[
-            { step: '1', text: 'Google Ads: acesse console.cloud.google.com → crie projeto → ative Google Ads API → gere credenciais OAuth2' },
-            { step: '2', text: 'Meta Ads: acesse developers.facebook.com → crie app → gere token de longa duração (60 dias)' },
-            { step: '3', text: 'Neon DB: acesse neon.tech → crie projeto gratuito → copie DATABASE_URL' },
-            { step: '4', text: 'Genspark: acesse configurações da API no seu painel Team → copie a chave' },
-            { step: '5', text: 'Cole todas as variáveis no Vercel: Settings → Environment Variables → redeploy' },
-          ].map(item => (
-            <div key={item.step} className="flex gap-3">
-              <span className="w-6 h-6 bg-gold rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">{item.step}</span>
-              <p>{item.text}</p>
+          {/* Card principal do perfil */}
+          <div className="bg-[#0f1629] border border-white/10 rounded-2xl overflow-hidden">
+            {/* Banner */}
+            <div className="h-24 w-full" style={{ background: 'linear-gradient(135deg, #0f2044, #1e3470, #D4A017)' }} />
+
+            {/* Avatar + Info */}
+            <div className="px-6 pb-6">
+              <div className="flex items-end gap-4 -mt-12 mb-4">
+                <div className="relative">
+                  <img
+                    src="/dr-ben-avatar.jpg"
+                    alt="Dr. Ben"
+                    className="w-24 h-24 rounded-2xl border-4 object-cover shadow-xl"
+                    style={{ borderColor: '#0f1629' }}
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-2 flex items-center justify-center"
+                    style={{ borderColor: '#0f1629' }}>
+                    <div className="w-2 h-2 bg-white rounded-full" />
+                  </div>
+                </div>
+                <div className="pb-2">
+                  <h2 className="text-xl font-bold text-white">{DR_BEN_PROFILE.nomeCompleto}</h2>
+                  <p className="text-white/50 text-sm">{DR_BEN_PROFILE.descricao}</p>
+                </div>
+              </div>
+
+              {/* Detalhes */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  { icon: <MapPin className="w-4 h-4" />,      label: 'Endereço',  value: DR_BEN_PROFILE.endereco },
+                  { icon: <Phone className="w-4 h-4" />,       label: 'Telefone',  value: DR_BEN_PROFILE.telefone },
+                  { icon: <Mail className="w-4 h-4" />,        label: 'E-mail',    value: DR_BEN_PROFILE.email },
+                  { icon: <Globe className="w-4 h-4" />,       label: 'Site',      value: DR_BEN_PROFILE.site },
+                  { icon: <Clock className="w-4 h-4" />,       label: 'Horário',   value: DR_BEN_PROFILE.horario },
+                  { icon: <MessageCircle className="w-4 h-4" />,label: 'WABA ID',  value: DR_BEN_PROFILE.whatsappId },
+                ].map(item => (
+                  <div key={item.label} className="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-3">
+                    <div className="text-[#D4A017] flex-shrink-0">{item.icon}</div>
+                    <div className="min-w-0">
+                      <p className="text-white/40 text-xs">{item.label}</p>
+                      <p className="text-white text-sm font-medium truncate">{item.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Áreas de atuação */}
+          <div className="bg-[#0f1629] border border-white/10 rounded-2xl p-5">
+            <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+              <Bot className="w-4 h-4 text-[#D4A017]" /> Áreas de Atuação
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {DR_BEN_PROFILE.areas.map(area => (
+                <span key={area}
+                  className="px-3 py-1.5 rounded-full text-xs font-medium border"
+                  style={{ background: 'rgba(212,160,23,0.10)', borderColor: 'rgba(212,160,23,0.30)', color: '#D4A017' }}>
+                  {area}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Mensagem de saudação */}
+          <div className="bg-[#0f1629] border border-white/10 rounded-2xl p-5">
+            <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+              <MessageCircle className="w-4 h-4 text-emerald-400" /> Mensagem de Saudação (WhatsApp)
+            </h3>
+            <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
+              <pre className="text-white/80 text-sm whitespace-pre-wrap font-sans leading-relaxed">
+                {DR_BEN_PROFILE.saudacao}
+              </pre>
+            </div>
+          </div>
+
+          {/* Templates */}
+          <div className="bg-[#0f1629] border border-white/10 rounded-2xl p-5">
+            <h3 className="text-white font-semibold mb-3">📋 Templates de Mensagem Aprovados</h3>
+            <div className="space-y-3">
+              {Object.entries(DR_BEN_PROFILE.templates).map(([key, tpl]) => (
+                <div key={key} className="bg-white/5 border border-white/10 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-white text-sm font-semibold">{tpl.nome}</p>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                      {tpl.idioma}
+                    </span>
+                  </div>
+                  <pre className="text-white/50 text-xs whitespace-pre-wrap font-sans">{tpl.texto}</pre>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Instrução para configurar foto no WhatsApp */}
+          <div className="bg-[#0f1629] border border-amber-500/30 rounded-2xl p-5">
+            <h3 className="text-amber-400 font-semibold mb-2 flex items-center gap-2">
+              ⚠️ Para atualizar a foto do perfil no WhatsApp Business
+            </h3>
+            <p className="text-white/60 text-sm mb-3">
+              A foto acima está configurada no sistema. Para aplicar no WhatsApp Business oficial, 
+              é necessário o <strong className="text-white">Access Token da Meta API</strong>. 
+              Quando inserir o token na aba "Integrações", a foto será sincronizada automaticamente.
+            </p>
+            <div className="bg-black/30 rounded-xl p-3 font-mono text-xs text-green-400">
+              POST https://graph.facebook.com/v19.0/888304720788200/whatsapp_business_profile<br/>
+              → description, email, websites, vertical<br/>
+              → profile_picture_url: /dr-ben-avatar.jpg
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* ── ABA INTEGRAÇÕES ── */}
+      {abaAtiva === 'integrações' && (
+        <div className="space-y-6">
+
+          {/* Progresso */}
+          <div className="bg-[#0f1629] border border-white/10 rounded-2xl p-5">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-semibold text-white">Progresso da Configuração</h2>
+              <span className="text-white/60 text-sm">{totalConfigured}/{totalFields} configurados</span>
+            </div>
+            <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full rounded-full transition-all"
+                style={{ width: `${(totalConfigured / totalFields) * 100}%`, background: '#D4A017' }} />
+            </div>
+            <div className="grid grid-cols-3 gap-3 mt-4">
+              {[
+                { label: 'Configurados', value: totalConfigured,              color: 'text-emerald-400' },
+                { label: 'Pendentes',    value: totalFields - totalConfigured, color: 'text-amber-400' },
+                { label: 'Total',        value: totalFields,                   color: 'text-white' },
+              ].map(s => (
+                <div key={s.label} className="bg-white/5 rounded-xl p-3 text-center">
+                  <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+                  <p className="text-white/40 text-xs mt-0.5">{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Seções de config */}
+          {configSections.map(section => (
+            <div key={section.title} className="bg-[#0f1629] border border-white/10 rounded-2xl p-5">
+              <h2 className="font-semibold text-white mb-1">{section.title}</h2>
+              <p className="text-white/50 text-sm mb-4">{section.description}</p>
+              <div className="space-y-4">
+                {section.fields.map(field => (
+                  <div key={field.key}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-sm font-medium text-white/90">{field.label}</label>
+                      <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
+                        field.status === 'configured'
+                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                          : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+                      }`}>
+                        {field.status === 'configured' ? '✅ Configurado' : '⏳ Pendente'}
+                      </span>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type={field.type === 'password' && !showKeys[field.key] ? 'password' : 'text'}
+                        placeholder={field.placeholder}
+                        defaultValue={field.status === 'configured' ? '••••••••••••••••' : ''}
+                        className="w-full px-3 py-2.5 pr-10 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#D4A017] font-mono"
+                      />
+                      {field.type === 'password' && (
+                        <button type="button" onClick={() => toggleKey(field.key)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80 transition-colors">
+                          {showKeys[field.key] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      )}
+                    </div>
+                    {field.hint && (
+                      <p className="text-white/40 text-xs mt-1">💡 {field.hint}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
-        </div>
-      </div>
 
-      {/* Vercel env vars */}
-      <div className="card">
-        <h2 className="font-semibold text-white mb-3">📋 Variáveis para o Vercel (copie e cole)</h2>
-        <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
-          <pre className="text-green-400 text-xs font-mono whitespace-pre">{`# Google Ads
-GOOGLE_ADS_CLIENT_ID=
-GOOGLE_ADS_CLIENT_SECRET=
-GOOGLE_ADS_DEVELOPER_TOKEN=
-GOOGLE_ADS_REFRESH_TOKEN=
-GOOGLE_ADS_CUSTOMER_ID=
+          {/* Variáveis Vercel */}
+          <div className="bg-[#0f1629] border border-white/10 rounded-2xl p-5">
+            <h2 className="font-semibold text-white mb-3">📋 Variáveis para o Vercel</h2>
+            <div className="bg-black/50 rounded-xl p-4 overflow-x-auto">
+              <pre className="text-green-400 text-xs font-mono whitespace-pre">{`# WhatsApp Business API (Meta)
+WHATSAPP_TOKEN=               # EAAb... (Access Token Meta)
+WHATSAPP_PHONE_NUMBER_ID=     # ID do número
+WHATSAPP_WABA_ID=888304720788200
 
 # Meta Ads
 META_APP_ID=
@@ -185,20 +316,27 @@ META_APP_SECRET=
 META_ACCESS_TOKEN=
 META_AD_ACCOUNT_ID=
 
-# IA
-GEMINI_API_KEY=                   # já existe no drben
+# Google Ads
+GOOGLE_ADS_CLIENT_ID=
+GOOGLE_ADS_CLIENT_SECRET=
+GOOGLE_ADS_DEVELOPER_TOKEN=
+GOOGLE_ADS_REFRESH_TOKEN=
+
+# ZapSign ✅ já configurado
+ZAPSIGN_TOKEN=426e787a-3446-4341-bbd2-2b88e544ad39
+
+# IA ✅ Gemini já configurado
+GEMINI_API_KEY=
 GENSPARK_API_KEY=
 
-# WhatsApp
-WHATSAPP_TOKEN=                   # já existe
-WHATSAPP_PHONE_NUMBER_ID=
-KOMMO_API_KEY=
-
 # Database
-DATABASE_URL=                     # postgresql://... (Neon)
-JWT_SECRET=                       # string aleatória longa`}</pre>
+DATABASE_URL=                 # postgresql://... (Neon)
+JWT_SECRET=`}</pre>
+            </div>
+          </div>
+
         </div>
-      </div>
+      )}
     </div>
   )
 }
