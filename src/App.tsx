@@ -4,95 +4,85 @@ import {
   LayoutDashboard, Megaphone, FileText,
   Users, Bot, Search, Settings, LogOut, Bell,
   ChevronRight, Building2, Shield, MessageSquare,
-  BarChart3, Plug, Workflow
+  BarChart3, Plug, Workflow, TrendingUp
 } from 'lucide-react'
 
 // Pages
-import HubComercial from './pages/HubComercial'
-import Dashboard from './pages/Dashboard'
-import Campanhas from './pages/Campanhas'
-import Analytics from './pages/Analytics'
-import Conteudo from './pages/Conteudo'
-import CRM from './pages/CRM'
-import Leads from './pages/Leads'
-import Agentes from './pages/Agentes'
-import PalavrasChave from './pages/PalavrasChave'
-import Configuracoes from './pages/Configuracoes'
-import Plantonista from './pages/Plantonista'
+import HubComercial    from './pages/HubComercial'
+import Dashboard       from './pages/Dashboard'
+import Campanhas       from './pages/Campanhas'
+import Analytics       from './pages/Analytics'
+import Conteudo        from './pages/Conteudo'
+import CRM             from './pages/CRM'
+import Leads           from './pages/Leads'
+import Agentes         from './pages/Agentes'
+import PalavrasChave   from './pages/PalavrasChave'
+import Configuracoes   from './pages/Configuracoes'
+import Plantonista     from './pages/Plantonista'
 import DrBenIntegracao from './pages/DrBenIntegracao'
-import Integracoes from './pages/Integracoes'
-import FlowBuilder from './pages/FlowBuilder'
+import Integracoes     from './pages/Integracoes'
+import FlowBuilder     from './pages/FlowBuilder'
 
 const navGroups = [
   {
     label: 'VISÃO GERAL',
     items: [
-      { to: '/', icon: Building2, label: 'Central Comercial', exact: true },
+      { to: '/',         icon: Building2,       label: 'Central Comercial', exact: true },
     ],
   },
   {
     label: 'CRM & ATENDIMENTO',
     items: [
-      { to: '/crm', icon: Users, label: 'CRM — Pipeline' },
-      { to: '/plantonista', icon: Shield, label: 'Plantonista & Alertas' },
-      { to: '/dr-ben', icon: MessageSquare, label: 'Dr. Ben — IA' },
-      { to: '/flow-builder', icon: Workflow, label: 'Dr. Ben Flow' },
+      { to: '/crm',          icon: Users,          label: 'CRM — Pipeline' },
+      { to: '/plantonista',  icon: Shield,         label: 'Plantonista & Alertas' },
+      { to: '/dr-ben',       icon: MessageSquare,  label: 'Dr. Ben — IA' },
+      { to: '/flow-builder', icon: Workflow,       label: 'Dr. Ben Flow' },
     ],
   },
   {
     label: 'TRÁFEGO & MARKETING',
     items: [
-      { to: '/campanhas', icon: Megaphone, label: 'Campanhas' },
-      { to: '/analytics', icon: BarChart3, label: 'Analytics' },
-      { to: '/conteudo', icon: FileText, label: 'Conteúdo IA' },
-      { to: '/palavras-chave', icon: Search, label: 'Palavras-chave' },
+      { to: '/campanhas',     icon: Megaphone,      label: 'Campanhas' },
+      { to: '/analytics',     icon: BarChart3,      label: 'Analytics' },
+      { to: '/conteudo',      icon: FileText,       label: 'Conteúdo IA' },
+      { to: '/palavras-chave',icon: Search,         label: 'Palavras-chave' },
     ],
   },
   {
     label: 'INTELIGÊNCIA',
     items: [
-      { to: '/agentes', icon: Bot, label: 'Agentes IA' },
-      { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard Ads' },
+      { to: '/agentes',   icon: Bot,            label: 'Agentes IA' },
+      { to: '/dashboard', icon: LayoutDashboard,label: 'Dashboard Ads' },
     ],
   },
   {
     label: 'SISTEMA',
     items: [
-      { to: '/integracoes', icon: Plug, label: 'Integrações' },
+      { to: '/integracoes',   icon: Plug,     label: 'Integrações' },
       { to: '/configuracoes', icon: Settings, label: 'Configurações' },
     ],
   },
 ]
 
-// Ícone SVG do Ben Growth Center
-function BenGrowthIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="40" height="40" rx="10" fill="url(#bgGradient)" />
-      <path d="M10 28 L16 18 L22 22 L30 12" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <circle cx="30" cy="12" r="3" fill="#00b37e" />
-      <path d="M10 32 L30 32" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" strokeLinecap="round"/>
-      <defs>
-        <linearGradient id="bgGradient" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#1a3a7e" />
-          <stop offset="1" stopColor="#0f2044" />
-        </linearGradient>
-      </defs>
-    </svg>
-  )
-}
-
 function Sidebar() {
   const location = useLocation()
   return (
-    <aside className="w-64 bg-primary-900 min-h-screen flex flex-col fixed left-0 top-0 z-40 overflow-y-auto">
-      {/* Logo Ben Growth Center */}
-      <div className="p-5 border-b border-primary-700 flex-shrink-0">
+    <aside
+      className="w-64 min-h-screen flex flex-col fixed left-0 top-0 z-40 overflow-y-auto"
+      style={{ background: '#0a1628', borderRight: '1px solid rgba(255,255,255,0.07)' }}
+    >
+      {/* Logo */}
+      <div className="p-5 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
         <div className="flex items-center gap-3">
-          <BenGrowthIcon className="w-10 h-10 flex-shrink-0" />
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md"
+            style={{ background: 'linear-gradient(135deg, #1e3470, #0f2044)', border: '1px solid rgba(212,160,23,0.40)' }}
+          >
+            <TrendingUp size={18} style={{ color: '#D4A017' }} />
+          </div>
           <div>
-            <h1 className="text-white font-bold text-sm leading-tight">Ben Growth Center</h1>
-            <p className="text-growth-400 text-xs font-medium">Inteligência Comercial Jurídica</p>
+            <h1 className="font-bold text-sm leading-tight text-white font-sans">Ben Growth Center</h1>
+            <p className="text-xs font-medium font-sans" style={{ color: '#D4A017' }}>Inteligência Comercial</p>
           </div>
         </div>
       </div>
@@ -101,7 +91,10 @@ function Sidebar() {
       <nav className="flex-1 p-3 space-y-4">
         {navGroups.map(group => (
           <div key={group.label}>
-            <p className="text-primary-400 text-xs font-semibold px-3 mb-1 tracking-wider">{group.label}</p>
+            <p className="text-xs font-semibold px-3 mb-1.5 font-sans tracking-wider"
+              style={{ color: 'rgba(159,176,215,0.50)' }}>
+              {group.label}
+            </p>
             <div className="space-y-0.5">
               {group.items.map(item => {
                 const isActive = item.exact
@@ -111,11 +104,13 @@ function Sidebar() {
                   <NavLink
                     key={item.to}
                     to={item.to}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
-                      isActive
-                        ? 'bg-growth text-white shadow-sm'
-                        : 'text-primary-200 hover:bg-primary-700 hover:text-white'
-                    }`}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all font-sans"
+                    style={isActive
+                      ? { background: '#D4A017', color: '#0f2044', fontWeight: 700 }
+                      : { color: 'rgba(159,176,215,0.85)' }
+                    }
+                    onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)'; (e.currentTarget as HTMLElement).style.color = '#ffffff'; } }}
+                    onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'rgba(159,176,215,0.85)'; } }}
                   >
                     <item.icon className="w-4 h-4 flex-shrink-0" />
                     <span className="text-sm font-medium">{item.label}</span>
@@ -129,23 +124,26 @@ function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-primary-700 flex-shrink-0">
-        {/* Ben Growth tag */}
-        <div className="mb-3 px-2">
-          <div className="flex items-center gap-2 bg-growth-900 border border-growth-700 rounded-lg px-3 py-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-growth-400 animate-pulse" />
-            <span className="text-growth-300 text-xs font-medium">Sistema Ativo</span>
+      <div className="p-4 flex-shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="mb-3">
+          <div className="flex items-center gap-2 rounded-xl px-3 py-1.5"
+            style={{ background: 'rgba(0,179,126,0.12)', border: '1px solid rgba(0,179,126,0.28)' }}>
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-medium font-sans" style={{ color: '#6ee7b7' }}>Sistema Ativo</span>
           </div>
         </div>
         <div className="flex items-center gap-3 px-2 py-2">
-          <div className="w-8 h-8 bg-growth rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-bold">MM</span>
+          <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{ background: '#D4A017', color: '#0f2044' }}>
+            <span className="text-sm font-bold">MM</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-white text-sm font-medium truncate">Mauro Monção</p>
-            <p className="text-primary-300 text-xs">Tributarista · OAB/PI</p>
+            <p className="text-white text-sm font-semibold font-sans truncate">Mauro Monção</p>
+            <p className="text-xs font-sans truncate" style={{ color: 'rgba(159,176,215,0.65)' }}>Tributarista · OAB/PI</p>
           </div>
-          <button className="text-primary-300 hover:text-white transition-colors">
+          <button className="transition-colors" style={{ color: 'rgba(159,176,215,0.65)' }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#ffffff')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(159,176,215,0.65)')}>
             <LogOut className="w-4 h-4" />
           </button>
         </div>
@@ -156,29 +154,37 @@ function Sidebar() {
 
 function TopBar() {
   return (
-    <header className="h-14 bg-white border-b border-slate-200 fixed top-0 right-0 left-64 z-30 flex items-center justify-between px-6">
-      <div className="flex items-center gap-3">
-        <div>
-          <p className="text-slate-800 font-semibold text-sm">Ben Growth Center</p>
-          <p className="text-slate-400 text-xs">
-            {new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-          </p>
-        </div>
+    <header
+      className="h-14 fixed top-0 right-0 left-64 z-30 flex items-center justify-between px-6"
+      style={{ background: '#0f2044', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
+    >
+      <div>
+        <p className="font-semibold text-sm font-serif text-white" style={{ letterSpacing: '-0.01em' }}>
+          Ben Growth Center
+        </p>
+        <p className="text-xs font-sans" style={{ color: 'rgba(159,176,215,0.70)' }}>
+          {new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        </p>
       </div>
       <div className="flex items-center gap-3">
         {/* Status agentes */}
-        <div className="flex items-center gap-1.5 bg-growth-50 border border-growth-200 rounded-full px-3 py-1.5">
-          <div className="w-1.5 h-1.5 rounded-full bg-growth-500 animate-pulse" />
-          <span className="text-growth-700 text-xs font-medium">7 Agentes Ativos</span>
+        <div className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
+          style={{ background: 'rgba(0,179,126,0.15)', border: '1px solid rgba(0,179,126,0.35)', color: '#6ee7b7', fontSize: '0.75rem', fontWeight: 500 }}>
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="font-sans">7 Agentes Ativos</span>
         </div>
         {/* Notificações */}
-        <button className="relative p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+        <button className="relative p-2 rounded-lg transition-colors"
+          style={{ color: 'rgba(159,176,215,0.70)' }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#ffffff')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'rgba(159,176,215,0.70)')}>
           <Bell className="w-5 h-5" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full" />
         </button>
         {/* Avatar */}
-        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-          <span className="text-white text-xs font-bold">MM</span>
+        <div className="w-8 h-8 rounded-full flex items-center justify-center"
+          style={{ background: '#D4A017', color: '#0f2044' }}>
+          <span className="text-xs font-bold">MM</span>
         </div>
       </div>
     </header>
@@ -187,11 +193,11 @@ function TopBar() {
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex">
+    <div className="flex" style={{ background: '#0f2044', minHeight: '100vh' }}>
       <Sidebar />
       <div className="flex-1 ml-64">
         <TopBar />
-        <main className="pt-14 min-h-screen bg-slate-50">
+        <main className="pt-14 min-h-screen" style={{ background: '#0f2044' }}>
           <div className="p-6">{children}</div>
         </main>
       </div>
@@ -204,17 +210,17 @@ export default function App() {
     <BrowserRouter>
       <Layout>
         <Routes>
-          <Route path="/" element={<HubComercial />} />
-          <Route path="/crm" element={<CRM />} />
-          <Route path="/plantonista" element={<Plantonista />} />
-          <Route path="/dr-ben" element={<DrBenIntegracao />} />
-          <Route path="/campanhas" element={<Campanhas />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/conteudo" element={<Conteudo />} />
+          <Route path="/"             element={<HubComercial />} />
+          <Route path="/crm"          element={<CRM />} />
+          <Route path="/plantonista"  element={<Plantonista />} />
+          <Route path="/dr-ben"       element={<DrBenIntegracao />} />
+          <Route path="/campanhas"    element={<Campanhas />} />
+          <Route path="/analytics"    element={<Analytics />} />
+          <Route path="/conteudo"     element={<Conteudo />} />
           <Route path="/palavras-chave" element={<PalavrasChave />} />
-          <Route path="/agentes" element={<Agentes />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/integracoes" element={<Integracoes />} />
+          <Route path="/agentes"      element={<Agentes />} />
+          <Route path="/dashboard"    element={<Dashboard />} />
+          <Route path="/integracoes"  element={<Integracoes />} />
           <Route path="/flow-builder" element={<FlowBuilder />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
         </Routes>

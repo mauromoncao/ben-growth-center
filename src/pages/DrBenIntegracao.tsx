@@ -91,8 +91,8 @@ export default function DrBenIntegracao() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Dr. Ben — Integração CRM</h1>
-          <p className="text-slate-500 text-sm mt-1">Fluxo de qualificação IA e repasse automático para humano</p>
+          <h1 className="text-2xl font-bold text-white">Dr. Ben — Integração CRM</h1>
+          <p className="text-white/60 text-sm mt-1">Fluxo de qualificação IA e repasse automático para humano</p>
         </div>
         <button onClick={iniciarDemo} disabled={rodando}
           className="btn-primary flex items-center gap-2 text-sm disabled:opacity-60">
@@ -104,12 +104,12 @@ export default function DrBenIntegracao() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Chat simulado */}
         <div className="card flex flex-col h-[520px]">
-          <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-100">
+          <div className="flex items-center gap-3 mb-4 pb-4 border-b border-white/8">
             <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
               <Bot className="w-6 h-6 text-amber-600" />
             </div>
             <div>
-              <h2 className="font-semibold text-slate-800">Dr. Ben — Chat ao Vivo</h2>
+              <h2 className="font-semibold text-white">Dr. Ben — Chat ao Vivo</h2>
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                 <span className="text-green-600 text-xs">Online · Gemini 2.5 Flash</span>
@@ -127,7 +127,7 @@ export default function DrBenIntegracao() {
             {mensagens.length === 0 && (
               <div className="text-center py-12">
                 <Bot className="w-12 h-12 text-slate-200 mx-auto mb-3" />
-                <p className="text-slate-400 text-sm">Clique em "Simular Conversa" para ver o Dr. Ben qualificando um lead em tempo real</p>
+                <p className="text-white/50 text-sm">Clique em "Simular Conversa" para ver o Dr. Ben qualificando um lead em tempo real</p>
               </div>
             )}
             {mensagens.map((msg, i) => (
@@ -139,20 +139,20 @@ export default function DrBenIntegracao() {
                 )}
                 <div className={`max-w-xs rounded-2xl px-3 py-2 text-sm ${
                   msg.role === 'user'
-                    ? 'bg-primary text-white rounded-tr-sm'
+                    ? 'bg-navy text-white rounded-tr-sm'
                     : msg.acao === 'repasse'
-                    ? 'bg-green-50 border-2 border-green-400 text-slate-700 rounded-tl-sm'
+                    ? 'bg-green-50 border-2 border-green-400 text-white/90 rounded-tl-sm'
                     : msg.acao === 'qualificado'
-                    ? 'bg-amber-50 border border-amber-300 text-slate-700 rounded-tl-sm'
-                    : 'bg-slate-100 text-slate-700 rounded-tl-sm'
+                    ? 'bg-amber-50 border border-amber-300 text-white/90 rounded-tl-sm'
+                    : 'bg-white/6 text-white/90 rounded-tl-sm'
                 }`}>
                   {msg.role === 'bot' && (
-                    <p className={`text-xs font-medium mb-0.5 ${msg.acao === 'repasse' ? 'text-green-600' : msg.acao === 'qualificado' ? 'text-amber-600' : 'text-slate-400'}`}>
+                    <p className={`text-xs font-medium mb-0.5 ${msg.acao === 'repasse' ? 'text-green-600' : msg.acao === 'qualificado' ? 'text-amber-600' : 'text-white/50'}`}>
                       {msg.acao === 'repasse' ? '✅ Repasse Automático' : msg.acao === 'qualificado' ? '🤖 Qualificação IA' : '🤖 Dr. Ben'}
                     </p>
                   )}
                   <p>{msg.texto}</p>
-                  <p className={`text-xs mt-1 ${msg.role === 'user' ? 'text-primary-200' : 'text-slate-400'}`}>{msg.hora}</p>
+                  <p className={`text-xs mt-1 ${msg.role === 'user' ? 'text-gold-200' : 'text-white/50'}`}>{msg.hora}</p>
                 </div>
               </div>
             ))}
@@ -161,7 +161,7 @@ export default function DrBenIntegracao() {
                 <div className="w-7 h-7 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <Bot className="w-4 h-4 text-amber-600" />
                 </div>
-                <div className="bg-slate-100 rounded-2xl rounded-tl-sm px-4 py-3">
+                <div className="bg-white/6 rounded-2xl rounded-tl-sm px-4 py-3">
                   <div className="flex gap-1">
                     <div className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" />
                     <div className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
@@ -173,13 +173,13 @@ export default function DrBenIntegracao() {
           </div>
 
           {/* Input */}
-          <div className="flex gap-2 pt-3 border-t border-slate-100">
+          <div className="flex gap-2 pt-3 border-t border-white/8">
             <input
               type="text"
               value={novaMsg}
               onChange={e => setNovaMsg(e.target.value)}
               placeholder="Testar Dr. Ben manualmente..."
-              className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+              className="flex-1 border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/55"
             />
             <button className="btn-primary px-3 py-2">
               <Send className="w-4 h-4" />
@@ -205,9 +205,9 @@ export default function DrBenIntegracao() {
                   { label: 'Valor Est.', value: 'R$ 20.000' },
                   { label: 'Status', value: '⏳ Aguardando' },
                 ].map(item => (
-                  <div key={item.label} className="bg-white rounded-lg p-2">
-                    <p className="text-slate-400 text-xs">{item.label}</p>
-                    <p className="font-medium text-slate-800">{item.value}</p>
+                  <div key={item.label} className="bg-white/5 rounded-lg p-2">
+                    <p className="text-white/50 text-xs">{item.label}</p>
+                    <p className="font-medium text-white">{item.value}</p>
                   </div>
                 ))}
               </div>
@@ -215,7 +215,7 @@ export default function DrBenIntegracao() {
                 <button className="flex-1 bg-green-500 text-white text-sm py-2 rounded-lg hover:bg-green-600 transition-colors">
                   Abrir no CRM
                 </button>
-                <button className="flex-1 bg-white border border-green-300 text-green-700 text-sm py-2 rounded-lg hover:bg-green-50 transition-colors">
+                <button className="flex-1 bg-white/5 border border-green-300 text-green-700 text-sm py-2 rounded-lg hover:bg-green-50 transition-colors">
                   Ver no WhatsApp
                 </button>
               </div>
@@ -224,22 +224,22 @@ export default function DrBenIntegracao() {
 
           {/* Webhook — Log de entradas */}
           <div className="card">
-            <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
+            <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
               <Zap className="w-4 h-4 text-amber-500" /> Webhook — Entradas Recentes
             </h3>
             <div className="space-y-2">
               {webhookLogsMock.map(log => (
-                <div key={log.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                <div key={log.id} className="flex items-center justify-between p-3 bg-white/4 rounded-xl hover:bg-white/6 transition-colors">
                   <div className="flex items-center gap-3">
                     <span className="text-xl">{log.fonte === 'WhatsApp' ? '💬' : '🌐'}</span>
                     <div>
-                      <p className="font-medium text-slate-700 text-sm">{log.nome}</p>
-                      <p className="text-slate-400 text-xs">{log.mensagem} · {log.hora}</p>
+                      <p className="font-medium text-white/90 text-sm">{log.nome}</p>
+                      <p className="text-white/50 text-xs">{log.mensagem} · {log.hora}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     {log.score && (
-                      <span className="text-xs text-slate-500">{log.score}</span>
+                      <span className="text-xs text-white/60">{log.score}</span>
                     )}
                     <span className={statusWebhookCor[log.status]}>{statusWebhookLabel[log.status]}</span>
                   </div>
@@ -250,7 +250,7 @@ export default function DrBenIntegracao() {
 
           {/* Configuração da integração */}
           <div className="card">
-            <h3 className="font-semibold text-slate-800 mb-3">⚙️ Integração Ativa</h3>
+            <h3 className="font-semibold text-white mb-3">⚙️ Integração Ativa</h3>
             <div className="space-y-2">
               {[
                 { fonte: 'WhatsApp (Meta API)', status: true, url: 'webhook/whatsapp' },
@@ -258,14 +258,14 @@ export default function DrBenIntegracao() {
                 { fonte: 'Formulário Site', status: true, url: 'webhook/form' },
                 { fonte: 'Google Ads (Lead Form)', status: false, url: 'webhook/google-leads' },
               ].map(item => (
-                <div key={item.fonte} className="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg">
+                <div key={item.fonte} className="flex items-center justify-between p-2.5 bg-white/4 rounded-lg">
                   <div>
-                    <p className="text-sm font-medium text-slate-700">{item.fonte}</p>
-                    <p className="text-slate-400 text-xs font-mono">/api/{item.url}</p>
+                    <p className="text-sm font-medium text-white/90">{item.fonte}</p>
+                    <p className="text-white/50 text-xs font-mono">/api/{item.url}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${item.status ? 'bg-green-400' : 'bg-slate-300'}`} />
-                    <span className={`text-xs ${item.status ? 'text-green-600' : 'text-slate-400'}`}>
+                    <span className={`text-xs ${item.status ? 'text-green-600' : 'text-white/50'}`}>
                       {item.status ? 'Ativo' : 'Pendente'}
                     </span>
                   </div>

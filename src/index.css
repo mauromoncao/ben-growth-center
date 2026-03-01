@@ -1,38 +1,177 @@
+/* ── Ben Growth Center — Design System ────────────────────────────────────── */
+/* Paleta: Navy #0f2044 · Gold #D4A017 · Emerald #00b37e · Amber #f59e0b     */
+/* Fonts:  Outfit (sans) · Cormorant Garamond (serif)                         */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ── base ──────────────────────────────────────────────────────────────────── */
 @layer base {
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
+
   body {
-    font-family: 'Inter', system-ui, sans-serif;
-    background-color: #f1f5f9;
-    color: #1e293b;
+    font-family: 'Outfit', system-ui, sans-serif;
+    background-color: #0f2044;
+    color: #ffffff;
+    -webkit-font-smoothing: antialiased;
   }
+
+  ::-webkit-scrollbar       { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 99px; }
 }
 
+/* ── components ────────────────────────────────────────────────────────────── */
 @layer components {
+
+  /* ── Cards ── */
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-slate-100 p-6;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 16px;
+    padding: 1.25rem;
+    backdrop-filter: blur(4px);
   }
+  .card-dark {
+    background: rgba(0,0,0,0.20);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+  }
+
+  /* ── Buttons ── */
   .btn-primary {
-    @apply bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors;
+    background: #D4A017;
+    color: #0f2044;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.875rem;
+    transition: filter 0.15s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
   }
-  .btn-secondary {
-    @apply bg-gold text-white px-4 py-2 rounded-lg font-medium hover:bg-gold-600 transition-colors;
+  .btn-primary:hover  { filter: brightness(1.1); }
+  .btn-primary:active { transform: scale(0.97); }
+
+  .btn-navy {
+    background: #0f2044;
+    color: #F0C040;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.875rem;
+    transition: filter 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid rgba(212,160,23,0.30);
   }
-  .badge-green {
-    @apply bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium;
+  .btn-navy:hover { filter: brightness(1.15); }
+
+  .btn-ghost {
+    background: rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.85);
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.875rem;
+    border: 1px solid rgba(255,255,255,0.12);
+    transition: background 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
   }
-  .badge-red {
-    @apply bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-medium;
+  .btn-ghost:hover { background: rgba(255,255,255,0.12); }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.65rem;
+    border-radius: 99px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
   }
-  .badge-yellow {
-    @apply bg-yellow-100 text-yellow-700 text-xs px-2 py-0.5 rounded-full font-medium;
+  .badge-gold    { background: rgba(212,160,23,0.20); color: #F0C040;  }
+  .badge-emerald { background: rgba(0,179,126,0.20);  color: #6ee7b7;  }
+  .badge-crimson { background: rgba(225,29,72,0.22);  color: #fca5a5;  }
+  .badge-amber   { background: rgba(245,158,11,0.20); color: #fde68a;  }
+  .badge-violet  { background: rgba(124,58,237,0.22); color: #d8b4fe;  }
+  .badge-cyan    { background: rgba(8,145,178,0.20);  color: #7dd3fc;  }
+  .badge-navy    { background: rgba(15,32,68,0.50);   color: #9fb0d7;  border: 1px solid rgba(255,255,255,0.12); }
+
+  /* legacy compat */
+  .badge-green  { @apply badge badge-emerald; }
+  .badge-red    { @apply badge badge-crimson; }
+  .badge-yellow { @apply badge badge-amber;   }
+  .badge-blue   { @apply badge badge-cyan;    }
+
+  /* ── KPI Cards ── */
+  .kpi-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 16px;
+    padding: 1rem;
   }
-  .badge-blue {
-    @apply bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-medium;
+
+  /* ── Table ── */
+  .tbl-head th {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: rgba(159,176,215,0.70);
+    background: rgba(0,0,0,0.15);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-family: 'Outfit', sans-serif;
   }
+  .tbl-row {
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  .tbl-row:hover { background: rgba(255,255,255,0.04); }
+  .tbl-row td    { padding: 0.75rem 1rem; font-size: 0.875rem; font-family: 'Outfit', sans-serif; }
+  .tbl-row td.td-primary { color: #38bdf8; font-family: monospace; font-weight: 700; }
+  .tbl-row td.td-main    { color: #ffffff; font-weight: 600; }
+  .tbl-row td.td-sub     { color: rgba(159,176,215,0.80); }
+
+  /* ── Section title ── */
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+  }
+  .section-sub {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.875rem;
+    color: rgba(159,176,215,0.80);
+    margin-top: 0.25rem;
+  }
+
+  /* ── Input ── */
+  .input-dark {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    color: #ffffff;
+    padding: 0.5rem 0.875rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.875rem;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  .input-dark::placeholder { color: rgba(159,176,215,0.50); }
+  .input-dark:focus        { outline: none; border-color: rgba(212,160,23,0.60); }
 }

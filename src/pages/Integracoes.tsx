@@ -149,7 +149,7 @@ const FLUXO_COMERCIAL = [
   { label: 'Lead chega', sub: 'WhatsApp · Instagram · Site', icone: '📩', cor: 'bg-blue-100 text-blue-700' },
   { label: 'ManyChat', sub: 'Fluxo inicial + coleta de dados', icone: '🤖', cor: 'bg-sky-100 text-sky-700', fase: 'C' },
   { label: 'Dr. Ben qualifica', sub: 'Score automático de 0-100', icone: '⚡', cor: 'bg-amber-100 text-amber-700' },
-  { label: 'Entra no CRM', sub: 'Card criado automaticamente', icone: '📊', cor: 'bg-primary-100 text-primary', fase: 'A' },
+  { label: 'Entra no CRM', sub: 'Card criado automaticamente', icone: '📊', cor: 'bg-navy-100 text-gold', fase: 'A' },
   { label: 'Reunião agendada', sub: 'Google Calendar + Meet', icone: '📅', cor: 'bg-blue-100 text-blue-700', fase: 'A' },
   { label: 'Contrato enviado', sub: 'ZapSign — assinatura digital', icone: '✍️', cor: 'bg-violet-100 text-violet-700', fase: 'A' },
   { label: 'Cobrança gerada', sub: 'Asaas — Pix, Boleto, Cartão', icone: '💳', cor: 'bg-emerald-100 text-emerald-700', fase: 'A' },
@@ -175,7 +175,7 @@ function IntegracaoCard({ integracao }: { integracao: IntegracaoUI }) {
   const statusLabel = integracao.configurado ? 'Conectado' : integracao.fase === 'A' ? 'Configurar agora' : 'Pendente'
 
   return (
-    <div className={`bg-white rounded-xl border transition-all ${integracao.configurado ? 'border-emerald-200 shadow-sm' : integracao.fase === 'A' ? 'border-amber-200' : 'border-slate-200 opacity-80'}`}>
+    <div className={`bg-white/5 rounded-xl border transition-all ${integracao.configurado ? 'border-emerald-200 shadow-sm' : integracao.fase === 'A' ? 'border-amber-200' : 'border-white/10 opacity-80'}`}>
       <div className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -187,28 +187,28 @@ function IntegracaoCard({ integracao }: { integracao: IntegracaoUI }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-slate-800 text-sm">{integracao.nome}</h3>
+                <h3 className="font-semibold text-white text-sm">{integracao.nome}</h3>
                 <span className={`text-xs px-1.5 py-0.5 rounded border font-medium ${faseCor}`}>
                   Fase {integracao.fase}
                 </span>
               </div>
-              <p className="text-slate-500 text-xs mt-0.5">{integracao.descricao}</p>
+              <p className="text-white/60 text-xs mt-0.5">{integracao.descricao}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 ml-2">
             {statusIcon}
-            <button onClick={() => setExpandido(!expandido)} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors">
-              <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${expandido ? 'rotate-90' : ''}`} />
+            <button onClick={() => setExpandido(!expandido)} className="p-1.5 hover:bg-white/6 rounded-lg transition-colors">
+              <ChevronRight className={`w-4 h-4 text-white/50 transition-transform ${expandido ? 'rotate-90' : ''}`} />
             </button>
           </div>
         </div>
 
         <div className="flex items-center justify-between mt-3">
-          <span className={`text-xs font-medium ${integracao.configurado ? 'text-emerald-600' : integracao.fase === 'A' ? 'text-amber-600' : 'text-slate-400'}`}>
+          <span className={`text-xs font-medium ${integracao.configurado ? 'text-emerald-600' : integracao.fase === 'A' ? 'text-amber-600' : 'text-white/50'}`}>
             {statusLabel}
           </span>
           {integracao.ultimaSync && (
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-white/50">
               Sync: {new Date(integracao.ultimaSync).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
             </span>
           )}
@@ -217,7 +217,7 @@ function IntegracaoCard({ integracao }: { integracao: IntegracaoUI }) {
 
       {/* Expandido */}
       {expandido && (
-        <div className="px-4 pb-4 border-t border-slate-100 pt-3 space-y-3">
+        <div className="px-4 pb-4 border-t border-white/8 pt-3 space-y-3">
           {integracao.proximo && (
             <div className="bg-amber-50 rounded-lg p-3 flex items-start gap-2">
               <Info className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
@@ -231,20 +231,20 @@ function IntegracaoCard({ integracao }: { integracao: IntegracaoUI }) {
           <div className="flex gap-2">
             {integracao.linkConfig && (
               <a href={integracao.linkConfig} target="_blank" rel="noreferrer"
-                className="flex-1 flex items-center justify-center gap-1.5 bg-primary text-white py-2 rounded-lg text-xs font-medium hover:bg-primary-600 transition-colors">
+                className="flex-1 flex items-center justify-center gap-1.5 bg-navy text-white py-2 rounded-lg text-xs font-medium hover:bg-navy-600 transition-colors">
                 <Settings className="w-3.5 h-3.5" />
                 Configurar
               </a>
             )}
             {integracao.linkDocs && (
               <a href={integracao.linkDocs} target="_blank" rel="noreferrer"
-                className="flex-1 flex items-center justify-center gap-1.5 bg-slate-100 text-slate-700 py-2 rounded-lg text-xs font-medium hover:bg-slate-200 transition-colors">
+                className="flex-1 flex items-center justify-center gap-1.5 bg-white/6 text-white/90 py-2 rounded-lg text-xs font-medium hover:bg-white/8 transition-colors">
                 <ExternalLink className="w-3.5 h-3.5" />
                 Documentação
               </a>
             )}
             {!integracao.linkConfig && !integracao.linkDocs && (
-              <div className="flex-1 flex items-center justify-center gap-1.5 bg-slate-100 text-slate-500 py-2 rounded-lg text-xs">
+              <div className="flex-1 flex items-center justify-center gap-1.5 bg-white/6 text-white/60 py-2 rounded-lg text-xs">
                 <RefreshCw className="w-3.5 h-3.5" />
                 Automático via Google OAuth
               </div>
@@ -275,8 +275,8 @@ export default function Integracoes() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Central de Integrações</h1>
-        <p className="text-slate-500 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-white">Central de Integrações</h1>
+        <p className="text-white/60 text-sm mt-1">
           Google Workspace · ZapSign · Asaas · WhatsApp · ManyChat · Instagram
         </p>
       </div>
@@ -285,25 +285,25 @@ export default function Integracoes() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="card text-center py-4">
           <p className="text-2xl font-bold text-emerald-600">{totalConfigurados}/{INTEGRACOES.length}</p>
-          <p className="text-slate-500 text-xs mt-1">Integrações Ativas</p>
+          <p className="text-white/60 text-xs mt-1">Integrações Ativas</p>
         </div>
         <div className="card text-center py-4">
           <p className="text-2xl font-bold text-amber-600">{faseATotal - faseAConfigurados}</p>
-          <p className="text-slate-500 text-xs mt-1">Fase A — Pendentes</p>
+          <p className="text-white/60 text-xs mt-1">Fase A — Pendentes</p>
         </div>
         <div className="card text-center py-4">
           <p className="text-2xl font-bold text-blue-600">3</p>
-          <p className="text-slate-500 text-xs mt-1">Google APIs</p>
+          <p className="text-white/60 text-xs mt-1">Google APIs</p>
         </div>
         <div className="card text-center py-4">
-          <p className="text-2xl font-bold text-primary">100%</p>
-          <p className="text-slate-500 text-xs mt-1">Fluxo Mapeado</p>
+          <p className="text-2xl font-bold text-gold">100%</p>
+          <p className="text-white/60 text-xs mt-1">Fluxo Mapeado</p>
         </div>
       </div>
 
       {/* Fluxo comercial visual */}
       <div className="card p-5">
-        <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <h2 className="font-bold text-white mb-4 flex items-center gap-2">
           <Zap className="w-5 h-5 text-growth" />
           Fluxo Comercial Automatizado
         </h2>
@@ -332,7 +332,7 @@ export default function Integracoes() {
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-5 text-white">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl">🤖</div>
+            <div className="w-12 h-12 bg-white/5/20 rounded-xl flex items-center justify-center text-2xl">🤖</div>
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <h3 className="font-bold text-lg">ManyChat + Dr. Ben</h3>
@@ -362,7 +362,7 @@ export default function Integracoes() {
         </div>
 
         {/* Fluxo ManyChat */}
-        <div className="mt-4 bg-white/10 rounded-xl p-4">
+        <div className="mt-4 bg-white/5/10 rounded-xl p-4">
           <p className="text-xs text-blue-200 font-medium mb-3">FLUXO MANYCHAT → BEN GROWTH CENTER</p>
           <div className="flex items-center gap-2 flex-wrap">
             {[
@@ -374,7 +374,7 @@ export default function Integracoes() {
               { label: 'Card no CRM', icone: '📊' },
             ].map((s, i) => (
               <React.Fragment key={s.label}>
-                <div className="bg-white/20 rounded-lg px-3 py-1.5 text-xs text-white flex items-center gap-1.5 flex-shrink-0">
+                <div className="bg-white/5/20 rounded-lg px-3 py-1.5 text-xs text-white flex items-center gap-1.5 flex-shrink-0">
                   <span>{s.icone}</span> {s.label}
                 </div>
                 {i < 5 && <ArrowRight className="w-3 h-3 text-blue-300 flex-shrink-0" />}
@@ -386,18 +386,18 @@ export default function Integracoes() {
 
       {/* Filtros */}
       <div className="flex gap-3 flex-wrap">
-        <div className="flex gap-1 bg-white border border-slate-200 rounded-lg p-1">
+        <div className="flex gap-1 bg-white/6 border border-white/10 rounded-lg p-1">
           {['todas', 'A', 'B', 'C'].map(fase => (
             <button
               key={fase}
               onClick={() => setFiltroFase(fase as any)}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${filtroFase === fase ? 'bg-primary text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${filtroFase === fase ? 'bg-navy text-white' : 'text-white/80 hover:bg-white/4'}`}
             >
               {fase === 'todas' ? 'Todas' : `Fase ${fase}`}
             </button>
           ))}
         </div>
-        <div className="flex gap-1 bg-white border border-slate-200 rounded-lg p-1">
+        <div className="flex gap-1 bg-white/6 border border-white/10 rounded-lg p-1">
           {[
             { id: 'todas', label: 'Todas' },
             { id: 'google', label: '🔵 Google' },
@@ -409,7 +409,7 @@ export default function Integracoes() {
             <button
               key={cat.id}
               onClick={() => setFiltroCategoria(cat.id)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${filtroCategoria === cat.id ? 'bg-primary text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${filtroCategoria === cat.id ? 'bg-navy text-white' : 'text-white/80 hover:bg-white/4'}`}
             >
               {cat.label}
             </button>
@@ -426,8 +426,8 @@ export default function Integracoes() {
 
       {/* Guia rápido OAuth Google */}
       <div className="card p-5">
-        <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <Settings className="w-5 h-5 text-slate-500" />
+        <h2 className="font-bold text-white mb-4 flex items-center gap-2">
+          <Settings className="w-5 h-5 text-white/60" />
           Guia Rápido — Google Workspace @mauromoncao.adv.br
         </h2>
         <div className="space-y-3">
@@ -464,16 +464,16 @@ export default function Integracoes() {
             },
           ].map(step => (
             <div key={step.passo} className="flex items-start gap-4">
-              <div className="w-7 h-7 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+              <div className="w-7 h-7 bg-navy text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                 {step.passo}
               </div>
               <div className="flex-1">
-                <p className="font-medium text-slate-800 text-sm">{step.titulo}</p>
-                <p className="text-slate-500 text-xs mt-0.5">{step.desc}</p>
+                <p className="font-medium text-white text-sm">{step.titulo}</p>
+                <p className="text-white/60 text-xs mt-0.5">{step.desc}</p>
               </div>
               {step.link && (
                 <a href={step.link} target="_blank" rel="noreferrer"
-                  className="text-xs text-primary hover:underline flex items-center gap-1 flex-shrink-0">
+                  className="text-xs text-gold hover:underline flex items-center gap-1 flex-shrink-0">
                   Abrir <ExternalLink className="w-3 h-3" />
                 </a>
               )}
@@ -484,7 +484,7 @@ export default function Integracoes() {
 
       {/* Webhooks */}
       <div className="card p-5">
-        <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <h2 className="font-bold text-white mb-4 flex items-center gap-2">
           <Zap className="w-5 h-5 text-amber-500" />
           Webhooks — Recebimento de Eventos
         </h2>
@@ -515,18 +515,18 @@ export default function Integracoes() {
               acao: 'Envia lead para Dr. Ben qualificar e criar card no CRM',
             },
           ].map(wh => (
-            <div key={wh.servico} className="bg-slate-50 rounded-xl p-4">
+            <div key={wh.servico} className="bg-white/4 rounded-xl p-4">
               <div className="flex items-center gap-3 mb-2">
                 <span className={`w-8 h-8 ${wh.cor} rounded-lg flex items-center justify-center`}>{wh.icone}</span>
                 <div>
-                  <p className="font-medium text-slate-800 text-sm">{wh.servico}</p>
-                  <code className="text-xs text-primary bg-primary-50 px-2 py-0.5 rounded">{wh.url}</code>
+                  <p className="font-medium text-white text-sm">{wh.servico}</p>
+                  <code className="text-xs text-gold bg-navy-50 px-2 py-0.5 rounded">{wh.url}</code>
                 </div>
               </div>
-              <p className="text-slate-500 text-xs">{wh.acao}</p>
+              <p className="text-white/60 text-xs">{wh.acao}</p>
               <div className="flex gap-1 mt-2 flex-wrap">
                 {wh.eventos.map(ev => (
-                  <span key={ev} className="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded font-mono">{ev}</span>
+                  <span key={ev} className="text-xs bg-white/8 text-white/80 px-2 py-0.5 rounded font-mono">{ev}</span>
                 ))}
               </div>
             </div>

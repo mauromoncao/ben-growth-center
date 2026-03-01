@@ -79,8 +79,8 @@ export default function Configuracoes() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Configurações</h1>
-          <p className="text-slate-500 text-sm mt-1">Variáveis de ambiente e integrações do Lex Traffic</p>
+          <h1 className="text-2xl font-bold text-white">Configurações</h1>
+          <p className="text-white/60 text-sm mt-1">Variáveis de ambiente e integrações do Lex Traffic</p>
         </div>
         <button onClick={handleSave} className="btn-primary flex items-center gap-2 text-sm">
           {saved ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
@@ -91,25 +91,25 @@ export default function Configuracoes() {
       {/* Progress */}
       <div className="card">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="font-medium text-slate-700">Progresso da Configuração</h2>
-          <span className="text-slate-500 text-sm">{totalConfigured}/{totalFields} configurados</span>
+          <h2 className="font-medium text-white/90">Progresso da Configuração</h2>
+          <span className="text-white/60 text-sm">{totalConfigured}/{totalFields} configurados</span>
         </div>
-        <div className="h-3 bg-slate-100 rounded-full">
+        <div className="h-3 bg-white/6 rounded-full">
           <div className="h-full bg-gradient-to-r from-primary to-gold rounded-full transition-all"
             style={{ width: `${(totalConfigured / totalFields) * 100}%` }} />
         </div>
         <div className="grid grid-cols-3 gap-3 mt-4">
           <div className="text-center">
             <p className="text-green-600 font-bold">{totalConfigured}</p>
-            <p className="text-slate-400 text-xs">Configurados</p>
+            <p className="text-white/50 text-xs">Configurados</p>
           </div>
           <div className="text-center">
             <p className="text-amber-600 font-bold">{totalFields - totalConfigured}</p>
-            <p className="text-slate-400 text-xs">Pendentes</p>
+            <p className="text-white/50 text-xs">Pendentes</p>
           </div>
           <div className="text-center">
-            <p className="text-slate-800 font-bold">{totalFields}</p>
-            <p className="text-slate-400 text-xs">Total</p>
+            <p className="text-white font-bold">{totalFields}</p>
+            <p className="text-white/50 text-xs">Total</p>
           </div>
         </div>
       </div>
@@ -117,13 +117,13 @@ export default function Configuracoes() {
       {/* Config sections */}
       {configSections.map((section) => (
         <div key={section.title} className="card">
-          <h2 className="font-semibold text-slate-800 mb-1">{section.title}</h2>
-          <p className="text-slate-500 text-sm mb-4">{section.description}</p>
+          <h2 className="font-semibold text-white mb-1">{section.title}</h2>
+          <p className="text-white/60 text-sm mb-4">{section.description}</p>
           <div className="space-y-3">
             {section.fields.map((field) => (
               <div key={field.key}>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-sm font-medium text-slate-700">{field.label}</label>
+                  <label className="text-sm font-medium text-white/90">{field.label}</label>
                   <span className={field.status === 'configured' ? 'badge-green' : 'badge-yellow'}>
                     {field.status === 'configured' ? '✅ Configurado' : '⏳ Pendente'}
                   </span>
@@ -133,16 +133,16 @@ export default function Configuracoes() {
                     type={field.type === 'password' && !showKeys[field.key] ? 'password' : 'text'}
                     placeholder={field.placeholder}
                     defaultValue={field.status === 'configured' ? '••••••••••••••••' : ''}
-                    className="w-full px-3 py-2 pr-10 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 font-mono"
+                    className="w-full px-3 py-2 pr-10 bg-white/6 border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-white/55 font-mono"
                   />
                   {field.type === 'password' && (
                     <button type="button" onClick={() => toggleKey(field.key)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80">
                       {showKeys[field.key] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   )}
                 </div>
-                {field.hint && <p className="text-slate-400 text-xs mt-1">💡 {field.hint}</p>}
+                {field.hint && <p className="text-white/50 text-xs mt-1">💡 {field.hint}</p>}
               </div>
             ))}
           </div>
@@ -152,7 +152,7 @@ export default function Configuracoes() {
       {/* Guia de configuração rápida */}
       <div className="card bg-gradient-to-r from-primary-900 to-primary-700 text-white">
         <h2 className="font-semibold mb-3">🚀 Guia de Configuração Rápida</h2>
-        <div className="space-y-2 text-sm text-primary-200">
+        <div className="space-y-2 text-sm text-gold-200">
           {[
             { step: '1', text: 'Google Ads: acesse console.cloud.google.com → crie projeto → ative Google Ads API → gere credenciais OAuth2' },
             { step: '2', text: 'Meta Ads: acesse developers.facebook.com → crie app → gere token de longa duração (60 dias)' },
@@ -170,7 +170,7 @@ export default function Configuracoes() {
 
       {/* Vercel env vars */}
       <div className="card">
-        <h2 className="font-semibold text-slate-800 mb-3">📋 Variáveis para o Vercel (copie e cole)</h2>
+        <h2 className="font-semibold text-white mb-3">📋 Variáveis para o Vercel (copie e cole)</h2>
         <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
           <pre className="text-green-400 text-xs font-mono whitespace-pre">{`# Google Ads
 GOOGLE_ADS_CLIENT_ID=

@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Azul-noite profundo — identidade Ben Growth Center
+        // ── Paleta Principal Ben Growth Center ────────────────────────
         primary: {
           DEFAULT: '#0f2044',
           50:  '#e8edf7',
@@ -21,52 +21,44 @@ export default {
           800: '#274292',
           900: '#0f2044',
         },
-        // Verde-esmeralda — crescimento, conversão, sucesso
+        navy: {
+          DEFAULT: '#0f2044',
+          deep:    '#07182e',
+          mid:     '#1e3470',
+          light:   '#2d4a8a',
+        },
+        gold: {
+          DEFAULT: '#D4A017',
+          light:   '#F0C040',
+          dark:    '#C8960E',
+        },
         growth: {
           DEFAULT: '#00b37e',
           50:  '#e6f9f3',
           100: '#c0f0e1',
-          200: '#97e7ce',
-          300: '#6dddba',
           400: '#4dd4a7',
           500: '#00b37e',
           600: '#00a272',
           700: '#008f63',
-          800: '#007c55',
-          900: '#005c3f',
         },
-        // Dourado jurídico — destaque, badges, alertas
-        gold: {
-          DEFAULT: '#c9a84c',
-          50:  '#fdf8ec',
-          100: '#faeece',
-          200: '#f5e0a0',
-          300: '#f0d070',
-          400: '#e8c048',
-          500: '#c9a84c',
-          600: '#b8963e',
-          700: '#a07e2c',
-          800: '#896821',
-          900: '#71551a',
-        },
+        emerald: '#00b37e',
+        amber:   '#f59e0b',
+        crimson: '#e11d48',
+        violet:  '#7c3aed',
+        cyan:    '#0891b2',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans:  ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
+        serif: ['Cormorant Garamond', 'Georgia', 'serif'],
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'fade-in': 'fadeIn 0.3s ease-in-out',
-        'slide-up': 'slideUp 0.4s ease-out',
+        'fade-in':    'fadeIn 0.3s ease-in-out',
+        'slide-up':   'slideUp 0.4s ease-out',
       },
       keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(16px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
+        fadeIn:  { '0%': { opacity: '0' },                            '100%': { opacity: '1' } },
+        slideUp: { '0%': { opacity: '0', transform: 'translateY(16px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
       },
     },
   },

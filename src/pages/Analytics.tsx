@@ -35,13 +35,13 @@ export default function Analytics() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Analytics</h1>
-          <p className="text-slate-500 text-sm mt-1">Performance detalhada de todas as campanhas</p>
+          <h1 className="text-2xl font-bold text-white">Analytics</h1>
+          <p className="text-white/60 text-sm mt-1">Performance detalhada de todas as campanhas</p>
         </div>
-        <div className="flex gap-1 bg-white border border-slate-200 rounded-lg p-1">
+        <div className="flex gap-1 bg-white/6 border border-white/10 rounded-lg p-1">
           {(['7', '14', '30'] as const).map(p => (
             <button key={p} onClick={() => setPeriodo(p)}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${periodo === p ? 'bg-primary text-white' : 'text-slate-600 hover:bg-slate-50'}`}>
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${periodo === p ? 'bg-navy text-white' : 'text-white/80 hover:bg-white/4'}`}>
               {p} dias
             </button>
           ))}
@@ -57,15 +57,15 @@ export default function Analytics() {
           { label: 'CPL Médio', value: formatCurrency(avgCPL) },
         ].map(item => (
           <div key={item.label} className="card text-center">
-            <p className="text-2xl font-bold text-primary">{item.value}</p>
-            <p className="text-slate-500 text-xs mt-1">{item.label}</p>
+            <p className="text-2xl font-bold text-gold">{item.value}</p>
+            <p className="text-white/60 text-xs mt-1">{item.label}</p>
           </div>
         ))}
       </div>
 
       {/* Gasto por plataforma */}
       <div className="card">
-        <h2 className="font-semibold text-slate-800 mb-4">Investimento por Plataforma (R$)</h2>
+        <h2 className="font-semibold text-white mb-4">Investimento por Plataforma (R$)</h2>
         <ResponsiveContainer width="100%" height={250}>
           <AreaChart data={spendSliced}>
             <defs>
@@ -78,8 +78,8 @@ export default function Analytics() {
                 <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-            <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+            <XAxis dataKey="date" tick={{ fill: "rgba(159,176,215,0.65)", fontSize: 11 }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `R$${v}`} />
             <Tooltip formatter={(v) => [formatCurrency(Number(v)), '']} />
             <Legend />
@@ -92,12 +92,12 @@ export default function Analytics() {
       {/* Leads e Conversões */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card">
-          <h2 className="font-semibold text-slate-800 mb-4">Leads por Dia</h2>
+          <h2 className="font-semibold text-white mb-4">Leads por Dia</h2>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={sliced}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+              <XAxis dataKey="date" tick={{ fill: "rgba(159,176,215,0.65)", fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "rgba(159,176,215,0.65)", fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip />
               <Bar dataKey="leads" fill="#c9a84c" radius={[4, 4, 0, 0]} name="Leads" />
             </BarChart>
@@ -105,12 +105,12 @@ export default function Analytics() {
         </div>
 
         <div className="card">
-          <h2 className="font-semibold text-slate-800 mb-4">Conversões por Plataforma</h2>
+          <h2 className="font-semibold text-white mb-4">Conversões por Plataforma</h2>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={convSliced}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+              <XAxis dataKey="date" tick={{ fill: "rgba(159,176,215,0.65)", fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "rgba(159,176,215,0.65)", fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip />
               <Legend />
               <Bar dataKey="Google" fill="#4285F4" radius={[4, 4, 0, 0]} stackId="stack" />
@@ -122,12 +122,12 @@ export default function Analytics() {
 
       {/* Cliques por plataforma */}
       <div className="card">
-        <h2 className="font-semibold text-slate-800 mb-4">Cliques por Plataforma</h2>
+        <h2 className="font-semibold text-white mb-4">Cliques por Plataforma</h2>
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={sliced}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-            <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-            <YAxis tick={{ fontSize: 11 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+            <XAxis dataKey="date" tick={{ fill: "rgba(159,176,215,0.65)", fontSize: 11 }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fill: "rgba(159,176,215,0.65)", fontSize: 11 }} axisLine={false} tickLine={false} />
             <Tooltip />
             <Legend />
             <Line type="monotone" dataKey="googleClicks" stroke="#4285F4" strokeWidth={2} dot={false} name="Google" />
@@ -138,7 +138,7 @@ export default function Analytics() {
 
       {/* Insights automáticos da IA */}
       <div className="card border-l-4 border-gold">
-        <h2 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
+        <h2 className="font-semibold text-white mb-3 flex items-center gap-2">
           🤖 Insights da IA (Lex Analytics)
         </h2>
         <div className="space-y-2">
@@ -150,7 +150,7 @@ export default function Analytics() {
           ].map((insight, i) => (
             <div key={i} className="flex gap-3 p-3 bg-amber-50 rounded-lg">
               <span className="text-lg">{insight.icon}</span>
-              <p className="text-slate-700 text-sm">{insight.text}</p>
+              <p className="text-white/90 text-sm">{insight.text}</p>
             </div>
           ))}
         </div>
