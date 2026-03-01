@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Megaphone, FileText,
   Users, Bot, Search, Settings, LogOut, Bell,
   ChevronRight, Building2, Shield, MessageSquare,
-  BarChart3, Plug, Workflow, TrendingUp, Scale, FileSignature
+  BarChart3, Plug, Workflow, TrendingUp, Scale, FileSignature, DollarSign
 } from 'lucide-react'
 
 // Pages
@@ -26,6 +26,7 @@ import Integracoes     from './pages/Integracoes'
 import FlowBuilder       from './pages/FlowBuilder'
 import IntegracaoJuris   from './pages/IntegracaoJuris'
 import Assinaturas       from './pages/Assinaturas'
+import Financeiro        from './pages/Financeiro'
 
 // ─── Rota privada ─────────────────────────────────────────────
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -69,6 +70,7 @@ const navGroups = [
     label: 'DOCUMENTOS',
     items: [
       { to: '/assinaturas', icon: FileSignature, label: 'Assinaturas ZapSign' },
+      { to: '/financeiro',  icon: DollarSign,    label: 'Financeiro Asaas' },
     ],
   },
   {
@@ -271,6 +273,7 @@ function AppRoutes() {
               <Route path="/flow-builder"       element={<FlowBuilder />} />
               <Route path="/integracao-juris"   element={<IntegracaoJuris />} />
               <Route path="/assinaturas"         element={<Assinaturas />} />
+              <Route path="/financeiro"          element={<Financeiro />} />
               <Route path="/configuracoes"      element={<Configuracoes />} />
               <Route path="*"                   element={<Navigate to="/" replace />} />
             </Routes>

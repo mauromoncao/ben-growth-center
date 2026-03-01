@@ -6,6 +6,8 @@
   "rewrites": [
     { "source": "/api/zapsign", "destination": "/api/zapsign.js" },
     { "source": "/api/zapsign/:path*", "destination": "/api/zapsign.js" },
+    { "source": "/api/asaas", "destination": "/api/asaas.js" },
+    { "source": "/api/asaas/:path*", "destination": "/api/asaas.js" },
     { "source": "/api/:path*", "destination": "/api/index.js" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],

@@ -42,6 +42,13 @@ const configSections = [
     ] as ConfigField[],
   },
   {
+    title: '💚 Asaas (Pix · Boleto · Cartão)',
+    description: 'Cobranças automáticas, Pix instantâneo e boleto bancário. Token de produção ativo.',
+    fields: [
+      { key: 'ASAAS_TOKEN', label: 'API Token Asaas', placeholder: '$aact_prod_...', type: 'password', status: 'configured', hint: 'Token de produção configurado ✅' },
+    ] as ConfigField[],
+  },
+  {
     title: '✍️ ZapSign',
     description: 'Assinatura eletrônica de contratos — token já configurado e ativo.',
     fields: [
