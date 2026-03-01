@@ -23,12 +23,12 @@ const configSections = [
   },
   {
     title: '🟣 Meta Ads (Facebook & Instagram)',
-    description: 'Conecte sua conta Meta Business para gerenciar campanhas e leads automaticamente.',
+    description: 'Conta act_446623386807925 configurada. Insira o Access Token para ativar dados reais.',
     fields: [
-      { key: 'META_APP_ID',        label: 'App ID',                    placeholder: '123456789',       type: 'text',     status: 'pending' },
-      { key: 'META_APP_SECRET',    label: 'App Secret',                placeholder: 'abc123...',       type: 'password', status: 'pending' },
-      { key: 'META_ACCESS_TOKEN',  label: 'Access Token (Long-lived)', placeholder: 'EAAb...',         type: 'password', status: 'pending' },
-      { key: 'META_AD_ACCOUNT_ID', label: 'Ad Account ID',             placeholder: 'act_123456789',  type: 'text',     status: 'pending' },
+      { key: 'META_AD_ACCOUNT_ID', label: 'Ad Account ID',             placeholder: 'act_446623386807925', type: 'text',     status: 'configured', hint: 'act_446623386807925 — Mauro Moncao ✅' },
+      { key: 'META_APP_ID',        label: 'App ID',                    placeholder: '123456789',           type: 'text',     status: 'pending' },
+      { key: 'META_APP_SECRET',    label: 'App Secret',                placeholder: 'abc123...',           type: 'password', status: 'pending' },
+      { key: 'META_ACCESS_TOKEN',  label: 'Access Token (Long-lived)', placeholder: 'EAAb...',             type: 'password', status: 'pending', hint: 'developers.facebook.com → Explorador de API Graph → ads_read + ads_management' },
     ] as ConfigField[],
   },
   {

@@ -8,6 +8,8 @@
     { "source": "/api/zapsign/:path*", "destination": "/api/zapsign.js" },
     { "source": "/api/asaas", "destination": "/api/asaas.js" },
     { "source": "/api/asaas/:path*", "destination": "/api/asaas.js" },
+    { "source": "/api/meta-ads", "destination": "/api/meta-ads.js" },
+    { "source": "/api/meta-ads/:path*", "destination": "/api/meta-ads.js" },
     { "source": "/api/:path*", "destination": "/api/index.js" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
