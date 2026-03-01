@@ -4,6 +4,8 @@
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "rewrites": [
+    { "source": "/api/zapsign", "destination": "/api/zapsign.js" },
+    { "source": "/api/zapsign/:path*", "destination": "/api/zapsign.js" },
     { "source": "/api/:path*", "destination": "/api/index.js" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
