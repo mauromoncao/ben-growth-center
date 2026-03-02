@@ -86,7 +86,7 @@ function AlertaPush({ onClose }: { onClose: () => void }) {
           <Bell className="w-5 h-5 text-white animate-pulse" />
           <span className="text-white font-bold text-sm">⚡ LEAD AGUARDANDO VOCÊ</span>
         </div>
-        <button onClick={onClose} className="text-white/80 hover:text-white text-lg leading-none">✕</button>
+        <button onClick={onClose} className="text-gray-600 hover:text-white text-lg leading-none">✕</button>
       </div>
       {/* Corpo */}
       <div className="p-4">
@@ -95,19 +95,19 @@ function AlertaPush({ onClose }: { onClose: () => void }) {
             <span className="text-white font-bold">{lead.nome[0]}</span>
           </div>
           <div>
-            <p className="font-bold text-white">{lead.nome}</p>
-            <p className="text-white/60 text-xs">{lead.area} · {lead.origem}</p>
+            <p className="font-bold text-gray-900">{lead.nome}</p>
+            <p className="text-gray-500 text-xs">{lead.area} · {lead.origem}</p>
           </div>
           <span className="ml-auto bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full font-bold">URGENTE</span>
         </div>
-        <p className="text-white/80 text-sm bg-white/4 rounded-lg p-3 mb-3">
+        <p className="text-gray-600 text-sm bg-gray-50 rounded-lg p-3 mb-3">
           "{lead.resumoIA.substring(0, 100)}..."
         </p>
         <div className="flex gap-2">
           <button className="flex-1 bg-green-500 text-white py-2 rounded-xl text-sm font-bold hover:bg-green-600 transition-colors flex items-center justify-center gap-1">
             <MessageCircle className="w-4 h-4" /> Assumir
           </button>
-          <button className="flex-1 bg-white/6 text-white/80 py-2 rounded-xl text-sm font-medium hover:bg-white/8 transition-colors">
+          <button className="flex-1 bg-gray-100 text-gray-600 py-2 rounded-xl text-sm font-medium hover:bg-white/8 transition-colors">
             Adiar 10min
           </button>
         </div>
@@ -140,8 +140,8 @@ export default function Plantonista() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Plantonista & Alertas</h1>
-          <p className="text-white/60 text-sm mt-1">Controle de quem está de plantão e repasse automático do Dr. Ben</p>
+          <h1 className="text-2xl font-bold text-gray-900">Plantonista & Alertas</h1>
+          <p className="text-gray-500 text-sm mt-1">Controle de quem está de plantão e repasse automático do Dr. Ben</p>
         </div>
         <button
           onClick={() => setMostrarAlerta(true)}
@@ -168,12 +168,12 @@ export default function Plantonista() {
           </div>
           <div className="flex-1">
             <p className="text-white font-bold text-xl">{plantonistaHoje.nome}</p>
-            <p className="text-gold-200">{plantonistaHoje.cargo}</p>
+            <p className="text-gray-500">{plantonistaHoje.cargo}</p>
             <p className="text-gold-300 text-sm mt-1">{plantonistaHoje.telefone}</p>
           </div>
           <div className="text-right">
             <p className="text-3xl font-bold text-gold">{plantonistaHoje.atendimentosHoje}</p>
-            <p className="text-gold-200 text-sm">atend. hoje</p>
+            <p className="text-gray-500 text-sm">atend. hoje</p>
           </div>
         </div>
 
@@ -188,7 +188,7 @@ export default function Plantonista() {
               <div key={lead.id} className="flex items-center justify-between bg-white/5/10 rounded-lg p-2 mb-1">
                 <div>
                   <p className="text-white text-sm font-medium">{lead.nome}</p>
-                  <p className="text-gold-200 text-xs">{lead.area} · {lead.urgencia === 'alta' ? '🔴 Urgente' : '🟡 Normal'}</p>
+                  <p className="text-gray-500 text-xs">{lead.area} · {lead.urgencia === 'alta' ? '🔴 Urgente' : '🟡 Normal'}</p>
                 </div>
                 <button className="bg-green-500 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-green-400 transition-colors">
                   Assumir
@@ -206,8 +206,8 @@ export default function Plantonista() {
             <Bell className="w-6 h-6 text-amber-600" />
           </div>
           <div className="flex-1">
-            <h2 className="font-semibold text-white">📲 Notificações PWA no Celular</h2>
-            <p className="text-white/60 text-sm mt-1">
+            <h2 className="font-semibold text-gray-900">📲 Notificações PWA no Celular</h2>
+            <p className="text-gray-500 text-sm mt-1">
               Instale o app no seu celular e receba alertas push quando um lead chegar qualificado pelo Dr. Ben.
               Funciona sem internet móvel (wi-fi) e sem app store.
             </p>
@@ -222,7 +222,7 @@ export default function Plantonista() {
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   notificacoesAtivas
                     ? 'bg-green-500 text-white hover:bg-green-600'
-                    : 'bg-white/8 text-white/80 hover:bg-slate-300'
+                    : 'bg-white/8 text-gray-600 hover:bg-slate-300'
                 }`}
               >
                 {notificacoesAtivas ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
@@ -249,7 +249,7 @@ export default function Plantonista() {
 
       {/* Fluxo de repasse visual */}
       <div className="card">
-        <h2 className="font-semibold text-white mb-4">🔄 Fluxo de Repasse Automático</h2>
+        <h2 className="font-semibold text-gray-900 mb-4">🔄 Fluxo de Repasse Automático</h2>
         <div className="flex items-center gap-2 overflow-x-auto pb-2">
           {[
             { icone: '🌐', titulo: 'Lead Entra', desc: 'Site, WhatsApp\nou Google/Meta Ads', cor: 'bg-blue-50 border-blue-200' },
@@ -261,11 +261,11 @@ export default function Plantonista() {
             <React.Fragment key={etapa.titulo}>
               <div className={`flex-shrink-0 w-36 border-2 rounded-xl p-3 text-center ${etapa.cor}`}>
                 <span className="text-3xl block mb-1">{etapa.icone}</span>
-                <p className="font-semibold text-white/90 text-xs">{etapa.titulo}</p>
-                <p className="text-white/50 text-xs mt-1 whitespace-pre-line">{etapa.desc}</p>
+                <p className="font-semibold text-gray-700 text-xs">{etapa.titulo}</p>
+                <p className="text-gray-400 text-xs mt-1 whitespace-pre-line">{etapa.desc}</p>
               </div>
               {i < 4 && (
-                <ArrowRight className="w-5 h-5 text-slate-300 flex-shrink-0" />
+                <ArrowRight className="w-5 h-5 text-gray-500 flex-shrink-0" />
               )}
             </React.Fragment>
           ))}
@@ -275,14 +275,14 @@ export default function Plantonista() {
       {/* Equipe */}
       <div className="card">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-white">👥 Equipe</h2>
+          <h2 className="font-semibold text-gray-900">👥 Equipe</h2>
           <button className="text-xs bg-navy-50 text-gold px-3 py-1 rounded-full hover:bg-navy-100">
             + Adicionar Membro
           </button>
         </div>
         <div className="space-y-3">
           {plantonistasMock.map(p => (
-            <div key={p.id} className={`flex items-center justify-between p-3 rounded-xl border transition-all ${plantonistaAtivo === p.id ? 'border-white/55 bg-navy-50' : 'border-white/8 hover:border-white/10'}`}>
+            <div key={p.id} className={`flex items-center justify-between p-3 rounded-xl border transition-all ${plantonistaAtivo === p.id ? 'border-white/55 bg-navy-50' : 'border-gray-100 hover:border-gray-200'}`}>
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center">
@@ -292,11 +292,11 @@ export default function Plantonista() {
                 </div>
                 <div>
                   <p className="font-medium text-white text-sm">{p.nome}</p>
-                  <p className="text-white/50 text-xs">{p.cargo} · {p.atendimentosHoje} hoje</p>
+                  <p className="text-gray-400 text-xs">{p.cargo} · {p.atendimentosHoje} hoje</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`text-xs px-2 py-0.5 rounded-full ${p.online ? 'bg-green-100 text-green-700' : 'bg-white/6 text-white/60'}`}>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${p.online ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                   {p.online ? 'Online' : 'Offline'}
                 </span>
                 <button
@@ -304,7 +304,7 @@ export default function Plantonista() {
                   className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${
                     plantonistaAtivo === p.id
                       ? 'bg-navy text-white'
-                      : 'bg-white/6 text-white/80 hover:bg-white/8'
+                      : 'bg-gray-100 text-gray-600 hover:bg-white/8'
                   }`}
                 >
                   {plantonistaAtivo === p.id ? '✅ Plantonista' : 'Definir'}
@@ -324,18 +324,18 @@ export default function Plantonista() {
           {escalaMock.slice(0, 7).map(dia => {
             const p = plantonistasMock.find(pl => pl.id === dia.plantonistaId)!
             return (
-              <div key={dia.diaSemana} className={`border rounded-xl p-3 ${dia.hoje ? 'border-white/40 bg-navy-50' : 'border-white/8'}`}>
-                <p className={`font-semibold text-sm ${dia.hoje ? 'text-gold' : 'text-white/80'}`}>
+              <div key={dia.diaSemana} className={`border rounded-xl p-3 ${dia.hoje ? 'border-white/40 bg-navy-50' : 'border-gray-100'}`}>
+                <p className={`font-semibold text-sm ${dia.hoje ? 'text-gold' : 'text-gray-600'}`}>
                   {dia.diaSemana} {dia.hoje && '(Hoje)'}
                 </p>
-                <p className="text-white/50 text-xs">{dia.data}</p>
+                <p className="text-gray-400 text-xs">{dia.data}</p>
                 <div className="mt-2 flex items-center gap-2">
                   <div className="w-6 h-6 bg-navy-100 rounded-full flex items-center justify-center">
-                    <span className="text-gold font-bold text-xs">{p.avatar}</span>
+                    <span className="text-blue-700 font-bold text-xs">{p.avatar}</span>
                   </div>
                   <div>
-                    <p className="text-white/90 text-xs font-medium">{p.nome.split(' ')[1]}</p>
-                    <p className="text-white/50 text-xs">{dia.turno}</p>
+                    <p className="text-gray-700 text-xs font-medium">{p.nome.split(' ')[1]}</p>
+                    <p className="text-gray-400 text-xs">{dia.turno}</p>
                   </div>
                 </div>
               </div>
@@ -349,7 +349,7 @@ export default function Plantonista() {
         <h2 className="font-semibold text-white mb-3 flex items-center gap-2">
           <Zap className="w-5 h-5 text-gold" /> Critérios de Repasse — Dr. Ben
         </h2>
-        <p className="text-white/60 text-sm mb-4">Quando o Dr. Ben deve acionar o alerta de plantonista?</p>
+        <p className="text-gray-500 text-sm mb-4">Quando o Dr. Ben deve acionar o alerta de plantonista?</p>
         <div className="space-y-3">
           {[
             { label: 'Score ≥ 70 pontos', ativo: true, desc: 'Lead bem qualificado pela IA' },
@@ -358,10 +358,10 @@ export default function Plantonista() {
             { label: 'Palavras-chave de urgência', ativo: true, desc: 'Ex: "urgente", "preciso hoje", "corre risco"' },
             { label: 'Área Tributário (sempre)', ativo: false, desc: 'Todos os leads tributários vão para humano' },
           ].map((criterio, i) => (
-            <div key={i} className="flex items-center justify-between p-3 bg-white/4 rounded-xl">
+            <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
               <div>
-                <p className="font-medium text-white/90 text-sm">{criterio.label}</p>
-                <p className="text-white/50 text-xs">{criterio.desc}</p>
+                <p className="font-medium text-gray-700 text-sm">{criterio.label}</p>
+                <p className="text-gray-400 text-xs">{criterio.desc}</p>
               </div>
               <div className={`w-10 h-6 rounded-full transition-colors cursor-pointer ${criterio.ativo ? 'bg-green-400' : 'bg-white/8'}`}>
                 <div className={`w-4 h-4 bg-white/5 rounded-full shadow mt-1 transition-transform ${criterio.ativo ? 'translate-x-5' : 'translate-x-1'}`} />

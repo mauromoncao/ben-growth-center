@@ -26,8 +26,8 @@ export default function Campanhas() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Campanhas</h1>
-          <p className="text-white/60 text-sm mt-1">Gerencie suas campanhas no Google Ads e Meta Ads</p>
+          <h1 className="text-2xl font-bold text-gray-900">Campanhas</h1>
+          <p className="text-gray-500 text-sm mt-1">Gerencie suas campanhas no Google Ads e Meta Ads</p>
         </div>
         <button className="btn-primary flex items-center gap-2 text-sm">
           <Plus className="w-4 h-4" />
@@ -37,18 +37,18 @@ export default function Campanhas() {
 
       {/* Filters */}
       <div className="flex gap-3 flex-wrap">
-        <div className="flex gap-1 bg-white/6 border border-white/10 rounded-lg p-1">
+        <div className="flex gap-1 bg-gray-100 border border-gray-200 rounded-lg p-1">
           {(['all', 'google', 'meta'] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${filter === f ? 'bg-navy text-white' : 'text-white/80 hover:bg-white/4'}`}>
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${filter === f ? 'bg-navy text-white' : 'text-gray-600 hover:bg-gray-50'}`}>
               {f === 'all' ? 'Todas' : f === 'google' ? '🔵 Google' : '🟣 Meta'}
             </button>
           ))}
         </div>
-        <div className="flex gap-1 bg-white/6 border border-white/10 rounded-lg p-1">
+        <div className="flex gap-1 bg-gray-100 border border-gray-200 rounded-lg p-1">
           {(['all', 'active', 'paused'] as const).map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${statusFilter === s ? 'bg-navy text-white' : 'text-white/80 hover:bg-white/4'}`}>
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${statusFilter === s ? 'bg-navy text-white' : 'text-gray-600 hover:bg-gray-50'}`}>
               {s === 'all' ? 'Todos' : s === 'active' ? '✅ Ativos' : '⏸️ Pausados'}
             </button>
           ))}
@@ -66,7 +66,7 @@ export default function Campanhas() {
         ].map(item => (
           <div key={item.label} className="card text-center">
             <p className="text-2xl font-bold text-gold">{item.value}</p>
-            <p className="text-white/60 text-xs mt-1">{item.label}</p>
+            <p className="text-gray-500 text-xs mt-1">{item.label}</p>
           </div>
         ))}
       </div>
@@ -81,19 +81,19 @@ export default function Campanhas() {
                   {campaign.platform === 'google' ? '🔵' : '🟣'}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white">{campaign.name}</h3>
+                  <h3 className="font-semibold text-gray-900">{campaign.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="badge-blue">{campaign.area}</span>
                     <span className={getStatusColor(campaign.status)}>{getStatusLabel(campaign.status)}</span>
-                    <span className="text-white/50 text-xs">Desde {campaign.startDate}</span>
+                    <span className="text-gray-400 text-xs">Desde {campaign.startDate}</span>
                   </div>
                 </div>
               </div>
               <div className="flex gap-2">
                 {campaign.status === 'active'
-                  ? <button className="p-2 text-white/50 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-colors"><Pause className="w-4 h-4" /></button>
-                  : <button className="p-2 text-white/50 hover:text-green-500 hover:bg-green-50 rounded-lg transition-colors"><Play className="w-4 h-4" /></button>}
-                <button className="p-2 text-white/50 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
+                  ? <button className="p-2 text-gray-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-colors"><Pause className="w-4 h-4" /></button>
+                  : <button className="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg transition-colors"><Play className="w-4 h-4" /></button>}
+                <button className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
               </div>
             </div>
 
@@ -109,19 +109,19 @@ export default function Campanhas() {
                 { label: 'CPL', value: formatCurrency(campaign.cpl) },
               ].map(m => (
                 <div key={m.label} className="text-center">
-                  <p className="text-white/50 text-xs">{m.label}</p>
-                  <p className="font-semibold text-white text-sm">{m.value}</p>
+                  <p className="text-gray-400 text-xs">{m.label}</p>
+                  <p className="font-semibold text-gray-900 text-sm">{m.value}</p>
                 </div>
               ))}
             </div>
 
             {/* Budget progress */}
             <div className="mt-4">
-              <div className="flex justify-between text-xs text-white/50 mb-1">
+              <div className="flex justify-between text-xs text-gray-400 mb-1">
                 <span>Uso do Orçamento</span>
                 <span>{formatCurrency(campaign.spent)} / {formatCurrency(campaign.budget)} ({Math.round((campaign.spent / campaign.budget) * 100)}%)</span>
               </div>
-              <div className="h-2 bg-white/6 rounded-full">
+              <div className="h-2 bg-gray-100 rounded-full">
                 <div className={`h-full rounded-full transition-all ${campaign.spent / campaign.budget > 0.9 ? 'bg-red-400' : campaign.spent / campaign.budget > 0.7 ? 'bg-amber-400' : 'bg-green-400'}`}
                   style={{ width: `${Math.min((campaign.spent / campaign.budget) * 100, 100)}%` }} />
               </div>
@@ -135,20 +135,20 @@ export default function Campanhas() {
               <span className={`text-sm font-medium ${campaign.roas >= 3 ? 'text-green-600' : 'text-red-600'}`}>
                 ROAS {campaign.roas}x
               </span>
-              <span className="text-white/50 text-xs">·</span>
-              <span className="text-white/60 text-xs">{campaign.conversions} conversões</span>
+              <span className="text-gray-400 text-xs">·</span>
+              <span className="text-gray-500 text-xs">{campaign.conversions} conversões</span>
             </div>
           </div>
         ))}
       </div>
 
       {/* CTA Nova Campanha */}
-      <div className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center hover:border-white/55 transition-colors cursor-pointer">
+      <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-white/55 transition-colors cursor-pointer">
         <div className="w-12 h-12 bg-navy-50 rounded-xl mx-auto flex items-center justify-center mb-3">
           <Plus className="w-6 h-6 text-gold" />
         </div>
-        <p className="font-medium text-white/90">Criar Nova Campanha com IA</p>
-        <p className="text-white/50 text-sm mt-1">O Lex Campanhas pesquisa palavras-chave, gera os textos e cria a campanha automaticamente</p>
+        <p className="font-medium text-gray-700">Criar Nova Campanha com IA</p>
+        <p className="text-gray-400 text-sm mt-1">O Lex Campanhas pesquisa palavras-chave, gera os textos e cria a campanha automaticamente</p>
         <button className="btn-primary mt-4 text-sm">Acionar Lex Campanhas</button>
       </div>
     </div>

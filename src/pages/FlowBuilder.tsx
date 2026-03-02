@@ -18,7 +18,7 @@ function CanalIcon({ canal }: { canal: string }) {
   if (canal === 'whatsapp') return <MessageCircle className="w-3.5 h-3.5 text-green-500" />
   if (canal === 'instagram') return <Instagram className="w-3.5 h-3.5 text-pink-500" />
   if (canal === 'site_chat') return <Globe className="w-3.5 h-3.5 text-blue-500" />
-  return <Smartphone className="w-3.5 h-3.5 text-white/50" />
+  return <Smartphone className="w-3.5 h-3.5 text-gray-400" />
 }
 
 // ─── Card de Fluxo ────────────────────────────────────────────
@@ -29,7 +29,7 @@ function FluxoCard({ flow, onSelect }: { flow: Flow; onSelect: () => void }) {
   const totalSteps = Object.keys(flow.steps).length
 
   return (
-    <div className="bg-white/6 rounded-xl border border-white/10 hover:border-white/55 hover:shadow-md transition-all">
+    <div className="bg-gray-50 rounded-xl border border-gray-200 hover:border-white/55 hover:shadow-md transition-all">
       <div className="p-4">
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
@@ -43,46 +43,46 @@ function FluxoCard({ flow, onSelect }: { flow: Flow; onSelect: () => void }) {
               >
                 {ativo
                   ? <ToggleRight className="w-5 h-5 text-emerald-500" />
-                  : <ToggleLeft className="w-5 h-5 text-slate-300" />
+                  : <ToggleLeft className="w-5 h-5 text-gray-500" />
                 }
               </button>
             </div>
-            <p className="text-white/60 text-xs leading-relaxed">{flow.descricao}</p>
+            <p className="text-gray-500 text-xs leading-relaxed">{flow.descricao}</p>
           </div>
         </div>
 
         {/* Canais */}
         <div className="flex items-center gap-2 mb-3">
           {flow.canal.map(c => (
-            <span key={c} className="flex items-center gap-1 bg-white/6 rounded-full px-2 py-0.5 text-xs text-white/80">
+            <span key={c} className="flex items-center gap-1 bg-gray-100 rounded-full px-2 py-0.5 text-xs text-gray-600">
               <CanalIcon canal={c} />
               {c === 'whatsapp' ? 'WhatsApp' : c === 'instagram' ? 'Instagram' : c === 'site_chat' ? 'Chat Site' : c}
             </span>
           ))}
-          <span className="text-xs text-white/50">{totalSteps} etapas</span>
+          <span className="text-xs text-gray-400">{totalSteps} etapas</span>
         </div>
 
         {/* Stats */}
         {flow.stats && (
           <div className="grid grid-cols-4 gap-2 mb-3">
             {[
-              { label: 'Disparos', value: flow.stats.disparos, cor: 'text-white/90' },
+              { label: 'Disparos', value: flow.stats.disparos, cor: 'text-gray-700' },
               { label: 'Leads', value: flow.stats.leadsGerados, cor: 'text-gold' },
               { label: 'Concluídos', value: flow.stats.conclusoes, cor: 'text-blue-600' },
               { label: 'Conversão', value: `${taxaConv}%`, cor: 'text-emerald-600' },
             ].map(s => (
-              <div key={s.label} className="text-center bg-white/4 rounded-lg py-1.5">
+              <div key={s.label} className="text-center bg-gray-50 rounded-lg py-1.5">
                 <p className={`font-bold text-sm ${s.cor}`}>{s.value}</p>
-                <p className="text-white/50 text-xs">{s.label}</p>
+                <p className="text-gray-400 text-xs">{s.label}</p>
               </div>
             ))}
           </div>
         )}
 
         {/* Gatilho */}
-        <div className="flex items-center gap-2 text-xs text-white/60 mb-3">
+        <div className="flex items-center gap-2 text-xs text-gray-500 mb-3">
           <Zap className="w-3.5 h-3.5 text-amber-400" />
-          <span>Gatilho: <strong className="text-white/90">{flow.gatilho}</strong></span>
+          <span>Gatilho: <strong className="text-gray-700">{flow.gatilho}</strong></span>
         </div>
 
         {/* Ações */}
@@ -93,10 +93,10 @@ function FluxoCard({ flow, onSelect }: { flow: Flow; onSelect: () => void }) {
           >
             <Edit3 className="w-3.5 h-3.5" /> Editar Fluxo
           </button>
-          <button className="p-2 bg-white/6 text-white/80 rounded-lg hover:bg-white/8 transition-colors" title="Duplicar">
+          <button className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-white/8 transition-colors" title="Duplicar">
             <Copy className="w-4 h-4" />
           </button>
-          <button className="p-2 bg-white/6 text-white/80 rounded-lg hover:bg-white/8 transition-colors" title="Excluir">
+          <button className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-white/8 transition-colors" title="Excluir">
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
@@ -113,13 +113,13 @@ function FluxoViewer({ flow, onClose }: { flow: Flow; onClose: () => void }) {
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-white/5 rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-white/8">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <div>
             <h2 className="font-bold text-white text-lg">{flow.nome}</h2>
-            <p className="text-white/50 text-sm">{flow.descricao}</p>
+            <p className="text-gray-400 text-sm">{flow.descricao}</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/6 rounded-lg">
-            <X className="w-5 h-5 text-white/50" />
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
+            <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 
@@ -148,11 +148,11 @@ function FluxoViewer({ flow, onClose }: { flow: Flow; onClose: () => void }) {
                       <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${typeColor}`}>
                         {typeLabel}
                       </span>
-                      <span className="text-xs text-white/50">{step.label || step.id}</span>
+                      <span className="text-xs text-gray-400">{step.label || step.id}</span>
                     </div>
 
                     {step.message && (
-                      <div className="bg-white/4 rounded-xl p-3 text-sm text-white/90 border border-white/10 whitespace-pre-line">
+                      <div className="bg-gray-50 rounded-xl p-3 text-sm text-gray-700 border border-gray-200 whitespace-pre-line">
                         {step.message}
                       </div>
                     )}
@@ -196,11 +196,11 @@ function FluxoViewer({ flow, onClose }: { flow: Flow; onClose: () => void }) {
           </div>
         </div>
 
-        <div className="p-4 border-t border-white/8 flex gap-3">
+        <div className="p-4 border-t border-gray-100 flex gap-3">
           <button className="flex-1 btn-primary text-sm flex items-center justify-center gap-2">
             <Play className="w-4 h-4" /> Testar Fluxo
           </button>
-          <button onClick={onClose} className="px-4 py-2 bg-white/6 text-white/90 rounded-xl text-sm font-medium hover:bg-white/8 transition-colors">
+          <button onClick={onClose} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-white/8 transition-colors">
             Fechar
           </button>
         </div>
@@ -221,11 +221,11 @@ function ComparativoCard() {
         </div>
         <div>
           <h3 className="font-bold text-lg">Economia com Dr. Ben Flow</h3>
-          <p className="text-gold-200 text-sm">Substituto nativo do ManyChat — custo zero</p>
+          <p className="text-gray-500 text-sm">Substituto nativo do ManyChat — custo zero</p>
         </div>
         <div className="ml-auto text-right">
           <p className="text-3xl font-black text-growth">R$ {drBenFlow.economiaAnual.toLocaleString('pt-BR')}</p>
-          <p className="text-gold-200 text-sm">economizados por ano</p>
+          <p className="text-gray-500 text-sm">economizados por ano</p>
         </div>
       </div>
 
@@ -237,18 +237,18 @@ function ComparativoCard() {
           </p>
           <div className="space-y-2 text-sm">
             <p className="flex items-center justify-between">
-              <span className="text-gold-200">Custo mensal</span>
+              <span className="text-gray-500">Custo mensal</span>
               <span className="font-bold text-red-300">R$ {manychat.custoMensal}</span>
             </p>
             <p className="flex items-center justify-between">
-              <span className="text-gold-200">Custo anual</span>
+              <span className="text-gray-500">Custo anual</span>
               <span className="font-bold text-red-300">R$ {manychat.custoAnual.toLocaleString('pt-BR')}</span>
             </p>
             <p className="flex items-center justify-between">
-              <span className="text-gold-200">Limite de leads</span>
+              <span className="text-gray-500">Limite de leads</span>
               <span className="text-white">{manychat.limitesLeads}/mês</span>
             </p>
-            <div className="border-t border-white/10 pt-2 space-y-1">
+            <div className="border-t border-gray-200 pt-2 space-y-1">
               {[
                 { label: 'Qualificação com IA', ok: false },
                 { label: 'Integrado ao CRM', ok: false },
@@ -257,7 +257,7 @@ function ComparativoCard() {
               ].map(f => (
                 <p key={f.label} className="flex items-center gap-2 text-xs">
                   <X className="w-3 h-3 text-red-400 flex-shrink-0" />
-                  <span className="text-gold-200">{f.label}</span>
+                  <span className="text-gray-500">{f.label}</span>
                 </p>
               ))}
             </div>
@@ -271,18 +271,18 @@ function ComparativoCard() {
           </p>
           <div className="space-y-2 text-sm">
             <p className="flex items-center justify-between">
-              <span className="text-gold-200">Custo mensal</span>
+              <span className="text-gray-500">Custo mensal</span>
               <span className="font-bold text-growth">R$ 0</span>
             </p>
             <p className="flex items-center justify-between">
-              <span className="text-gold-200">Custo anual</span>
+              <span className="text-gray-500">Custo anual</span>
               <span className="font-bold text-growth">R$ 0</span>
             </p>
             <p className="flex items-center justify-between">
-              <span className="text-gold-200">Limite de leads</span>
+              <span className="text-gray-500">Limite de leads</span>
               <span className="text-white font-bold">Ilimitado</span>
             </p>
-            <div className="border-t border-white/10 pt-2 space-y-1">
+            <div className="border-t border-gray-200 pt-2 space-y-1">
               {[
                 'Qualificação com IA (Dr. Ben)',
                 'Integrado ao CRM nativo',
@@ -385,12 +385,12 @@ function SimuladorChat({ flow }: { flow: Flow }) {
   }
 
   return (
-    <div className="bg-slate-900 rounded-xl overflow-hidden border border-slate-700">
+    <div className="bg-slate-900 rounded-xl overflow-hidden border border-gray-200">
       {/* Barra de status */}
       <div className="bg-slate-800 px-4 py-2 flex items-center gap-2">
         <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
         <span className="text-green-400 text-xs font-medium">Dr. Ben Flow — Simulador</span>
-        <span className="text-white/60 text-xs ml-auto">{flow.nome}</span>
+        <span className="text-gray-500 text-xs ml-auto">{flow.nome}</span>
       </div>
 
       {/* Chat */}
@@ -417,13 +417,13 @@ function SimuladorChat({ flow }: { flow: Flow }) {
 
       {/* Input */}
       {iniciado && (
-        <div className="border-t border-slate-700 p-3 flex gap-2">
+        <div className="border-t border-gray-200 p-3 flex gap-2">
           <input
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && enviar()}
             placeholder="Digite sua resposta..."
-            className="flex-1 bg-slate-800 text-slate-100 rounded-lg px-3 py-2 text-sm border border-slate-600 focus:outline-none focus:border-growth"
+            className="flex-1 bg-slate-800 text-slate-100 rounded-lg px-3 py-2 text-sm border border-gray-200 focus:outline-none focus:border-growth"
           />
           <button onClick={enviar} className="bg-growth text-gold px-4 rounded-lg font-medium text-sm hover:bg-growth-400 transition-colors">
             Enviar
@@ -450,8 +450,8 @@ export default function FlowBuilder() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Dr. Ben Flow</h1>
-          <p className="text-white/60 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-gray-900">Dr. Ben Flow</h1>
+          <p className="text-gray-500 text-sm mt-1">
             Motor de fluxos conversacionais nativo — substitui ManyChat com custo zero
           </p>
         </div>
@@ -477,13 +477,13 @@ export default function FlowBuilder() {
           <div key={k.label} className="card text-center py-4">
             <p className="text-2xl mb-1">{k.icon}</p>
             <p className={`text-2xl font-bold ${k.cor}`}>{k.value}</p>
-            <p className="text-white/60 text-xs">{k.label}</p>
+            <p className="text-gray-500 text-xs">{k.label}</p>
           </div>
         ))}
       </div>
 
       {/* Abas */}
-      <div className="flex gap-1 bg-white/6 border border-white/10 rounded-xl p-1 w-fit">
+      <div className="flex gap-1 bg-gray-100 border border-gray-200 rounded-xl p-1 w-fit">
         {[
           { id: 'fluxos', label: '⚡ Fluxos' },
           { id: 'simulador', label: '🎮 Simulador' },
@@ -493,7 +493,7 @@ export default function FlowBuilder() {
           <button
             key={aba.id}
             onClick={() => setAbaAtiva(aba.id as any)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${abaAtiva === aba.id ? 'bg-navy text-white' : 'text-white/80 hover:bg-white/4'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${abaAtiva === aba.id ? 'bg-navy text-white' : 'text-gray-600 hover:bg-gray-50'}`}
           >
             {aba.label}
           </button>
@@ -509,13 +509,13 @@ export default function FlowBuilder() {
             ))}
 
             {/* Card de criar novo */}
-            <div className="bg-white/6 rounded-xl border-2 border-dashed border-white/10 p-6 flex flex-col items-center justify-center gap-3 hover:border-white/55 hover:bg-navy-50/30 transition-all cursor-pointer group">
-              <div className="w-12 h-12 bg-white/6 group-hover:bg-navy-100 rounded-full flex items-center justify-center transition-colors">
-                <Plus className="w-6 h-6 text-white/50 group-hover:text-gold transition-colors" />
+            <div className="bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 p-6 flex flex-col items-center justify-center gap-3 hover:border-white/55 hover:bg-navy-50/30 transition-all cursor-pointer group">
+              <div className="w-12 h-12 bg-gray-100 group-hover:bg-navy-100 rounded-full flex items-center justify-center transition-colors">
+                <Plus className="w-6 h-6 text-gray-400 group-hover:text-gold transition-colors" />
               </div>
               <div className="text-center">
-                <p className="font-medium text-white/80 text-sm">Criar novo fluxo</p>
-                <p className="text-white/50 text-xs mt-0.5">WhatsApp · Instagram · Chat</p>
+                <p className="font-medium text-gray-600 text-sm">Criar novo fluxo</p>
+                <p className="text-gray-400 text-xs mt-0.5">WhatsApp · Instagram · Chat</p>
               </div>
             </div>
           </div>
@@ -555,12 +555,12 @@ export default function FlowBuilder() {
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-2xl">{c.icone}</span>
                   <div>
-                    <p className="font-semibold text-white text-sm">{c.canal}</p>
+                    <p className="font-semibold text-gray-900 text-sm">{c.canal}</p>
                     <p className={`text-xs font-medium ${c.statusCor}`}>{c.status}</p>
                   </div>
                 </div>
-                <p className="text-white/80 text-xs mb-2">{c.desc}</p>
-                <code className="text-xs bg-white/5/60 text-white/80 px-2 py-1 rounded block font-mono">{c.webhook}</code>
+                <p className="text-gray-600 text-xs mb-2">{c.desc}</p>
+                <code className="text-xs bg-white/5/60 text-gray-600 px-2 py-1 rounded block font-mono">{c.webhook}</code>
               </div>
             ))}
           </div>
@@ -571,11 +571,11 @@ export default function FlowBuilder() {
       {abaAtiva === 'simulador' && (
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <label className="text-sm font-medium text-white/90">Fluxo para testar:</label>
+            <label className="text-sm font-medium text-gray-700">Fluxo para testar:</label>
             <select
               value={fluxoSimulador.id}
               onChange={e => setFluxoSimulador(FLUXOS_BIBLIOTECA.find(f => f.id === e.target.value) || FLUXOS_BIBLIOTECA[0])}
-              className="border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/55"
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/55"
             >
               {FLUXOS_BIBLIOTECA.map(f => (
                 <option key={f.id} value={f.id}>{f.nome}</option>
@@ -590,7 +590,7 @@ export default function FlowBuilder() {
               <h3 className="font-bold text-white text-sm">Etapas do Fluxo</h3>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {Object.values(fluxoSimulador.steps).map((step, i) => (
-                  <div key={step.id} className="flex items-start gap-3 p-3 bg-white/6 rounded-xl border border-white/10">
+                  <div key={step.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
                     <span className="w-6 h-6 rounded-full bg-navy text-white text-xs flex items-center justify-center font-bold flex-shrink-0">
                       {i + 1}
                     </span>
@@ -599,7 +599,7 @@ export default function FlowBuilder() {
                         {getStepTypeLabel(step.type)}
                       </span>
                       {step.message && (
-                        <p className="text-xs text-white/60 mt-1 line-clamp-2">{step.message}</p>
+                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">{step.message}</p>
                       )}
                     </div>
                   </div>
@@ -626,12 +626,12 @@ export default function FlowBuilder() {
                 { label: 'PLANTONISTA_WHATSAPP', desc: 'Número do Dr. Mauro para alertas urgentes (com DDI)', placeholder: '5586999999999', tipo: 'text' },
               ].map(campo => (
                 <div key={campo.label} className="space-y-1">
-                  <label className="text-xs font-bold text-white/90">{campo.label}</label>
-                  <p className="text-xs text-white/50">{campo.desc}</p>
+                  <label className="text-xs font-bold text-gray-700">{campo.label}</label>
+                  <p className="text-xs text-gray-400">{campo.desc}</p>
                   <input
                     type={campo.tipo}
                     placeholder={campo.placeholder}
-                    className="w-full border border-white/10 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-white/55"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-white/55"
                   />
                 </div>
               ))}
@@ -644,7 +644,7 @@ export default function FlowBuilder() {
               URL do Webhook para configurar no Meta
             </h3>
             <div className="bg-slate-900 rounded-xl p-4">
-              <p className="text-white/50 text-xs mb-2">Cole esta URL no Meta Business → WhatsApp → Webhooks:</p>
+              <p className="text-gray-400 text-xs mb-2">Cole esta URL no Meta Business → WhatsApp → Webhooks:</p>
               <code className="text-growth text-sm block">https://seu-dominio.vercel.app/api/flow/whatsapp</code>
             </div>
             <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -656,7 +656,7 @@ export default function FlowBuilder() {
                 <div key={s.passo} className="bg-blue-50 rounded-xl p-3 flex gap-3">
                   <span className="w-6 h-6 bg-navy text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">{s.passo}</span>
                   <div>
-                    <p className="text-xs text-white/90">{s.texto}</p>
+                    <p className="text-xs text-gray-700">{s.texto}</p>
                     {s.link && (
                       <a href={s.link} target="_blank" rel="noreferrer" className="text-xs text-gold hover:underline flex items-center gap-1 mt-1">
                         Abrir <ExternalLink className="w-3 h-3" />
@@ -689,7 +689,7 @@ export default function FlowBuilder() {
                     <span className="text-2xl flex-shrink-0">{item.icone}</span>
                     <div>
                       <p className="font-medium text-white text-sm">{item.titulo}</p>
-                      <p className="text-white/60 text-xs mt-0.5">{item.desc}</p>
+                      <p className="text-gray-500 text-xs mt-0.5">{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -705,12 +705,12 @@ export default function FlowBuilder() {
                   { item: 'Vercel Pro (se precisar)', custo: 'R$ 100/mês', status: '⏳ futuro' },
                   { item: 'Sobra de economia por mês', custo: 'R$ 310/mês', status: '💰 livre' },
                 ].map(r => (
-                  <div key={r.item} className="flex items-center justify-between p-3 bg-white/4 rounded-xl">
+                  <div key={r.item} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                     <div>
                       <p className="font-medium text-white text-sm">{r.item}</p>
-                      <p className="text-white/50 text-xs">{r.status}</p>
+                      <p className="text-gray-400 text-xs">{r.status}</p>
                     </div>
-                    <span className="font-bold text-white/90 text-sm">{r.custo}</span>
+                    <span className="font-bold text-gray-700 text-sm">{r.custo}</span>
                   </div>
                 ))}
                 <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-center">

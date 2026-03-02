@@ -92,8 +92,8 @@ export default function DrBenIntegracao() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Dr. Ben — Integração CRM</h1>
-          <p className="text-white/60 text-sm mt-1">Fluxo de qualificação IA e repasse automático para humano</p>
+          <h1 className="text-2xl font-bold text-gray-900">Dr. Ben — Integração CRM</h1>
+          <p className="text-gray-500 text-sm mt-1">Fluxo de qualificação IA e repasse automático para humano</p>
         </div>
         <button onClick={iniciarDemo} disabled={rodando}
           className="btn-primary flex items-center gap-2 text-sm disabled:opacity-60">
@@ -105,11 +105,11 @@ export default function DrBenIntegracao() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Chat simulado */}
         <div className="card flex flex-col h-[520px]">
-          <div className="flex items-center gap-3 mb-4 pb-4 border-b border-white/8">
+          <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
             <img src={DR_BEN_PROFILE.avatar} alt="Dr. Ben"
               className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
             <div>
-              <h2 className="font-semibold text-white">Dr. Ben — Chat ao Vivo</h2>
+              <h2 className="font-semibold text-gray-900">Dr. Ben — Chat ao Vivo</h2>
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                 <span className="text-green-600 text-xs">Online · Gemini 2.5 Flash</span>
@@ -127,7 +127,7 @@ export default function DrBenIntegracao() {
             {mensagens.length === 0 && (
               <div className="text-center py-12">
                 <img src={DR_BEN_PROFILE.avatar} alt="Dr. Ben" className="w-12 h-12 rounded-full object-cover mx-auto mb-3" />
-                <p className="text-white/50 text-sm">Clique em "Simular Conversa" para ver o Dr. Ben qualificando um lead em tempo real</p>
+                <p className="text-gray-400 text-sm">Clique em "Simular Conversa" para ver o Dr. Ben qualificando um lead em tempo real</p>
               </div>
             )}
             {mensagens.map((msg, i) => (
@@ -140,18 +140,18 @@ export default function DrBenIntegracao() {
                   msg.role === 'user'
                     ? 'bg-navy text-white rounded-tr-sm'
                     : msg.acao === 'repasse'
-                    ? 'bg-green-50 border-2 border-green-400 text-white/90 rounded-tl-sm'
+                    ? 'bg-green-50 border-2 border-green-400 text-gray-700 rounded-tl-sm'
                     : msg.acao === 'qualificado'
-                    ? 'bg-amber-50 border border-amber-300 text-white/90 rounded-tl-sm'
-                    : 'bg-white/6 text-white/90 rounded-tl-sm'
+                    ? 'bg-amber-50 border border-amber-300 text-gray-700 rounded-tl-sm'
+                    : 'bg-gray-100 text-gray-700 rounded-tl-sm'
                 }`}>
                   {msg.role === 'bot' && (
-                    <p className={`text-xs font-medium mb-0.5 ${msg.acao === 'repasse' ? 'text-green-600' : msg.acao === 'qualificado' ? 'text-amber-600' : 'text-white/50'}`}>
+                    <p className={`text-xs font-medium mb-0.5 ${msg.acao === 'repasse' ? 'text-green-600' : msg.acao === 'qualificado' ? 'text-amber-600' : 'text-gray-400'}`}>
                       {msg.acao === 'repasse' ? '✅ Repasse Automático' : msg.acao === 'qualificado' ? '🤖 Qualificação IA' : '🤖 Dr. Ben'}
                     </p>
                   )}
                   <p>{msg.texto}</p>
-                  <p className={`text-xs mt-1 ${msg.role === 'user' ? 'text-gold-200' : 'text-white/50'}`}>{msg.hora}</p>
+                  <p className={`text-xs mt-1 ${msg.role === 'user' ? 'text-gray-500' : 'text-gray-400'}`}>{msg.hora}</p>
                 </div>
               </div>
             ))}
@@ -159,7 +159,7 @@ export default function DrBenIntegracao() {
               <div className="flex gap-2">
                 <img src={DR_BEN_PROFILE.avatar} alt="Dr. Ben"
                   className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
-                <div className="bg-white/6 rounded-2xl rounded-tl-sm px-4 py-3">
+                <div className="bg-gray-100 rounded-2xl rounded-tl-sm px-4 py-3">
                   <div className="flex gap-1">
                     <div className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" />
                     <div className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
@@ -171,13 +171,13 @@ export default function DrBenIntegracao() {
           </div>
 
           {/* Input */}
-          <div className="flex gap-2 pt-3 border-t border-white/8">
+          <div className="flex gap-2 pt-3 border-t border-gray-100">
             <input
               type="text"
               value={novaMsg}
               onChange={e => setNovaMsg(e.target.value)}
               placeholder="Testar Dr. Ben manualmente..."
-              className="flex-1 border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/55"
+              className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/55"
             />
             <button className="btn-primary px-3 py-2">
               <Send className="w-4 h-4" />
@@ -204,7 +204,7 @@ export default function DrBenIntegracao() {
                   { label: 'Status', value: '⏳ Aguardando' },
                 ].map(item => (
                   <div key={item.label} className="bg-white/5 rounded-lg p-2">
-                    <p className="text-white/50 text-xs">{item.label}</p>
+                    <p className="text-gray-400 text-xs">{item.label}</p>
                     <p className="font-medium text-white">{item.value}</p>
                   </div>
                 ))}
@@ -227,17 +227,17 @@ export default function DrBenIntegracao() {
             </h3>
             <div className="space-y-2">
               {webhookLogsMock.map(log => (
-                <div key={log.id} className="flex items-center justify-between p-3 bg-white/4 rounded-xl hover:bg-white/6 transition-colors">
+                <div key={log.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
                   <div className="flex items-center gap-3">
                     <span className="text-xl">{log.fonte === 'WhatsApp' ? '💬' : '🌐'}</span>
                     <div>
-                      <p className="font-medium text-white/90 text-sm">{log.nome}</p>
-                      <p className="text-white/50 text-xs">{log.mensagem} · {log.hora}</p>
+                      <p className="font-medium text-gray-700 text-sm">{log.nome}</p>
+                      <p className="text-gray-400 text-xs">{log.mensagem} · {log.hora}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     {log.score && (
-                      <span className="text-xs text-white/60">{log.score}</span>
+                      <span className="text-xs text-gray-500">{log.score}</span>
                     )}
                     <span className={statusWebhookCor[log.status]}>{statusWebhookLabel[log.status]}</span>
                   </div>
@@ -256,14 +256,14 @@ export default function DrBenIntegracao() {
                 { fonte: 'Formulário Site', status: true, url: 'webhook/form' },
                 { fonte: 'Google Ads (Lead Form)', status: false, url: 'webhook/google-leads' },
               ].map(item => (
-                <div key={item.fonte} className="flex items-center justify-between p-2.5 bg-white/4 rounded-lg">
+                <div key={item.fonte} className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
                   <div>
-                    <p className="text-sm font-medium text-white/90">{item.fonte}</p>
-                    <p className="text-white/50 text-xs font-mono">/api/{item.url}</p>
+                    <p className="text-sm font-medium text-gray-700">{item.fonte}</p>
+                    <p className="text-gray-400 text-xs font-mono">/api/{item.url}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${item.status ? 'bg-green-400' : 'bg-slate-300'}`} />
-                    <span className={`text-xs ${item.status ? 'text-green-600' : 'text-white/50'}`}>
+                    <span className={`text-xs ${item.status ? 'text-green-600' : 'text-gray-400'}`}>
                       {item.status ? 'Ativo' : 'Pendente'}
                     </span>
                   </div>

@@ -83,9 +83,9 @@ export default function HubComercial() {
           <div key={k.titulo} className="card">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-white/60 text-sm">{k.titulo}</p>
-                <p className="text-2xl font-bold text-white mt-1">{k.valor}</p>
-                <p className="text-white/50 text-xs mt-0.5">{k.sub}</p>
+                <p className="text-xs font-medium" style={{color:"#6B7280"}}>{k.titulo}</p>
+                <p className="text-2xl font-bold mt-1" style={{color:"#111827"}}>{k.valor}</p>
+                <p className="text-xs mt-0.5" style={{color:"#9CA3AF"}}>{k.sub}</p>
               </div>
               <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: k.cor }}>{k.icone}</div>
             </div>
@@ -124,8 +124,8 @@ export default function HubComercial() {
             className={`bg-gradient-to-br ${mod.cor} rounded-xl p-4 text-white hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer`}>
             <span className="text-3xl block mb-2">{mod.icone}</span>
             <p className="font-bold text-lg">{mod.label}</p>
-            <p className="text-white/70 text-xs mt-1">{mod.stats}</p>
-            <p className="text-white/90 text-xs mt-2 font-medium">{mod.status}</p>
+            <p className="text-gray-500 text-xs mt-1">{mod.stats}</p>
+            <p className="text-gray-700 text-xs mt-2 font-medium">{mod.status}</p>
           </a>
         ))}
       </div>
@@ -135,8 +135,8 @@ export default function HubComercial() {
         {/* Mini pipeline CRM */}
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-white">Pipeline Comercial</h2>
-            <a href="/crm" className="text-gold text-xs hover:underline flex items-center gap-1">
+            <h2 className="font-semibold" style={{color:"#111827"}}>Pipeline Comercial</h2>
+            <a href="/crm" className="text-yellow-700 text-xs hover:underline flex items-center gap-1">
               CRM Completo <ArrowUpRight className="w-3 h-3" />
             </a>
           </div>
@@ -149,8 +149,8 @@ export default function HubComercial() {
               { label: '🏆 Convertidos', count: crmLeadsMock.filter(l => l.status === 'convertido').length, cor: 'bg-emerald-400', pct: 25 },
             ].map(etapa => (
               <div key={etapa.label} className="flex items-center gap-3">
-                <p className="text-white/80 text-sm w-36 flex-shrink-0">{etapa.label}</p>
-                <div className="flex-1 h-6 bg-white/6 rounded-full overflow-hidden">
+                <p className="text-sm w-36 flex-shrink-0" style={{color:"#374151"}}>{etapa.label}</p>
+                <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
                   <div className={`h-full ${etapa.cor} rounded-full flex items-center justify-end pr-2 transition-all`}
                     style={{ width: `${etapa.pct * 3}%` }}>
                     <span className="text-white text-xs font-bold">{etapa.count}</span>
@@ -163,7 +163,7 @@ export default function HubComercial() {
 
         {/* Leads diários */}
         <div className="card">
-          <h2 className="font-semibold text-white mb-4">Leads × Investimento (7 dias)</h2>
+          <h2 className="font-semibold mb-4" style={{color:"#111827"}}>Leads × Investimento (7 dias)</h2>
           <ResponsiveContainer width="100%" height={200}>
             <AreaChart data={mockDailyMetrics.slice(-7)}>
               <defs>
@@ -172,10 +172,10 @@ export default function HubComercial() {
                   <stop offset="95%" stopColor="#c9a84c" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-              <XAxis dataKey="date" tick={{ fill: 'rgba(159,176,215,0.65)', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: 'rgba(159,176,215,0.65)', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: '#0f2044', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10, color: '#fff', fontFamily: 'Outfit', fontSize: 12 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
+              <XAxis dataKey="date" tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 8, color: '#1F2937', fontFamily: 'Inter', fontSize: 12 }} />
               <Area type="monotone" dataKey="leads" stroke="#c9a84c" fill="url(#colorLeads)" strokeWidth={2} name="Leads" />
             </AreaChart>
           </ResponsiveContainer>
@@ -187,8 +187,8 @@ export default function HubComercial() {
         {/* Status Agentes */}
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-white">Agentes IA</h2>
-            <a href="/agentes" className="text-gold text-xs hover:underline flex items-center gap-1">
+            <h2 className="font-semibold" style={{color:"#111827"}}>Agentes IA</h2>
+            <a href="/agentes" className="text-yellow-700 text-xs hover:underline flex items-center gap-1">
               Ver todos <ArrowUpRight className="w-3 h-3" />
             </a>
           </div>
@@ -199,12 +199,12 @@ export default function HubComercial() {
               { nome: 'Lex Marketing', icone: '📱', status: 'active', ultima: 'Hoje 07:05', modelo: 'Claude Opus' },
               { nome: 'Lex Monitor', icone: '🔔', status: 'active', ultima: 'Hoje 14:22', modelo: 'Gemini Flash' },
             ].map(ag => (
-              <div key={ag.nome} className="flex items-center justify-between p-3 bg-white/4 rounded-xl">
+              <div key={ag.nome} className="flex items-center justify-between p-3 rounded-xl" style={{background:"#F9FAFB",border:"1px solid #F3F4F6"}}>
                 <div className="flex items-center gap-3">
                   <span className="text-xl">{ag.icone}</span>
                   <div>
-                    <p className="font-medium text-white/90 text-sm">{ag.nome}</p>
-                    <p className="text-white/50 text-xs">{ag.modelo} · {ag.ultima}</p>
+                    <p className="font-medium text-sm" style={{color:"#111827"}}>{ag.nome}</p>
+                    <p className="text-xs" style={{color:"#6B7280"}}>{ag.modelo} · {ag.ultima}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -219,21 +219,21 @@ export default function HubComercial() {
         {/* Últimos leads Dr. Ben */}
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-white">Últimas Entradas — Dr. Ben</h2>
-            <a href="/dr-ben" className="text-gold text-xs hover:underline flex items-center gap-1">
+            <h2 className="font-semibold" style={{color:"#111827"}}>Últimas Entradas — Dr. Ben</h2>
+            <a href="/dr-ben" className="text-yellow-700 text-xs hover:underline flex items-center gap-1">
               Ver integração <ArrowUpRight className="w-3 h-3" />
             </a>
           </div>
           <div className="space-y-2">
             {crmLeadsMock.slice(0, 5).map(lead => (
-              <div key={lead.id} className="flex items-center justify-between p-3 bg-white/4 rounded-xl hover:bg-white/6 transition-colors">
+              <div key={lead.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-navy-100 rounded-full flex items-center justify-center">
-                    <span className="text-gold font-bold text-xs">{lead.nome[0]}</span>
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-blue-700 font-bold text-xs">{lead.nome[0]}</span>
                   </div>
                   <div>
-                    <p className="font-medium text-white/90 text-sm">{lead.nome}</p>
-                    <p className="text-white/50 text-xs">{lead.area} · {lead.origem}</p>
+                    <p className="font-medium text-sm" style={{color:"#111827"}}>{lead.nome}</p>
+                    <p className="text-xs" style={{color:"#6B7280"}}>{lead.area} · {lead.origem}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -263,23 +263,23 @@ export default function HubComercial() {
             <TrendingUp className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="font-bold text-xl mb-1">Meta Comercial — Março 2026</h2>
+            <h2 className="font-bold text-xl mb-1 text-white">Meta Comercial — Março 2026</h2>
             <p className="text-sm mb-4 font-sans" style={{ color: "rgba(212,160,23,0.80)" }}>Ben Growth Center: tráfego + IA + CRM centralizado — sem sistemas externos</p>
             <div className="grid grid-cols-3 gap-4">
               {[
                 { label: 'Leads/mês', atual: 89, meta: 150, cor: 'bg-blue-400' },
-                { label: 'Conversões', atual: 17, meta: 30, cor: 'bg-gold' },
+                { label: 'Conversões', atual: 17, meta: 30, cor: 'bg-yellow-500' },
                 { label: 'Receita (R$)', atual: 34800, meta: 60000, cor: 'bg-green-400' },
               ].map(m => (
                 <div key={m.label}>
-                  <div className="flex justify-between text-xs text-gold-200 mb-1">
+                  <div className="flex justify-between text-xs text-gray-500 mb-1">
                     <span>{m.label}</span>
                     <span>{typeof m.atual === 'number' && m.atual > 999 ? formatCurrency(m.atual) : m.atual}/{typeof m.meta === 'number' && m.meta > 999 ? formatCurrency(m.meta) : m.meta}</span>
                   </div>
                   <div className="h-2 rounded-full" style={{ background: "rgba(255,255,255,0.10)" }}>
                     <div className={`h-full ${m.cor} rounded-full`} style={{ width: `${Math.min((m.atual / m.meta) * 100, 100)}%` }} />
                   </div>
-                  <p className="text-white/60 text-xs mt-1">{Math.round((m.atual / m.meta) * 100)}% da meta</p>
+                  <p className="text-gray-500 text-xs mt-1">{Math.round((m.atual / m.meta) * 100)}% da meta</p>
                 </div>
               ))}
             </div>

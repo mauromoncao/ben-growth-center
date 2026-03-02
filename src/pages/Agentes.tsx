@@ -43,14 +43,14 @@ function AgentCard({ agent, onExecute, executing }: {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${agent.ativo ? 'bg-white/6' : 'bg-white/4'}`}>
+          <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${agent.ativo ? 'bg-gray-100' : 'bg-gray-50'}`}>
             {agent.emoji}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-white">{agent.nome}</h3>
+              <h3 className="font-bold text-gray-900">{agent.nome}</h3>
               {!agent.ativo && (
-                <span className="text-xs bg-white/6 text-white/50 px-2 py-0.5 rounded-full">Fase 2</span>
+                <span className="text-xs bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full">Fase 2</span>
               )}
             </div>
             {/* Modelo badge */}
@@ -79,25 +79,25 @@ function AgentCard({ agent, onExecute, executing }: {
           )}
           <button
             onClick={() => setExpandido(!expandido)}
-            className="w-8 h-8 bg-white/4 hover:bg-white/6 rounded-lg flex items-center justify-center transition-colors"
+            className="w-8 h-8 bg-gray-50 hover:bg-gray-100 rounded-lg flex items-center justify-center transition-colors"
           >
-            {expandido ? <ChevronUp className="w-4 h-4 text-white/60" /> : <ChevronDown className="w-4 h-4 text-white/60" />}
+            {expandido ? <ChevronUp className="w-4 h-4 text-gray-500" /> : <ChevronDown className="w-4 h-4 text-gray-500" />}
           </button>
         </div>
       </div>
 
       {/* Descrição */}
-      <p className="text-white/60 text-sm mt-2">{agent.descricao}</p>
+      <p className="text-gray-500 text-sm mt-2">{agent.descricao}</p>
 
       {/* Status bar */}
-      <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/8">
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
         <div className="flex items-center gap-2">
           <div className={`w-2 h-2 rounded-full ${agent.ativo ? 'bg-green-400 animate-pulse' : 'bg-slate-300'}`} />
-          <span className={`text-xs font-medium ${agent.ativo ? 'text-green-600' : 'text-white/50'}`}>
+          <span className={`text-xs font-medium ${agent.ativo ? 'text-green-600' : 'text-gray-400'}`}>
             {agent.ativo ? 'Ativo' : 'Inativo (Fase 2)'}
           </span>
         </div>
-        <div className="flex items-center gap-1 text-white/50 text-xs">
+        <div className="flex items-center gap-1 text-gray-400 text-xs">
           <Clock className="w-3 h-3" />
           {agent.schedule}
         </div>
@@ -118,11 +118,11 @@ function AgentCard({ agent, onExecute, executing }: {
 
       {/* EXPANDIDO — configurações */}
       {expandido && (
-        <div className="mt-4 pt-4 border-t border-white/8 space-y-4">
+        <div className="mt-4 pt-4 border-t border-gray-100 space-y-4">
 
           {/* Seletor de modelo */}
           <div>
-            <p className="text-white/80 text-xs font-semibold mb-2 flex items-center gap-1">
+            <p className="text-gray-600 text-xs font-semibold mb-2 flex items-center gap-1">
               <Brain className="w-3.5 h-3.5" /> MODELO IA
             </p>
             <div className="grid grid-cols-2 gap-2">
@@ -133,43 +133,43 @@ function AgentCard({ agent, onExecute, executing }: {
                   className={`text-left p-2.5 rounded-xl border-2 transition-all ${
                     modeloSelecionado === m.value
                       ? 'border-primary bg-navy-50'
-                      : 'border-white/8 hover:border-white/10'
+                      : 'border-gray-100 hover:border-gray-200'
                   }`}
                 >
-                  <p className={`text-xs font-semibold ${modeloSelecionado === m.value ? 'text-gold' : 'text-white/90'}`}>
+                  <p className={`text-xs font-semibold ${modeloSelecionado === m.value ? 'text-gold' : 'text-gray-700'}`}>
                     {m.label}
                   </p>
                   <div className="flex justify-between mt-0.5">
-                    <span className="text-white/50 text-xs">{m.custo}</span>
-                    <span className="text-white/50 text-xs">{m.forca}</span>
+                    <span className="text-gray-400 text-xs">{m.custo}</span>
+                    <span className="text-gray-400 text-xs">{m.forca}</span>
                   </div>
                 </button>
               ))}
             </div>
-            <p className="text-white/50 text-xs mt-2">
+            <p className="text-gray-400 text-xs mt-2">
               💡 Fallback: <strong>{getModelLabel(agent.modeloFallback)}</strong> (se modelo principal falhar)
             </p>
           </div>
 
           {/* Temperatura */}
           <div>
-            <p className="text-white/80 text-xs font-semibold mb-2">TEMPERATURA (criatividade)</p>
+            <p className="text-gray-600 text-xs font-semibold mb-2">TEMPERATURA (criatividade)</p>
             <div className="flex items-center gap-3">
-              <span className="text-xs text-white/50">Preciso</span>
-              <div className="flex-1 h-2 bg-white/6 rounded-full relative">
+              <span className="text-xs text-gray-400">Preciso</span>
+              <div className="flex-1 h-2 bg-gray-100 rounded-full relative">
                 <div
                   className="h-full bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"
                   style={{ width: `${agent.temperatura * 100}%` }}
                 />
               </div>
-              <span className="text-xs text-white/50">Criativo</span>
-              <span className="text-xs font-bold text-white/80 w-8">{agent.temperatura}</span>
+              <span className="text-xs text-gray-400">Criativo</span>
+              <span className="text-xs font-bold text-gray-600 w-8">{agent.temperatura}</span>
             </div>
           </div>
 
           {/* Prompt preview */}
           <div>
-            <p className="text-white/80 text-xs font-semibold mb-2">SYSTEM PROMPT (prévia)</p>
+            <p className="text-gray-600 text-xs font-semibold mb-2">SYSTEM PROMPT (prévia)</p>
             <div className="bg-slate-900 rounded-xl p-3 max-h-32 overflow-y-auto">
               <pre className="text-green-400 text-xs font-mono whitespace-pre-wrap">
                 {agent.systemPrompt.substring(0, 300)}...
@@ -233,8 +233,8 @@ export default function Agentes() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Agentes IA</h1>
-          <p className="text-white/60 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-gray-900">Agentes IA</h1>
+          <p className="text-gray-500 text-sm mt-1">
             {ativos} ativos · {totalAgentes - ativos} fase 2 · Roteamento multi-modelo automático
           </p>
         </div>
@@ -258,11 +258,11 @@ export default function Agentes() {
           ].map(item => (
             <div key={item.modelo} className={`border rounded-xl p-3 ${item.cor}`}>
               <p className="text-white font-semibold text-sm">{item.modelo}</p>
-              <p className="text-white/60 text-xs mb-2">{item.desc}</p>
+              <p className="text-gray-500 text-xs mb-2">{item.desc}</p>
               {item.agentes.map(a => (
                 <div key={a} className="flex items-center gap-1 mb-1">
                   <div className="w-1 h-1 rounded-full bg-white/5/60" />
-                  <span className="text-white/80 text-xs">{a}</span>
+                  <span className="text-gray-600 text-xs">{a}</span>
                 </div>
               ))}
             </div>
@@ -277,7 +277,7 @@ export default function Agentes() {
             <CheckCircle2 className="w-5 h-5 text-green-600" />
             <p className="font-semibold text-green-700">{resultado.agente} — Executado com Sucesso</p>
           </div>
-          <pre className="text-white/90 text-sm whitespace-pre-wrap bg-white/5 rounded-lg p-3 border border-green-100">
+          <pre className="text-gray-700 text-sm whitespace-pre-wrap bg-white/5 rounded-lg p-3 border border-green-100">
             {resultado.output}
           </pre>
         </div>
@@ -294,7 +294,7 @@ export default function Agentes() {
         ].map(f => (
           <button key={f.value} onClick={() => setAreaFiltro(f.value)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              areaFiltro === f.value ? 'bg-navy text-white' : 'bg-white/5 border border-white/10 text-white/80 hover:bg-white/4'
+              areaFiltro === f.value ? 'bg-navy text-white' : 'bg-white/5 border border-gray-200 text-gray-600 hover:bg-gray-50'
             }`}>
             {f.label}
           </button>
@@ -320,29 +320,29 @@ export default function Agentes() {
         </h2>
         <div className="space-y-2">
           {mockAgentActivities.map(activity => (
-            <div key={activity.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/4 transition-colors">
+            <div key={activity.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors">
               <div className="mt-0.5 flex-shrink-0">
                 {activity.status === 'success' && <CheckCircle2 className="w-4 h-4 text-green-500" />}
                 {activity.status === 'running' && <RefreshCw className="w-4 h-4 text-blue-500 animate-spin" />}
                 {activity.status === 'error' && <AlertCircle className="w-4 h-4 text-red-500" />}
-                {activity.status === 'scheduled' && <Clock className="w-4 h-4 text-white/50" />}
+                {activity.status === 'scheduled' && <Clock className="w-4 h-4 text-gray-400" />}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                  <p className="text-white/90 text-sm">{activity.action}</p>
+                  <p className="text-gray-700 text-sm">{activity.action}</p>
                   <span className={`text-xs flex-shrink-0 ${getStatusColor(activity.status)}`}>
                     {getStatusLabel(activity.status)}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-white/50 text-xs flex items-center gap-1">
+                  <span className="text-gray-400 text-xs flex items-center gap-1">
                     <Zap className="w-3 h-3" />{activity.agent}
                   </span>
-                  <span className="text-slate-300 text-xs">·</span>
-                  <span className="text-white/50 text-xs">{activity.timestamp}</span>
+                  <span className="text-gray-500 text-xs">·</span>
+                  <span className="text-gray-400 text-xs">{activity.timestamp}</span>
                 </div>
                 {activity.details && (
-                  <p className="text-white/50 text-xs mt-0.5">{activity.details}</p>
+                  <p className="text-gray-400 text-xs mt-0.5">{activity.details}</p>
                 )}
               </div>
             </div>

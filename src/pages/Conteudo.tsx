@@ -39,8 +39,8 @@ A impugnação administrativa é o primeiro recurso disponível ao contribuinte 
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Conteúdo IA</h1>
-          <p className="text-white/60 text-sm mt-1">Blog, redes sociais e copies gerados pelos agentes Lex</p>
+          <h1 className="text-2xl font-bold text-gray-900">Conteúdo IA</h1>
+          <p className="text-gray-500 text-sm mt-1">Blog, redes sociais e copies gerados pelos agentes Lex</p>
         </div>
         <button onClick={handleGenerate} disabled={generating}
           className="btn-primary flex items-center gap-2 text-sm disabled:opacity-60">
@@ -56,13 +56,13 @@ A impugnação administrativa é o primeiro recurso disponível ao contribuinte 
             <span className="text-green-700 font-medium text-sm flex items-center gap-2">
               <Zap className="w-4 h-4" /> Conteúdo Gerado com Sucesso!
             </span>
-            <button onClick={() => setGeneratedPreview(null)} className="text-white/50 hover:text-white/80 text-xs">✕ Fechar</button>
+            <button onClick={() => setGeneratedPreview(null)} className="text-gray-400 hover:text-gray-600 text-xs">✕ Fechar</button>
           </div>
-          <pre className="text-white/90 text-sm whitespace-pre-wrap bg-white/5 rounded-lg p-4 border border-green-200">{generatedPreview}</pre>
+          <pre className="text-gray-700 text-sm whitespace-pre-wrap bg-white/5 rounded-lg p-4 border border-green-200">{generatedPreview}</pre>
           <div className="flex gap-2 mt-3">
             <button className="btn-primary text-sm">Publicar no Blog</button>
-            <button className="bg-white/6 text-white/90 px-4 py-2 rounded-lg text-sm hover:bg-white/8">Editar</button>
-            <button className="bg-white/6 text-white/90 px-4 py-2 rounded-lg text-sm hover:bg-white/8">Agendar</button>
+            <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-white/8">Editar</button>
+            <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-white/8">Agendar</button>
           </div>
         </div>
       )}
@@ -77,7 +77,7 @@ A impugnação administrativa é o primeiro recurso disponível ao contribuinte 
           { value: 'video_script', label: '🎬 Script Vídeo' },
         ].map(f => (
           <button key={f.value} onClick={() => setTypeFilter(f.value)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${typeFilter === f.value ? 'bg-navy text-white' : 'bg-white/5 border border-white/10 text-white/80 hover:bg-white/4'}`}>
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${typeFilter === f.value ? 'bg-navy text-white' : 'bg-white/5 border border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
             {f.label}
           </button>
         ))}
@@ -92,7 +92,7 @@ A impugnação administrativa é o primeiro recurso disponível ao contribuinte 
         ].map(s => (
           <div key={s.label} className="card text-center">
             <p className={`text-3xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-white/60 text-sm mt-1">{s.label}</p>
+            <p className="text-gray-500 text-sm mt-1">{s.label}</p>
           </div>
         ))}
       </div>
@@ -109,16 +109,16 @@ A impugnação administrativa é o primeiro recurso disponível ao contribuinte 
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
                     <span className="badge-blue">{item.area}</span>
                     <span className={getStatusColor(item.status)}>{getStatusLabel(item.status)}</span>
-                    {item.platform && <span className="text-white/50 text-xs">{item.platform}</span>}
-                    <span className="text-white/50 text-xs flex items-center gap-1">
+                    {item.platform && <span className="text-gray-400 text-xs">{item.platform}</span>}
+                    <span className="text-gray-400 text-xs flex items-center gap-1">
                       <Zap className="w-3 h-3" />{item.aiAgent}
                     </span>
                   </div>
                   {item.performance && (
                     <div className="flex gap-4 mt-2">
-                      <span className="text-xs text-white/60">👁️ {item.performance.views.toLocaleString('pt-BR')} visualizações</span>
-                      <span className="text-xs text-white/60">🖱️ {item.performance.clicks} cliques</span>
-                      <span className="text-xs text-white/60">🎯 {item.performance.leads} leads</span>
+                      <span className="text-xs text-gray-500">👁️ {item.performance.views.toLocaleString('pt-BR')} visualizações</span>
+                      <span className="text-xs text-gray-500">🖱️ {item.performance.clicks} cliques</span>
+                      <span className="text-xs text-gray-500">🎯 {item.performance.leads} leads</span>
                     </div>
                   )}
                   {item.scheduledAt && (
@@ -129,8 +129,8 @@ A impugnação administrativa é o primeiro recurso disponível ao contribuinte 
                 </div>
               </div>
               <div className="flex gap-1 flex-shrink-0">
-                <button className="p-1.5 text-white/50 hover:text-blue-500 hover:bg-blue-50 rounded transition-colors"><Eye className="w-4 h-4" /></button>
-                <button className="p-1.5 text-white/50 hover:text-gold hover:bg-navy-50 rounded transition-colors"><Edit2 className="w-4 h-4" /></button>
+                <button className="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded transition-colors"><Eye className="w-4 h-4" /></button>
+                <button className="p-1.5 text-gray-400 hover:text-gold hover:bg-navy-50 rounded transition-colors"><Edit2 className="w-4 h-4" /></button>
               </div>
             </div>
           </div>
@@ -142,7 +142,7 @@ A impugnação administrativa é o primeiro recurso disponível ao contribuinte 
         <h2 className="font-semibold mb-2 flex items-center gap-2">
           📅 Plano Semanal Automático (Lex Conteúdo)
         </h2>
-        <p className="text-gold-200 text-sm mb-4">O agente produz automaticamente todo dia às 07:00:</p>
+        <p className="text-gray-500 text-sm mb-4">O agente produz automaticamente todo dia às 07:00:</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             { day: 'Seg', content: '📝 1 Artigo Blog (Tributário)' },

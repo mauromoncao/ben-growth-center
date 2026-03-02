@@ -35,13 +35,13 @@ export default function Analytics() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Analytics</h1>
-          <p className="text-white/60 text-sm mt-1">Performance detalhada de todas as campanhas</p>
+          <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
+          <p className="text-gray-500 text-sm mt-1">Performance detalhada de todas as campanhas</p>
         </div>
-        <div className="flex gap-1 bg-white/6 border border-white/10 rounded-lg p-1">
+        <div className="flex gap-1 bg-gray-100 border border-gray-200 rounded-lg p-1">
           {(['7', '14', '30'] as const).map(p => (
             <button key={p} onClick={() => setPeriodo(p)}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${periodo === p ? 'bg-navy text-white' : 'text-white/80 hover:bg-white/4'}`}>
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${periodo === p ? 'bg-navy text-white' : 'text-gray-600 hover:bg-gray-50'}`}>
               {p} dias
             </button>
           ))}
@@ -58,14 +58,14 @@ export default function Analytics() {
         ].map(item => (
           <div key={item.label} className="card text-center">
             <p className="text-2xl font-bold text-gold">{item.value}</p>
-            <p className="text-white/60 text-xs mt-1">{item.label}</p>
+            <p className="text-gray-500 text-xs mt-1">{item.label}</p>
           </div>
         ))}
       </div>
 
       {/* Gasto por plataforma */}
       <div className="card">
-        <h2 className="font-semibold text-white mb-4">Investimento por Plataforma (R$)</h2>
+        <h2 className="font-semibold text-gray-900 mb-4">Investimento por Plataforma (R$)</h2>
         <ResponsiveContainer width="100%" height={250}>
           <AreaChart data={spendSliced}>
             <defs>
@@ -78,7 +78,7 @@ export default function Analytics() {
                 <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
             <XAxis dataKey="date" tick={{ fill: "rgba(159,176,215,0.65)", fontSize: 11 }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `R$${v}`} />
             <Tooltip formatter={(v) => [formatCurrency(Number(v)), '']} />
@@ -92,10 +92,10 @@ export default function Analytics() {
       {/* Leads e Conversões */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card">
-          <h2 className="font-semibold text-white mb-4">Leads por Dia</h2>
+          <h2 className="font-semibold text-gray-900 mb-4">Leads por Dia</h2>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={sliced}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
               <XAxis dataKey="date" tick={{ fill: "rgba(159,176,215,0.65)", fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: "rgba(159,176,215,0.65)", fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip />
@@ -105,10 +105,10 @@ export default function Analytics() {
         </div>
 
         <div className="card">
-          <h2 className="font-semibold text-white mb-4">Conversões por Plataforma</h2>
+          <h2 className="font-semibold text-gray-900 mb-4">Conversões por Plataforma</h2>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={convSliced}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
               <XAxis dataKey="date" tick={{ fill: "rgba(159,176,215,0.65)", fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: "rgba(159,176,215,0.65)", fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip />
@@ -122,10 +122,10 @@ export default function Analytics() {
 
       {/* Cliques por plataforma */}
       <div className="card">
-        <h2 className="font-semibold text-white mb-4">Cliques por Plataforma</h2>
+        <h2 className="font-semibold text-gray-900 mb-4">Cliques por Plataforma</h2>
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={sliced}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
             <XAxis dataKey="date" tick={{ fill: "rgba(159,176,215,0.65)", fontSize: 11 }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fill: "rgba(159,176,215,0.65)", fontSize: 11 }} axisLine={false} tickLine={false} />
             <Tooltip />
@@ -150,7 +150,7 @@ export default function Analytics() {
           ].map((insight, i) => (
             <div key={i} className="flex gap-3 p-3 bg-amber-50 rounded-lg">
               <span className="text-lg">{insight.icon}</span>
-              <p className="text-white/90 text-sm">{insight.text}</p>
+              <p className="text-gray-700 text-sm">{insight.text}</p>
             </div>
           ))}
         </div>

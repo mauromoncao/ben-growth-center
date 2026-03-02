@@ -115,8 +115,8 @@ export default function Configuracoes() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Configurações</h1>
-          <p className="text-white/60 text-sm mt-1">Perfil Dr. Ben · Integrações · Variáveis de ambiente</p>
+          <h1 className="text-2xl font-bold text-gray-900">Configurações</h1>
+          <p className="text-gray-500 text-sm mt-1">Perfil Dr. Ben · Integrações · Variáveis de ambiente</p>
         </div>
         <button onClick={handleSave}
           className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all"
@@ -133,7 +133,7 @@ export default function Configuracoes() {
             className={`px-5 py-2 rounded-xl text-sm font-semibold border capitalize transition-all ${
               abaAtiva === aba
                 ? 'border-[#D4A017] text-[#D4A017] bg-[#D4A017]/10'
-                : 'border-white/10 text-white/50 hover:border-white/20'
+                : 'border-gray-200 text-gray-400 hover:border-white/20'
             }`}>
             {aba === 'perfil' ? '🤖 Perfil Dr. Ben' : '🔌 Integrações'}
           </button>
@@ -145,7 +145,7 @@ export default function Configuracoes() {
         <div className="space-y-6">
 
           {/* Card principal do perfil */}
-          <div className="bg-[#0f1629] border border-white/10 rounded-2xl overflow-hidden">
+          <div className="bg-[#0f1629] border border-gray-200 rounded-2xl overflow-hidden">
             {/* Banner */}
             <div className="h-24 w-full" style={{ background: 'linear-gradient(135deg, #0f2044, #1e3470, #D4A017)' }} />
 
@@ -165,8 +165,8 @@ export default function Configuracoes() {
                   </div>
                 </div>
                 <div className="pb-2">
-                  <h2 className="text-xl font-bold text-white">{DR_BEN_PROFILE.nomeCompleto}</h2>
-                  <p className="text-white/50 text-sm">{DR_BEN_PROFILE.descricao}</p>
+                  <h2 className="text-xl font-bold text-gray-900">{DR_BEN_PROFILE.nomeCompleto}</h2>
+                  <p className="text-gray-400 text-sm">{DR_BEN_PROFILE.descricao}</p>
                 </div>
               </div>
 
@@ -183,7 +183,7 @@ export default function Configuracoes() {
                   <div key={item.label} className="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-3">
                     <div className="text-[#D4A017] flex-shrink-0">{item.icon}</div>
                     <div className="min-w-0">
-                      <p className="text-white/40 text-xs">{item.label}</p>
+                      <p className="text-gray-400 text-xs">{item.label}</p>
                       <p className="text-white text-sm font-medium truncate">{item.value}</p>
                     </div>
                   </div>
@@ -193,7 +193,7 @@ export default function Configuracoes() {
           </div>
 
           {/* Áreas de atuação */}
-          <div className="bg-[#0f1629] border border-white/10 rounded-2xl p-5">
+          <div className="bg-[#0f1629] border border-gray-200 rounded-2xl p-5">
             <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
               <Bot className="w-4 h-4 text-[#D4A017]" /> Áreas de Atuação
             </h3>
@@ -209,30 +209,30 @@ export default function Configuracoes() {
           </div>
 
           {/* Mensagem de saudação */}
-          <div className="bg-[#0f1629] border border-white/10 rounded-2xl p-5">
+          <div className="bg-[#0f1629] border border-gray-200 rounded-2xl p-5">
             <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
               <MessageCircle className="w-4 h-4 text-emerald-400" /> Mensagem de Saudação (WhatsApp)
             </h3>
             <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
-              <pre className="text-white/80 text-sm whitespace-pre-wrap font-sans leading-relaxed">
+              <pre className="text-gray-600 text-sm whitespace-pre-wrap font-sans leading-relaxed">
                 {DR_BEN_PROFILE.saudacao}
               </pre>
             </div>
           </div>
 
           {/* Templates */}
-          <div className="bg-[#0f1629] border border-white/10 rounded-2xl p-5">
+          <div className="bg-[#0f1629] border border-gray-200 rounded-2xl p-5">
             <h3 className="text-white font-semibold mb-3">📋 Templates de Mensagem Aprovados</h3>
             <div className="space-y-3">
               {Object.entries(DR_BEN_PROFILE.templates).map(([key, tpl]) => (
-                <div key={key} className="bg-white/5 border border-white/10 rounded-xl p-4">
+                <div key={key} className="bg-white/5 border border-gray-200 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-white text-sm font-semibold">{tpl.nome}</p>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
                       {tpl.idioma}
                     </span>
                   </div>
-                  <pre className="text-white/50 text-xs whitespace-pre-wrap font-sans">{tpl.texto}</pre>
+                  <pre className="text-gray-400 text-xs whitespace-pre-wrap font-sans">{tpl.texto}</pre>
                 </div>
               ))}
             </div>
@@ -243,7 +243,7 @@ export default function Configuracoes() {
             <h3 className="text-amber-400 font-semibold mb-2 flex items-center gap-2">
               ⚠️ Para atualizar a foto do perfil no WhatsApp Business
             </h3>
-            <p className="text-white/60 text-sm mb-3">
+            <p className="text-gray-500 text-sm mb-3">
               A foto acima está configurada no sistema. Para aplicar no WhatsApp Business oficial, 
               é necessário o <strong className="text-white">Access Token da Meta API</strong>. 
               Quando inserir o token na aba "Integrações", a foto será sincronizada automaticamente.
@@ -263,10 +263,10 @@ export default function Configuracoes() {
         <div className="space-y-6">
 
           {/* Progresso */}
-          <div className="bg-[#0f1629] border border-white/10 rounded-2xl p-5">
+          <div className="bg-[#0f1629] border border-gray-200 rounded-2xl p-5">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-semibold text-white">Progresso da Configuração</h2>
-              <span className="text-white/60 text-sm">{totalConfigured}/{totalFields} configurados</span>
+              <h2 className="font-semibold text-gray-900">Progresso da Configuração</h2>
+              <span className="text-gray-500 text-sm">{totalConfigured}/{totalFields} configurados</span>
             </div>
             <div className="h-2 bg-white/5 rounded-full overflow-hidden">
               <div className="h-full rounded-full transition-all"
@@ -280,7 +280,7 @@ export default function Configuracoes() {
               ].map(s => (
                 <div key={s.label} className="bg-white/5 rounded-xl p-3 text-center">
                   <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-                  <p className="text-white/40 text-xs mt-0.5">{s.label}</p>
+                  <p className="text-gray-400 text-xs mt-0.5">{s.label}</p>
                 </div>
               ))}
             </div>
@@ -288,14 +288,14 @@ export default function Configuracoes() {
 
           {/* Seções de config */}
           {configSections.map(section => (
-            <div key={section.title} className="bg-[#0f1629] border border-white/10 rounded-2xl p-5">
+            <div key={section.title} className="bg-[#0f1629] border border-gray-200 rounded-2xl p-5">
               <h2 className="font-semibold text-white mb-1">{section.title}</h2>
-              <p className="text-white/50 text-sm mb-4">{section.description}</p>
+              <p className="text-gray-400 text-sm mb-4">{section.description}</p>
               <div className="space-y-4">
                 {section.fields.map(field => (
                   <div key={field.key}>
                     <div className="flex items-center justify-between mb-1.5">
-                      <label className="text-sm font-medium text-white/90">{field.label}</label>
+                      <label className="text-sm font-medium text-gray-700">{field.label}</label>
                       <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
                         field.status === 'configured'
                           ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
@@ -309,17 +309,17 @@ export default function Configuracoes() {
                         type={field.type === 'password' && !showKeys[field.key] ? 'password' : 'text'}
                         placeholder={field.placeholder}
                         defaultValue={field.status === 'configured' ? '••••••••••••••••' : ''}
-                        className="w-full px-3 py-2.5 pr-10 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#D4A017] font-mono"
+                        className="w-full px-3 py-2.5 pr-10 bg-white/5 border border-gray-200 rounded-xl text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#D4A017] font-mono"
                       />
                       {field.type === 'password' && (
                         <button type="button" onClick={() => toggleKey(field.key)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80 transition-colors">
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
                           {showKeys[field.key] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       )}
                     </div>
                     {field.hint && (
-                      <p className="text-white/40 text-xs mt-1">💡 {field.hint}</p>
+                      <p className="text-gray-400 text-xs mt-1">💡 {field.hint}</p>
                     )}
                   </div>
                 ))}
@@ -328,7 +328,7 @@ export default function Configuracoes() {
           ))}
 
           {/* Variáveis Vercel */}
-          <div className="bg-[#0f1629] border border-white/10 rounded-2xl p-5">
+          <div className="bg-[#0f1629] border border-gray-200 rounded-2xl p-5">
             <h2 className="font-semibold text-white mb-3">📋 Variáveis para o Vercel</h2>
             <div className="bg-black/50 rounded-xl p-4 overflow-x-auto">
               <pre className="text-green-400 text-xs font-mono whitespace-pre">{`# WhatsApp Business API (Meta)

@@ -40,8 +40,8 @@ export default function PalavrasChave() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Palavras-chave</h1>
-          <p className="text-white/60 text-sm mt-1">Monitore e descubra termos de busca para suas campanhas</p>
+          <h1 className="text-2xl font-bold text-gray-900">Palavras-chave</h1>
+          <p className="text-gray-500 text-sm mt-1">Monitore e descubra termos de busca para suas campanhas</p>
         </div>
         <button onClick={handleResearch} disabled={researching}
           className="btn-primary flex items-center gap-2 text-sm disabled:opacity-60">
@@ -57,7 +57,7 @@ export default function PalavrasChave() {
           <div className="space-y-2">
             {newKeywords.map((kw, i) => (
               <div key={i} className="flex items-center justify-between bg-white/5 rounded-lg p-3 border border-green-100">
-                <p className="text-white/90 text-sm">{kw}</p>
+                <p className="text-gray-700 text-sm">{kw}</p>
                 <button className="text-xs bg-navy text-white px-3 py-1 rounded-full hover:bg-navy-700">Adicionar</button>
               </div>
             ))}
@@ -68,12 +68,12 @@ export default function PalavrasChave() {
       {/* Filters */}
       <div className="flex gap-3 flex-wrap">
         <div className="relative flex-1 min-w-48">
-          <Search className="w-4 h-4 text-white/50 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input type="text" placeholder="Buscar palavra-chave..." value={search} onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-white/6 border border-white/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-white/55" />
+            className="w-full pl-9 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-white/55" />
         </div>
         <select value={area} onChange={e => setArea(e.target.value)}
-          className="bg-white/6 border border-white/10 rounded-lg text-sm px-3 py-2">
+          className="bg-gray-100 border border-gray-200 rounded-lg text-sm px-3 py-2">
           <option value="all">Todas as áreas</option>
           <option value="Tributário">Tributário</option>
           <option value="Previdenciário">Previdenciário</option>
@@ -90,7 +90,7 @@ export default function PalavrasChave() {
         ].map(s => (
           <div key={s.label} className="card text-center">
             <p className="text-2xl font-bold text-gold">{s.value}</p>
-            <p className="text-white/60 text-xs mt-1">{s.label}</p>
+            <p className="text-gray-500 text-xs mt-1">{s.label}</p>
           </div>
         ))}
       </div>
@@ -99,26 +99,26 @@ export default function PalavrasChave() {
       <div className="card p-0 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-white/4 border-b border-white/8">
+            <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="text-left px-4 py-3 text-white/60 font-medium">Palavra-chave</th>
-                <th className="text-left px-4 py-3 text-white/60 font-medium">Área</th>
-                <th className="text-right px-4 py-3 text-white/60 font-medium">Volume</th>
-                <th className="text-right px-4 py-3 text-white/60 font-medium">CPC</th>
-                <th className="text-center px-4 py-3 text-white/60 font-medium">Concorrência</th>
-                <th className="text-center px-4 py-3 text-white/60 font-medium">Posição</th>
-                <th className="text-right px-4 py-3 text-white/60 font-medium">Cliques</th>
-                <th className="text-right px-4 py-3 text-white/60 font-medium">Impressões</th>
-                <th className="text-left px-4 py-3 text-white/60 font-medium">Ação</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Palavra-chave</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Área</th>
+                <th className="text-right px-4 py-3 text-gray-500 font-medium">Volume</th>
+                <th className="text-right px-4 py-3 text-gray-500 font-medium">CPC</th>
+                <th className="text-center px-4 py-3 text-gray-500 font-medium">Concorrência</th>
+                <th className="text-center px-4 py-3 text-gray-500 font-medium">Posição</th>
+                <th className="text-right px-4 py-3 text-gray-500 font-medium">Cliques</th>
+                <th className="text-right px-4 py-3 text-gray-500 font-medium">Impressões</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Ação</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((kw, i) => (
-                <tr key={kw.keyword} className={`border-b border-slate-50 hover:bg-white/4 transition-colors ${i % 2 === 0 ? '' : 'bg-white/4/30'}`}>
+                <tr key={kw.keyword} className={`border-b border-slate-50 hover:bg-gray-50 transition-colors ${i % 2 === 0 ? '' : 'bg-gray-50/30'}`}>
                   <td className="px-4 py-3 font-medium text-white">{kw.keyword}</td>
                   <td className="px-4 py-3"><span className="badge-blue">{kw.area}</span></td>
-                  <td className="px-4 py-3 text-right text-white/80">{formatNumber(kw.volume)}</td>
-                  <td className="px-4 py-3 text-right text-white/80">{formatCurrency(kw.cpc)}</td>
+                  <td className="px-4 py-3 text-right text-gray-600">{formatNumber(kw.volume)}</td>
+                  <td className="px-4 py-3 text-right text-gray-600">{formatCurrency(kw.cpc)}</td>
                   <td className="px-4 py-3 text-center">
                     <span className={competitionColors[kw.competition]}>{competitionLabels[kw.competition]}</span>
                   </td>
@@ -129,8 +129,8 @@ export default function PalavrasChave() {
                       </span>
                     ) : '—'}
                   </td>
-                  <td className="px-4 py-3 text-right text-white/80">{kw.clicks ? formatNumber(kw.clicks) : '—'}</td>
-                  <td className="px-4 py-3 text-right text-white/80">{kw.impressions ? formatNumber(kw.impressions) : '—'}</td>
+                  <td className="px-4 py-3 text-right text-gray-600">{kw.clicks ? formatNumber(kw.clicks) : '—'}</td>
+                  <td className="px-4 py-3 text-right text-gray-600">{kw.impressions ? formatNumber(kw.impressions) : '—'}</td>
                   <td className="px-4 py-3">
                     <button className="text-xs bg-navy-50 text-gold px-2 py-1 rounded hover:bg-navy-100 transition-colors">
                       + Campanha
@@ -154,7 +154,7 @@ export default function PalavrasChave() {
           ].map((insight, i) => (
             <div key={i} className="flex gap-3 p-3 bg-amber-50 rounded-lg">
               <span>{insight.icon}</span>
-              <p className="text-white/90 text-sm">{insight.text}</p>
+              <p className="text-gray-700 text-sm">{insight.text}</p>
             </div>
           ))}
         </div>

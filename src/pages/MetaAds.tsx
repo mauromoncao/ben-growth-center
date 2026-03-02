@@ -22,13 +22,13 @@ const StatusBadge = ({ status }: { status: string }) => {
     ACTIVE:   'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
     PAUSED:   'bg-amber-500/20 text-amber-300 border-amber-500/30',
     DELETED:  'bg-red-500/20 text-red-300 border-red-500/30',
-    ARCHIVED: 'bg-slate-500/20 text-slate-300 border-slate-500/30',
+    ARCHIVED: 'bg-slate-500/20 text-gray-500 border-slate-500/30',
   }
   const labels: Record<string, string> = {
     ACTIVE: '✅ Ativo', PAUSED: '⏸️ Pausado', DELETED: '🗑️ Deletado', ARCHIVED: '📦 Arquivado',
   }
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${map[status] || 'bg-slate-500/20 text-slate-300 border-slate-500/30'}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${map[status] || 'bg-slate-500/20 text-gray-500 border-slate-500/30'}`}>
       {labels[status] || status}
     </span>
   )
@@ -55,14 +55,14 @@ const CampanhaCard = ({
   const conversoes = MetaAdsService.getConversoes(insight || {} as MetaInsight)
 
   return (
-    <div className="bg-[#0f1629] border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all">
+    <div className="bg-[#0f1629] border border-gray-200 rounded-2xl p-5 hover:border-white/20 transition-all">
       <div className="flex items-start justify-between gap-4 mb-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <p className="text-white font-semibold truncate">{campanha.name}</p>
             <StatusBadge status={campanha.status} />
           </div>
-          <p className="text-white/40 text-xs">
+          <p className="text-gray-400 text-xs">
             ID: <span className="font-mono">{campanha.id}</span>
             {campanha.objective && ` · ${campanha.objective}`}
           </p>
@@ -96,7 +96,7 @@ const CampanhaCard = ({
             { label: 'CTR',         value: fmtP(insight.ctr),           icon: <TrendingUp className="w-3 h-3" />, color: 'text-emerald-300' },
           ].map(m => (
             <div key={m.label} className="bg-white/5 rounded-xl p-3">
-              <div className="flex items-center gap-1 text-white/40 mb-1">
+              <div className="flex items-center gap-1 text-gray-400 mb-1">
                 {m.icon}
                 <span className="text-xs">{m.label}</span>
               </div>
@@ -116,7 +116,7 @@ const CampanhaCard = ({
           {roas > 0 && (
             <div className="flex items-center gap-1.5">
               <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-xs text-white/60">ROAS: </span>
+              <span className="text-xs text-gray-500">ROAS: </span>
               <span className={`text-xs font-bold ${roas >= 3 ? 'text-emerald-400' : roas >= 1.5 ? 'text-amber-400' : 'text-red-400'}`}>
                 {roas.toFixed(2)}x
               </span>
@@ -125,14 +125,14 @@ const CampanhaCard = ({
           {conversoes > 0 && (
             <div className="flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5 text-[#D4A017]" />
-              <span className="text-xs text-white/60">Conversões: </span>
+              <span className="text-xs text-gray-500">Conversões: </span>
               <span className="text-xs font-bold text-[#D4A017]">{conversoes}</span>
             </div>
           )}
           {insight.cpc && (
             <div className="flex items-center gap-1.5">
               <MousePointer className="w-3.5 h-3.5 text-purple-400" />
-              <span className="text-xs text-white/60">CPC: </span>
+              <span className="text-xs text-gray-500">CPC: </span>
               <span className="text-xs font-bold text-purple-300">{fmtR(insight.cpc)}</span>
             </div>
           )}
@@ -202,14 +202,14 @@ export default function MetaAds() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
             <div className="p-2 rounded-xl" style={{ background: 'linear-gradient(135deg, #1877F2, #42b72a)' }}>
               <Megaphone className="w-5 h-5 text-white" />
             </div>
             Meta Ads
           </h1>
-          <p className="text-white/50 text-sm mt-1">
-            Conta: <span className="font-mono text-white/70">{META_AD_ACCOUNT_ID}</span>
+          <p className="text-gray-400 text-sm mt-1">
+            Conta: <span className="font-mono text-gray-500">{META_AD_ACCOUNT_ID}</span>
             {nomeUsuario && <span className="ml-2 text-[#D4A017]">· {nomeUsuario}</span>}
           </p>
         </div>
@@ -219,7 +219,7 @@ export default function MetaAds() {
             conexao === 'ok'      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
             : conexao === 'pendente' ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
             : conexao === 'erro'  ? 'bg-red-500/10 border-red-500/30 text-red-400'
-            : 'bg-slate-500/10 border-slate-500/30 text-slate-400'
+            : 'bg-slate-500/10 border-slate-500/30 text-gray-400'
           }`}>
             {conexao === 'ok' ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
             {conexao === 'ok'       ? 'Conectado'
@@ -227,11 +227,11 @@ export default function MetaAds() {
              : conexao === 'erro'   ? 'Erro de conexão'
              : 'Verificando…'}
           </div>
-          <button onClick={carregar} className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-white/60 transition-all">
+          <button onClick={carregar} className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-gray-200 text-gray-500 transition-all">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <a href="https://adsmanager.facebook.com" target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 text-white/70 hover:text-white hover:border-white/20 text-sm transition-all">
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-500 hover:text-white hover:border-white/20 text-sm transition-all">
             <ExternalLink className="w-4 h-4" /> Ads Manager
           </a>
         </div>
@@ -247,7 +247,7 @@ export default function MetaAds() {
               A conta <span className="font-mono font-bold">{META_AD_ACCOUNT_ID}</span> está configurada.
               Para ver dados reais de campanhas, insira o Access Token:
             </p>
-            <div className="bg-black/30 rounded-xl p-3 font-mono text-xs text-white/60 mb-3">
+            <div className="bg-black/30 rounded-xl p-3 font-mono text-xs text-gray-500 mb-3">
               1. Acesse: <span className="text-blue-400">https://developers.facebook.com</span><br/>
               2. Explorador de API Graph → Gerar Token<br/>
               3. Permissões: ads_read + ads_management<br/>
@@ -264,7 +264,7 @@ export default function MetaAds() {
       {/* Stats gerais — últimos 30 dias */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Gasto (30d)',     value: fmtR(totalGasto),       icon: <DollarSign className="w-5 h-5" />, color: 'text-white',       bg: 'bg-white/5',           border: 'border-white/10' },
+          { label: 'Gasto (30d)',     value: fmtR(totalGasto),       icon: <DollarSign className="w-5 h-5" />, color: 'text-white',       bg: 'bg-white/5',           border: 'border-gray-200' },
           { label: 'Impressões',      value: fmtN(totalImpressoes),  icon: <Eye className="w-5 h-5" />,        color: 'text-blue-300',    bg: 'bg-blue-500/10',       border: 'border-blue-500/20' },
           { label: 'Cliques',         value: fmtN(totalCliques),     icon: <MousePointer className="w-5 h-5" />,color: 'text-purple-300', bg: 'bg-purple-500/10',     border: 'border-purple-500/20' },
           { label: 'Conversões',      value: fmtN(totalConversoes),  icon: <Zap className="w-5 h-5" />,        color: 'text-[#D4A017]',   bg: 'bg-amber-500/10',      border: 'border-amber-500/20' },
@@ -272,7 +272,7 @@ export default function MetaAds() {
           <div key={s.label} className={`${s.bg} border ${s.border} rounded-2xl p-4`}>
             <div className="flex items-center gap-2 mb-2">
               <div className={s.color}>{s.icon}</div>
-              <p className="text-white/50 text-xs font-medium">{s.label}</p>
+              <p className="text-gray-400 text-xs font-medium">{s.label}</p>
             </div>
             <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
           </div>
@@ -283,15 +283,15 @@ export default function MetaAds() {
       {(gastos.hoje || gastos.mes) && (
         <div className="grid grid-cols-2 gap-4 mb-6">
           {gastos.hoje && (
-            <div className="bg-[#0f1629] border border-white/10 rounded-2xl p-4">
-              <p className="text-white/50 text-xs font-medium mb-2">📅 Gasto Hoje</p>
-              <p className="text-2xl font-bold text-white">{fmtR(gastos.hoje.spend)}</p>
+            <div className="bg-[#0f1629] border border-gray-200 rounded-2xl p-4">
+              <p className="text-gray-400 text-xs font-medium mb-2">📅 Gasto Hoje</p>
+              <p className="text-2xl font-bold text-gray-900">{fmtR(gastos.hoje.spend)}</p>
               <p className="text-white/30 text-xs mt-1">{fmtN(gastos.hoje.impressions)} impressões · {fmtN(gastos.hoje.clicks)} cliques</p>
             </div>
           )}
           {gastos.mes && (
-            <div className="bg-[#0f1629] border border-white/10 rounded-2xl p-4">
-              <p className="text-white/50 text-xs font-medium mb-2">📆 Gasto no Mês</p>
+            <div className="bg-[#0f1629] border border-gray-200 rounded-2xl p-4">
+              <p className="text-gray-400 text-xs font-medium mb-2">📆 Gasto no Mês</p>
               <p className="text-2xl font-bold text-[#D4A017]">{fmtR(gastos.mes.spend)}</p>
               <p className="text-white/30 text-xs mt-1">{fmtN(gastos.mes.impressions)} impressões · {fmtN(gastos.mes.clicks)} cliques</p>
             </div>
@@ -310,7 +310,7 @@ export default function MetaAds() {
             className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${
               filtro === f.key
                 ? 'bg-[#1877F2]/20 border-[#1877F2] text-blue-300'
-                : 'bg-white/5 border-white/10 text-white/50 hover:border-white/20'
+                : 'bg-white/5 border-gray-200 text-gray-400 hover:border-white/20'
             }`}>
             {f.label}
             {f.key !== 'todos' && (
@@ -333,7 +333,7 @@ export default function MetaAds() {
       ) : campsFiltradas.length === 0 ? (
         <div className="text-center py-20">
           <Megaphone className="w-12 h-12 text-white/20 mx-auto mb-3" />
-          <p className="text-white/40 font-medium">
+          <p className="text-gray-400 font-medium">
             {conexao === 'pendente' ? 'Insira o Access Token para ver campanhas' : 'Nenhuma campanha encontrada'}
           </p>
           <p className="text-white/25 text-sm mt-1">

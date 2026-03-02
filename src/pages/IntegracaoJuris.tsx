@@ -109,11 +109,11 @@ export default function IntegracaoJuris() {
       {/* ── Header ─────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
             <ArrowLeftRight className="w-6 h-6 text-gold" />
             Integração com Ben Juris Center
           </h1>
-          <p className="text-white/60 text-sm mt-1">
+          <p className="text-gray-500 text-sm mt-1">
             Fluxo bidirecional de dados entre Módulo 01 (Comercial) e Módulo 02 (Jurídico)
           </p>
         </div>
@@ -173,8 +173,8 @@ export default function IntegracaoJuris() {
               { label: 'Agentes Dr. Ben', value: '7' },
             ].map(item => (
               <div key={item.label} className="bg-white/5 rounded-lg p-2">
-                <p className="text-white/50">{item.label}</p>
-                <p className="font-bold text-white">{item.value}</p>
+                <p className="text-gray-400">{item.label}</p>
+                <p className="font-bold text-gray-900">{item.value}</p>
               </div>
             ))}
           </div>
@@ -200,8 +200,8 @@ export default function IntegracaoJuris() {
               { label: 'Honorários/mês', value: 'R$ 42k' },
             ].map(item => (
               <div key={item.label} className="bg-white/5 rounded-lg p-2">
-                <p className="text-white/50">{item.label}</p>
-                <p className="font-bold text-white">{item.value}</p>
+                <p className="text-gray-400">{item.label}</p>
+                <p className="font-bold text-gray-900">{item.value}</p>
               </div>
             ))}
           </div>
@@ -219,7 +219,7 @@ export default function IntegracaoJuris() {
           <div key={kpi.label} className="card flex items-center gap-3" style={{ background: kpi.bg, border: '1px solid rgba(255,255,255,0.06)' }}>
             <kpi.icon className={`w-8 h-8 flex-shrink-0 ${kpi.cor}`} />
             <div>
-              <p className="text-white/50 text-xs">{kpi.label}</p>
+              <p className="text-gray-400 text-xs">{kpi.label}</p>
               <p className={`text-xl font-bold ${kpi.cor}`}>{kpi.value}</p>
             </div>
           </div>
@@ -227,7 +227,7 @@ export default function IntegracaoJuris() {
       </div>
 
       {/* ── Abas ───────────────────────────────────────────── */}
-      <div className="flex gap-2 border-b border-white/10 pb-0">
+      <div className="flex gap-2 border-b border-gray-200 pb-0">
         {([
           { id: 'fluxo', label: '⚡ Fluxo de Eventos', count: MOCK_CROSS_EVENTS.length },
           { id: 'leads', label: '🎯 Pipeline de Leads', count: MOCK_LEADS_PIPELINE.length },
@@ -239,7 +239,7 @@ export default function IntegracaoJuris() {
             className={`px-4 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-all -mb-px ${
               abaAtiva === aba.id
                 ? 'border-yellow-400 text-white'
-                : 'border-transparent text-white/50 hover:text-white/80'
+                : 'border-transparent text-gray-400 hover:text-gray-600'
             }`}
           >
             {aba.label}
@@ -252,7 +252,7 @@ export default function IntegracaoJuris() {
 
       {abaAtiva === 'fluxo' && (
         <div className="space-y-3">
-          <p className="text-white/50 text-xs">
+          <p className="text-gray-400 text-xs">
             Eventos trocados entre os módulos — Growth Center ↔ Ben Juris Center em tempo real
           </p>
           {eventos.map(evt => (
@@ -263,24 +263,24 @@ export default function IntegracaoJuris() {
 
       {abaAtiva === 'leads' && (
         <div className="space-y-3">
-          <p className="text-white/50 text-xs">
+          <p className="text-gray-400 text-xs">
             Leads capturados pelo Dr. Ben Atendimento e seu status no Juris Center
           </p>
           {MOCK_LEADS_PIPELINE.map(lead => (
-            <div key={lead.id} className="card border border-white/8 hover:border-white/15 transition-all">
+            <div key={lead.id} className="card border border-gray-100 hover:border-white/15 transition-all">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="font-bold text-white">{lead.nome}</p>
+                    <p className="font-bold text-gray-900">{lead.nome}</p>
                     <span className={`text-xs rounded-full px-2 py-0.5 font-medium ${
                       lead.urgencia === 'alta' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
                       lead.urgencia === 'media' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
-                      'bg-slate-500/20 text-slate-400 border border-slate-500/30'
+                      'bg-slate-500/20 text-gray-400 border border-slate-500/30'
                     }`}>
                       {lead.urgencia === 'alta' ? '🔴 Alta' : lead.urgencia === 'media' ? '🟡 Média' : '🟢 Baixa'}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-white/50 mb-2">
+                  <div className="flex items-center gap-3 text-xs text-gray-400 mb-2">
                     <span>📞 {lead.telefone}</span>
                     <span>•</span>
                     <span>⚖️ {lead.areaJuridica}</span>
@@ -306,13 +306,13 @@ export default function IntegracaoJuris() {
                     lead.statusJuris === 'cliente_ativo'  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
                     lead.statusJuris === 'processo_aberto' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
                     lead.statusJuris === 'triagem'         ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
-                    'bg-slate-500/20 text-slate-400 border-slate-500/30'
+                    'bg-slate-500/20 text-gray-400 border-slate-500/30'
                   }`}>
                     {lead.statusJuris === 'cliente_ativo'   ? '✅ Cliente Ativo' :
                      lead.statusJuris === 'processo_aberto' ? '⚖️ Processo Aberto' :
                      lead.statusJuris === 'triagem'         ? '🔍 Em Triagem' : '⏳ Aguardando'}
                   </span>
-                  <p className="text-white/40 text-xs mt-2">{lead.dataCaptura}</p>
+                  <p className="text-gray-400 text-xs mt-2">{lead.dataCaptura}</p>
                   {lead.statusJuris === 'aguardando' && (
                     <button
                       onClick={() => handleEnviarLead(lead)}
@@ -334,7 +334,7 @@ export default function IntegracaoJuris() {
 
       {abaAtiva === 'processos' && (
         <div className="space-y-3">
-          <p className="text-white/50 text-xs">
+          <p className="text-gray-400 text-xs">
             Sinais do Juris Center que afetam a estratégia comercial do Growth
           </p>
           {MOCK_SINAIS_JURIS.map(sinal => (
@@ -349,10 +349,10 @@ export default function IntegracaoJuris() {
                       {sinal.area}
                     </span>
                   </div>
-                  <p className="text-white/40 text-xs mb-2">
+                  <p className="text-gray-400 text-xs mb-2">
                     Processo: {sinal.processoNumero}
                   </p>
-                  <p className="text-white/70 text-xs mb-3">
+                  <p className="text-gray-500 text-xs mb-3">
                     📌 {sinal.fase}
                   </p>
                   {sinal.campanhaRelacionada && (
@@ -365,11 +365,11 @@ export default function IntegracaoJuris() {
                 </div>
                 <div className="text-right space-y-2">
                   <div>
-                    <p className="text-white/40 text-xs">Honorário Total</p>
+                    <p className="text-gray-400 text-xs">Honorário Total</p>
                     <p className="font-bold text-amber-400">R$ {sinal.honorarioTotal.toLocaleString('pt-BR')}</p>
                   </div>
                   <div>
-                    <p className="text-white/40 text-xs">Pago</p>
+                    <p className="text-gray-400 text-xs">Pago</p>
                     <p className="font-semibold text-emerald-400">
                       R$ {sinal.honorarioPago.toLocaleString('pt-BR')}
                     </p>
@@ -389,7 +389,7 @@ export default function IntegracaoJuris() {
       )}
 
       {/* ── Diagrama visual de integração ──────────────────── */}
-      <div className="card border border-white/10">
+      <div className="card border border-gray-200">
         <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
           <ArrowLeftRight className="w-4 h-4 text-gold" />
           Mapa de Integração — Dr. Ben Ecosystem
@@ -401,14 +401,14 @@ export default function IntegracaoJuris() {
             <TrendingUp className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
             <p className="font-bold text-white text-sm mb-1">Ben Growth Center</p>
             <p className="text-emerald-400 text-xs mb-3">Módulo 01</p>
-            <div className="space-y-1 text-xs text-white/60 text-left">
+            <div className="space-y-1 text-xs text-gray-500 text-left">
               {['🤖 Dr. Ben Atendimento', '📢 Dr. Ben Campanhas', '📝 Dr. Ben Conteúdo', '🔔 Dr. Ben Monitor'].map(a => (
                 <p key={a}>{a}</p>
               ))}
             </div>
           </div>
           {/* Setas */}
-          <div className="flex flex-col items-center gap-3 text-xs text-white/50">
+          <div className="flex flex-col items-center gap-3 text-xs text-gray-400">
             <div className="flex items-center gap-1 text-emerald-400">
               <span>Leads qualificados</span>
               <ArrowRight className="w-3 h-3" />
@@ -433,7 +433,7 @@ export default function IntegracaoJuris() {
             <Scale className="w-8 h-8 text-blue-400 mx-auto mb-2" />
             <p className="font-bold text-white text-sm mb-1">Ben Juris Center</p>
             <p className="text-blue-400 text-xs mb-3">Módulo 02</p>
-            <div className="space-y-1 text-xs text-white/60 text-left">
+            <div className="space-y-1 text-xs text-gray-500 text-left">
               {['📝 Dr. Ben Petições', '📋 Dr. Ben Contratos', '⚖️ Dr. Ben Análise', '🔍 Dr. Ben Auditoria'].map(a => (
                 <p key={a}>{a}</p>
               ))}

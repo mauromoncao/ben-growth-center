@@ -32,10 +32,10 @@ const StatusBadge = ({ status }: { status: string }) => {
     RECEIVED:         { label: '✅ Recebido',   cls: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' },
     CONFIRMED:        { label: '✅ Confirmado', cls: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' },
     OVERDUE:          { label: '🔴 Vencido',    cls: 'bg-red-500/20 text-red-300 border-red-500/30' },
-    REFUNDED:         { label: '↩️ Estornado',  cls: 'bg-slate-500/20 text-slate-300 border-slate-500/30' },
+    REFUNDED:         { label: '↩️ Estornado',  cls: 'bg-slate-500/20 text-gray-500 border-slate-500/30' },
     RECEIVED_IN_CASH: { label: '💵 Em dinheiro',cls: 'bg-teal-500/20 text-teal-300 border-teal-500/30' },
   }
-  const s = map[status] || { label: status, cls: 'bg-slate-500/20 text-slate-300 border-slate-500/30' }
+  const s = map[status] || { label: status, cls: 'bg-slate-500/20 text-gray-500 border-slate-500/30' }
   return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${s.cls}`}>{s.label}</span>
 }
 
@@ -102,29 +102,29 @@ const ModalNovaCobranca = ({
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#0f1629] border border-white/10 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#0f1629] border border-gray-200 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-emerald-500/20 rounded-xl">
               <DollarSign className="w-5 h-5 text-emerald-400" />
             </div>
             <div>
               <h2 className="text-white font-bold text-lg">Nova Cobrança</h2>
-              <p className="text-white/50 text-sm">Pix · Boleto · Cartão via Asaas</p>
+              <p className="text-gray-400 text-sm">Pix · Boleto · Cartão via Asaas</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-white/40 hover:text-white/80">
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <XCircle className="w-6 h-6" />
           </button>
         </div>
 
         <div className="p-6 space-y-5">
           {/* Usar plano pré-configurado */}
-          <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
+          <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-gray-200">
             <input type="checkbox" id="usarPlano" checked={usarPlano}
               onChange={e => setUsarPlano(e.target.checked)} className="accent-emerald-500 w-4 h-4" />
-            <label htmlFor="usarPlano" className="text-white/80 text-sm cursor-pointer">
+            <label htmlFor="usarPlano" className="text-gray-600 text-sm cursor-pointer">
               Usar plano de honorários pré-configurado
             </label>
           </div>
@@ -132,18 +132,18 @@ const ModalNovaCobranca = ({
           {/* Planos */}
           {usarPlano && (
             <div>
-              <label className="text-white/70 text-sm font-medium mb-2 block">Plano</label>
+              <label className="text-gray-500 text-sm font-medium mb-2 block">Plano</label>
               <div className="grid grid-cols-1 gap-2">
                 {(Object.entries(PLANOS_HONORARIOS) as [keyof typeof PLANOS_HONORARIOS, typeof planoSelecionado][]).map(([key, p]) => (
                   <button key={key} onClick={() => setPlanoKey(key)}
                     className={`flex items-center justify-between p-3 rounded-xl border text-left transition-all ${
                       planoKey === key
                         ? 'border-emerald-500 bg-emerald-500/10 text-white'
-                        : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20'
+                        : 'border-gray-200 bg-white/5 text-gray-500 hover:border-white/20'
                     }`}>
                     <span className="text-sm font-medium">{p.nome}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-white/40">{p.tipo}</span>
+                      <span className="text-xs text-gray-400">{p.tipo}</span>
                       <span className="text-sm font-bold text-emerald-400">{fmtValor(p.valor)}</span>
                     </div>
                   </button>
@@ -157,29 +157,29 @@ const ModalNovaCobranca = ({
             <>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-white/70 text-sm font-medium mb-1.5 block">Valor (R$) *</label>
+                  <label className="text-gray-500 text-sm font-medium mb-1.5 block">Valor (R$) *</label>
                   <input value={valor} onChange={e => setValor(e.target.value)} placeholder="0,00"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-emerald-500" />
+                    className="w-full bg-white/5 border border-gray-200 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-emerald-500" />
                 </div>
                 <div>
-                  <label className="text-white/70 text-sm font-medium mb-1.5 block">Vencimento *</label>
+                  <label className="text-gray-500 text-sm font-medium mb-1.5 block">Vencimento *</label>
                   <input type="date" value={vencimento} onChange={e => setVencimento(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500" />
+                    className="w-full bg-white/5 border border-gray-200 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500" />
                 </div>
               </div>
               <div>
-                <label className="text-white/70 text-sm font-medium mb-1.5 block">Descrição *</label>
+                <label className="text-gray-500 text-sm font-medium mb-1.5 block">Descrição *</label>
                 <input value={descricao} onChange={e => setDescricao(e.target.value)}
                   placeholder="Ex: Honorários advocatícios — Tributário"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-emerald-500" />
+                  className="w-full bg-white/5 border border-gray-200 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-emerald-500" />
               </div>
               <div>
-                <label className="text-white/70 text-sm font-medium mb-2 block">Forma de Pagamento</label>
+                <label className="text-gray-500 text-sm font-medium mb-2 block">Forma de Pagamento</label>
                 <div className="grid grid-cols-3 gap-2">
                   {(['PIX', 'BOLETO', 'CREDIT_CARD'] as AsaasPaymentType[]).map(t => (
                     <button key={t} onClick={() => setTipo(t)}
                       className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-sm font-medium transition-all ${
-                        tipo === t ? 'border-emerald-500 bg-emerald-500/10 text-white' : 'border-white/10 bg-white/5 text-white/50 hover:border-white/20'
+                        tipo === t ? 'border-emerald-500 bg-emerald-500/10 text-white' : 'border-gray-200 bg-white/5 text-gray-400 hover:border-white/20'
                       }`}>
                       {TIPO_ICON[t]}
                       {t === 'CREDIT_CARD' ? 'Cartão' : t}
@@ -190,27 +190,27 @@ const ModalNovaCobranca = ({
             </>
           )}
 
-          <hr className="border-white/10" />
+          <hr className="border-gray-200" />
 
           {/* Cliente */}
           <div>
-            <label className="text-white/70 text-sm font-medium mb-1.5 block">ID do Cliente Asaas (se já cadastrado)</label>
+            <label className="text-gray-500 text-sm font-medium mb-1.5 block">ID do Cliente Asaas (se já cadastrado)</label>
             <input value={customerId} onChange={e => setCustomerId(e.target.value)}
               placeholder="cus_XXXXXXXXXXXXXXXX"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-emerald-500 font-mono text-sm" />
+              className="w-full bg-white/5 border border-gray-200 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-emerald-500 font-mono text-sm" />
             <p className="text-white/30 text-xs mt-1">Ou preencha Nome + CPF/CNPJ abaixo para criar automaticamente</p>
           </div>
           {!customerId && (
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-white/70 text-sm font-medium mb-1.5 block">Nome do Cliente</label>
+                <label className="text-gray-500 text-sm font-medium mb-1.5 block">Nome do Cliente</label>
                 <input value={nomeCliente} onChange={e => setNomeCliente(e.target.value)} placeholder="Nome completo"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-emerald-500" />
+                  className="w-full bg-white/5 border border-gray-200 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-emerald-500" />
               </div>
               <div>
-                <label className="text-white/70 text-sm font-medium mb-1.5 block">CPF / CNPJ</label>
+                <label className="text-gray-500 text-sm font-medium mb-1.5 block">CPF / CNPJ</label>
                 <input value={cpfCnpj} onChange={e => setCpfCnpj(e.target.value)} placeholder="000.000.000-00"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-emerald-500" />
+                  className="w-full bg-white/5 border border-gray-200 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-emerald-500" />
               </div>
             </div>
           )}
@@ -227,7 +227,7 @@ const ModalNovaCobranca = ({
 
           {/* Ações */}
           <div className="flex gap-3 pt-2">
-            <button onClick={onClose} className="flex-1 py-3 rounded-xl border border-white/10 text-white/60 hover:text-white transition-all">
+            <button onClick={onClose} className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-500 hover:text-white transition-all">
               Cancelar
             </button>
             <button onClick={handleSubmit} disabled={loading || criandoCliente}
@@ -274,18 +274,18 @@ const CobrancaCard = ({ pag, onRefresh }: { pag: AsaasPaymentResponse; onRefresh
 
   return (
     <>
-      <div className="bg-[#0f1629] border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all">
+      <div className="bg-[#0f1629] border border-gray-200 rounded-2xl p-5 hover:border-white/20 transition-all">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3">
             <div className="p-2 bg-white/5 rounded-xl mt-0.5">
-              {TIPO_ICON[pag.billingType] || <DollarSign className="w-4 h-4 text-white/40" />}
+              {TIPO_ICON[pag.billingType] || <DollarSign className="w-4 h-4 text-gray-400" />}
             </div>
             <div>
               <p className="text-white font-semibold">{pag.description || 'Cobrança Asaas'}</p>
-              <p className="text-white/40 text-xs mt-0.5 font-mono">{pag.id}</p>
+              <p className="text-gray-400 text-xs mt-0.5 font-mono">{pag.id}</p>
               <div className="flex items-center gap-3 mt-2">
                 <StatusBadge status={pag.status} />
-                <span className="text-white/40 text-xs">Venc: {fmtData(pag.dueDate)}</span>
+                <span className="text-gray-400 text-xs">Venc: {fmtData(pag.dueDate)}</span>
               </div>
             </div>
           </div>
@@ -331,7 +331,7 @@ const CobrancaCard = ({ pag, onRefresh }: { pag: AsaasPaymentResponse; onRefresh
       {/* Modal QR Code Pix */}
       {pixModal && pixData && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setPixModal(false)}>
-          <div className="bg-[#0f1629] border border-white/10 rounded-2xl p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
+          <div className="bg-[#0f1629] border border-gray-200 rounded-2xl p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
             <h3 className="text-white font-bold text-lg mb-4 text-center flex items-center justify-center gap-2">
               <QrCode className="w-5 h-5 text-emerald-400" /> Pix QR Code
             </h3>
@@ -340,7 +340,7 @@ const CobrancaCard = ({ pag, onRefresh }: { pag: AsaasPaymentResponse; onRefresh
                 className="w-48 h-48 mx-auto rounded-xl mb-4" />
             )}
             <div className="bg-black/30 rounded-xl p-3 mb-4">
-              <p className="text-white/50 text-xs mb-1">Pix copia e cola:</p>
+              <p className="text-gray-400 text-xs mb-1">Pix copia e cola:</p>
               <p className="text-white text-xs font-mono break-all">{pixData.payload}</p>
             </div>
             <div className="flex gap-2">
@@ -349,7 +349,7 @@ const CobrancaCard = ({ pag, onRefresh }: { pag: AsaasPaymentResponse; onRefresh
                 <Copy className="w-4 h-4" /> Copiar
               </button>
               <button onClick={() => setPixModal(false)}
-                className="flex-1 py-2.5 rounded-xl border border-white/10 text-white/60 hover:text-white text-sm transition-all">
+                className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-500 hover:text-white text-sm transition-all">
                 Fechar
               </button>
             </div>
@@ -417,11 +417,11 @@ export default function Financeiro() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
             <DollarSign className="w-7 h-7 text-emerald-400" />
             Financeiro — Asaas
           </h1>
-          <p className="text-white/50 text-sm mt-1">Cobranças, Pix, Boleto e Cartão</p>
+          <p className="text-gray-400 text-sm mt-1">Cobranças, Pix, Boleto e Cartão</p>
         </div>
         <div className="flex items-center gap-3">
           {/* Status conexão */}
@@ -435,7 +435,7 @@ export default function Financeiro() {
               ? `Conectado${conta ? ` · ${conta}` : ''}`
               : conexao === 'erro' ? 'Desconectado' : 'Verificando…'}
           </div>
-          <button onClick={carregar} className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-white/60 transition-all">
+          <button onClick={carregar} className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-gray-200 text-gray-500 transition-all">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <button onClick={() => setModalAberto(true)}
@@ -448,7 +448,7 @@ export default function Financeiro() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Saldo Asaas',  value: saldo != null ? fmtValor(saldo) : '—', icon: <Banknote className="w-5 h-5" />, color: 'text-white', bg: 'bg-white/5', border: 'border-white/10' },
+          { label: 'Saldo Asaas',  value: saldo != null ? fmtValor(saldo) : '—', icon: <Banknote className="w-5 h-5" />, color: 'text-white', bg: 'bg-white/5', border: 'border-gray-200' },
           { label: 'Recebido',     value: fmtValor(recebido), icon: <TrendingUp className="w-5 h-5" />, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
           { label: 'A Receber',    value: fmtValor(pendente), icon: <Clock className="w-5 h-5" />, color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
           { label: 'Vencido',      value: fmtValor(vencido),  icon: <TrendingDown className="w-5 h-5" />, color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20' },
@@ -456,7 +456,7 @@ export default function Financeiro() {
           <div key={s.label} className={`${s.bg} border ${s.border} rounded-2xl p-4`}>
             <div className="flex items-center gap-2 mb-2">
               <div className={s.color}>{s.icon}</div>
-              <p className="text-white/50 text-xs font-medium">{s.label}</p>
+              <p className="text-gray-400 text-xs font-medium">{s.label}</p>
             </div>
             <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
           </div>
@@ -468,7 +468,7 @@ export default function Financeiro() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-2.5 w-4 h-4 text-white/30" />
           <input value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar cobrança..."
-            className="w-full pl-9 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white placeholder-white/30 focus:outline-none focus:border-emerald-500" />
+            className="w-full pl-9 bg-white/5 border border-gray-200 rounded-xl px-4 py-2 text-white placeholder-white/30 focus:outline-none focus:border-emerald-500" />
         </div>
         <div className="flex gap-2 flex-wrap">
           {[
@@ -481,7 +481,7 @@ export default function Financeiro() {
               className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${
                 filtroStatus === f.key
                   ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
-                  : 'bg-white/5 border-white/10 text-white/50 hover:border-white/20'
+                  : 'bg-white/5 border-gray-200 text-gray-400 hover:border-white/20'
               }`}>
               {f.label}
             </button>
@@ -497,7 +497,7 @@ export default function Financeiro() {
       ) : cobrancasFiltradas.length === 0 ? (
         <div className="text-center py-20">
           <DollarSign className="w-12 h-12 text-white/20 mx-auto mb-3" />
-          <p className="text-white/40 font-medium">Nenhuma cobrança encontrada</p>
+          <p className="text-gray-400 font-medium">Nenhuma cobrança encontrada</p>
           <p className="text-white/25 text-sm mt-1">Clique em "Nova Cobrança" para gerar um Pix ou Boleto</p>
         </div>
       ) : (
@@ -512,12 +512,12 @@ export default function Financeiro() {
       {totalPaginas > 1 && (
         <div className="flex items-center justify-center gap-3 mt-6">
           <button onClick={() => setPagina(p => Math.max(1, p - 1))} disabled={pagina === 1}
-            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-white/60 disabled:opacity-30">
+            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-gray-200 text-gray-500 disabled:opacity-30">
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="text-white/50 text-sm">{pagina} / {totalPaginas} · {totalCount} cobranças</span>
+          <span className="text-gray-400 text-sm">{pagina} / {totalPaginas} · {totalCount} cobranças</span>
           <button onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))} disabled={pagina === totalPaginas}
-            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-white/60 disabled:opacity-30">
+            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-gray-200 text-gray-500 disabled:opacity-30">
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>

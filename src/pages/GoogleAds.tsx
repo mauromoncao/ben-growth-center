@@ -37,7 +37,7 @@ function KPICard({
           </div>
         )}
       </div>
-      <p className="text-2xl font-bold text-white font-sans">{value}</p>
+      <p className="text-2xl font-bold text-gray-900 font-sans">{value}</p>
       <p className="text-xs font-sans mt-0.5" style={{ color: 'rgba(159,176,215,0.70)' }}>{label}</p>
       {sub && <p className="text-xs font-sans mt-1" style={{ color: 'rgba(159,176,215,0.50)' }}>{sub}</p>}
     </div>
@@ -224,7 +224,7 @@ export default function GoogleAds() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-white font-sans">Google Ads</h1>
+          <h1 className="text-2xl font-bold text-gray-900 font-sans">Google Ads</h1>
           <p className="text-sm font-sans mt-0.5" style={{ color: 'rgba(159,176,215,0.65)' }}>
             Performance de campanhas — MCC 104-876-3500
           </p>
@@ -382,7 +382,7 @@ export default function GoogleAds() {
                           <stop offset="95%" stopColor="#D4A017" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
                       <XAxis dataKey="data" tick={{ fill: 'rgba(159,176,215,0.60)', fontSize: 11 }}
                         tickFormatter={v => v.slice(5)} />
                       <YAxis tick={{ fill: 'rgba(159,176,215,0.60)', fontSize: 11 }}
@@ -405,7 +405,7 @@ export default function GoogleAds() {
                 ) : (
                   <ResponsiveContainer width="100%" height={200}>
                     <BarChart data={diario}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
                       <XAxis dataKey="data" tick={{ fill: 'rgba(159,176,215,0.60)', fontSize: 11 }}
                         tickFormatter={v => v.slice(5)} />
                       <YAxis tick={{ fill: 'rgba(159,176,215,0.60)', fontSize: 11 }} width={45} />

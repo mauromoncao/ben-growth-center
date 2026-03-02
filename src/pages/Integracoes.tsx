@@ -170,12 +170,12 @@ function IntegracaoCard({ integracao }: { integracao: IntegracaoUI }) {
     ? <CheckCircle2 className="w-5 h-5 text-emerald-500" />
     : integracao.fase === 'A'
     ? <AlertCircle className="w-5 h-5 text-amber-500" />
-    : <XCircle className="w-5 h-5 text-slate-300" />
+    : <XCircle className="w-5 h-5 text-gray-500" />
 
   const statusLabel = integracao.configurado ? 'Conectado' : integracao.fase === 'A' ? 'Configurar agora' : 'Pendente'
 
   return (
-    <div className={`bg-white/5 rounded-xl border transition-all ${integracao.configurado ? 'border-emerald-200 shadow-sm' : integracao.fase === 'A' ? 'border-amber-200' : 'border-white/10 opacity-80'}`}>
+    <div className={`bg-white/5 rounded-xl border transition-all ${integracao.configurado ? 'border-emerald-200 shadow-sm' : integracao.fase === 'A' ? 'border-amber-200' : 'border-gray-200 opacity-80'}`}>
       <div className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -187,28 +187,28 @@ function IntegracaoCard({ integracao }: { integracao: IntegracaoUI }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-white text-sm">{integracao.nome}</h3>
+                <h3 className="font-semibold text-gray-900 text-sm">{integracao.nome}</h3>
                 <span className={`text-xs px-1.5 py-0.5 rounded border font-medium ${faseCor}`}>
                   Fase {integracao.fase}
                 </span>
               </div>
-              <p className="text-white/60 text-xs mt-0.5">{integracao.descricao}</p>
+              <p className="text-gray-500 text-xs mt-0.5">{integracao.descricao}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 ml-2">
             {statusIcon}
-            <button onClick={() => setExpandido(!expandido)} className="p-1.5 hover:bg-white/6 rounded-lg transition-colors">
-              <ChevronRight className={`w-4 h-4 text-white/50 transition-transform ${expandido ? 'rotate-90' : ''}`} />
+            <button onClick={() => setExpandido(!expandido)} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+              <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${expandido ? 'rotate-90' : ''}`} />
             </button>
           </div>
         </div>
 
         <div className="flex items-center justify-between mt-3">
-          <span className={`text-xs font-medium ${integracao.configurado ? 'text-emerald-600' : integracao.fase === 'A' ? 'text-amber-600' : 'text-white/50'}`}>
+          <span className={`text-xs font-medium ${integracao.configurado ? 'text-emerald-600' : integracao.fase === 'A' ? 'text-amber-600' : 'text-gray-400'}`}>
             {statusLabel}
           </span>
           {integracao.ultimaSync && (
-            <span className="text-xs text-white/50">
+            <span className="text-xs text-gray-400">
               Sync: {new Date(integracao.ultimaSync).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
             </span>
           )}
@@ -217,7 +217,7 @@ function IntegracaoCard({ integracao }: { integracao: IntegracaoUI }) {
 
       {/* Expandido */}
       {expandido && (
-        <div className="px-4 pb-4 border-t border-white/8 pt-3 space-y-3">
+        <div className="px-4 pb-4 border-t border-gray-100 pt-3 space-y-3">
           {integracao.proximo && (
             <div className="bg-amber-50 rounded-lg p-3 flex items-start gap-2">
               <Info className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
@@ -238,13 +238,13 @@ function IntegracaoCard({ integracao }: { integracao: IntegracaoUI }) {
             )}
             {integracao.linkDocs && (
               <a href={integracao.linkDocs} target="_blank" rel="noreferrer"
-                className="flex-1 flex items-center justify-center gap-1.5 bg-white/6 text-white/90 py-2 rounded-lg text-xs font-medium hover:bg-white/8 transition-colors">
+                className="flex-1 flex items-center justify-center gap-1.5 bg-gray-100 text-gray-700 py-2 rounded-lg text-xs font-medium hover:bg-white/8 transition-colors">
                 <ExternalLink className="w-3.5 h-3.5" />
                 Documentação
               </a>
             )}
             {!integracao.linkConfig && !integracao.linkDocs && (
-              <div className="flex-1 flex items-center justify-center gap-1.5 bg-white/6 text-white/60 py-2 rounded-lg text-xs">
+              <div className="flex-1 flex items-center justify-center gap-1.5 bg-gray-100 text-gray-500 py-2 rounded-lg text-xs">
                 <RefreshCw className="w-3.5 h-3.5" />
                 Automático via Google OAuth
               </div>
@@ -275,8 +275,8 @@ export default function Integracoes() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Central de Integrações</h1>
-        <p className="text-white/60 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-gray-900">Central de Integrações</h1>
+        <p className="text-gray-500 text-sm mt-1">
           Google Workspace · ZapSign · Asaas · WhatsApp · ManyChat · Instagram
         </p>
       </div>
@@ -285,19 +285,19 @@ export default function Integracoes() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="card text-center py-4">
           <p className="text-2xl font-bold text-emerald-600">{totalConfigurados}/{INTEGRACOES.length}</p>
-          <p className="text-white/60 text-xs mt-1">Integrações Ativas</p>
+          <p className="text-gray-500 text-xs mt-1">Integrações Ativas</p>
         </div>
         <div className="card text-center py-4">
           <p className="text-2xl font-bold text-amber-600">{faseATotal - faseAConfigurados}</p>
-          <p className="text-white/60 text-xs mt-1">Fase A — Pendentes</p>
+          <p className="text-gray-500 text-xs mt-1">Fase A — Pendentes</p>
         </div>
         <div className="card text-center py-4">
           <p className="text-2xl font-bold text-blue-600">3</p>
-          <p className="text-white/60 text-xs mt-1">Google APIs</p>
+          <p className="text-gray-500 text-xs mt-1">Google APIs</p>
         </div>
         <div className="card text-center py-4">
           <p className="text-2xl font-bold text-gold">100%</p>
-          <p className="text-white/60 text-xs mt-1">Fluxo Mapeado</p>
+          <p className="text-gray-500 text-xs mt-1">Fluxo Mapeado</p>
         </div>
       </div>
 
@@ -320,7 +320,7 @@ export default function Integracoes() {
               </div>
               {i < FLUXO_COMERCIAL.length - 1 && (
                 <div className="flex-shrink-0 flex items-center mt-6">
-                  <ArrowRight className="w-4 h-4 text-slate-300" />
+                  <ArrowRight className="w-4 h-4 text-gray-500" />
                 </div>
               )}
             </React.Fragment>
@@ -386,18 +386,18 @@ export default function Integracoes() {
 
       {/* Filtros */}
       <div className="flex gap-3 flex-wrap">
-        <div className="flex gap-1 bg-white/6 border border-white/10 rounded-lg p-1">
+        <div className="flex gap-1 bg-gray-100 border border-gray-200 rounded-lg p-1">
           {['todas', 'A', 'B', 'C'].map(fase => (
             <button
               key={fase}
               onClick={() => setFiltroFase(fase as any)}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${filtroFase === fase ? 'bg-navy text-white' : 'text-white/80 hover:bg-white/4'}`}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${filtroFase === fase ? 'bg-navy text-white' : 'text-gray-600 hover:bg-gray-50'}`}
             >
               {fase === 'todas' ? 'Todas' : `Fase ${fase}`}
             </button>
           ))}
         </div>
-        <div className="flex gap-1 bg-white/6 border border-white/10 rounded-lg p-1">
+        <div className="flex gap-1 bg-gray-100 border border-gray-200 rounded-lg p-1">
           {[
             { id: 'todas', label: 'Todas' },
             { id: 'google', label: '🔵 Google' },
@@ -409,7 +409,7 @@ export default function Integracoes() {
             <button
               key={cat.id}
               onClick={() => setFiltroCategoria(cat.id)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${filtroCategoria === cat.id ? 'bg-navy text-white' : 'text-white/80 hover:bg-white/4'}`}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${filtroCategoria === cat.id ? 'bg-navy text-white' : 'text-gray-600 hover:bg-gray-50'}`}
             >
               {cat.label}
             </button>
@@ -427,7 +427,7 @@ export default function Integracoes() {
       {/* Guia rápido OAuth Google */}
       <div className="card p-5">
         <h2 className="font-bold text-white mb-4 flex items-center gap-2">
-          <Settings className="w-5 h-5 text-white/60" />
+          <Settings className="w-5 h-5 text-gray-500" />
           Guia Rápido — Google Workspace @mauromoncao.adv.br
         </h2>
         <div className="space-y-3">
@@ -469,7 +469,7 @@ export default function Integracoes() {
               </div>
               <div className="flex-1">
                 <p className="font-medium text-white text-sm">{step.titulo}</p>
-                <p className="text-white/60 text-xs mt-0.5">{step.desc}</p>
+                <p className="text-gray-500 text-xs mt-0.5">{step.desc}</p>
               </div>
               {step.link && (
                 <a href={step.link} target="_blank" rel="noreferrer"
@@ -515,7 +515,7 @@ export default function Integracoes() {
               acao: 'Envia lead para Dr. Ben qualificar e criar card no CRM',
             },
           ].map(wh => (
-            <div key={wh.servico} className="bg-white/4 rounded-xl p-4">
+            <div key={wh.servico} className="bg-gray-50 rounded-xl p-4">
               <div className="flex items-center gap-3 mb-2">
                 <span className={`w-8 h-8 ${wh.cor} rounded-lg flex items-center justify-center`}>{wh.icone}</span>
                 <div>
@@ -523,10 +523,10 @@ export default function Integracoes() {
                   <code className="text-xs text-gold bg-navy-50 px-2 py-0.5 rounded">{wh.url}</code>
                 </div>
               </div>
-              <p className="text-white/60 text-xs">{wh.acao}</p>
+              <p className="text-gray-500 text-xs">{wh.acao}</p>
               <div className="flex gap-1 mt-2 flex-wrap">
                 {wh.eventos.map(ev => (
-                  <span key={ev} className="text-xs bg-white/8 text-white/80 px-2 py-0.5 rounded font-mono">{ev}</span>
+                  <span key={ev} className="text-xs bg-white/8 text-gray-600 px-2 py-0.5 rounded font-mono">{ev}</span>
                 ))}
               </div>
             </div>

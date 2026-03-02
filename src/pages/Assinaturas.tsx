@@ -24,7 +24,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     signed:  { label: 'Assinado',   cls: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30', icon: <CheckCircle2 className="w-3 h-3" /> },
     refused: { label: 'Recusado',   cls: 'bg-red-500/20 text-red-300 border-red-500/30', icon: <XCircle className="w-3 h-3" /> },
   }
-  const s = map[status] || { label: status, cls: 'bg-slate-500/20 text-slate-300 border-slate-500/30', icon: null }
+  const s = map[status] || { label: status, cls: 'bg-slate-500/20 text-gray-500 border-slate-500/30', icon: null }
   return (
     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${s.cls}`}>
       {s.icon}{s.label}
@@ -91,19 +91,19 @@ const ModalNovoDocumento = ({
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#0f1629] border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#0f1629] border border-gray-200 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-purple-500/20 rounded-xl">
               <FileSignature className="w-5 h-5 text-purple-400" />
             </div>
             <div>
               <h2 className="text-white font-bold text-lg">Novo Documento</h2>
-              <p className="text-white/50 text-sm">Enviar para assinatura digital</p>
+              <p className="text-gray-400 text-sm">Enviar para assinatura digital</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-white/40 hover:text-white/80 transition-colors">
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <XCircle className="w-6 h-6" />
           </button>
         </div>
@@ -111,7 +111,7 @@ const ModalNovoDocumento = ({
         <div className="p-6 space-y-5">
           {/* Tipo de contrato */}
           <div>
-            <label className="text-white/70 text-sm font-medium mb-2 block">Tipo de Documento</label>
+            <label className="text-gray-500 text-sm font-medium mb-2 block">Tipo de Documento</label>
             <div className="grid grid-cols-2 gap-2">
               {(Object.entries(ZapSignTemplates) as [TipoContrato, typeof tpl][]).map(([key, t]) => (
                 <button
@@ -120,7 +120,7 @@ const ModalNovoDocumento = ({
                   className={`flex items-center gap-2 p-3 rounded-xl border text-left transition-all ${
                     tipo === key
                       ? 'border-purple-500 bg-purple-500/10 text-white'
-                      : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20'
+                      : 'border-gray-200 bg-white/5 text-gray-500 hover:border-white/20'
                   }`}
                 >
                   <span className="text-lg">{t.emoji}</span>
@@ -132,23 +132,23 @@ const ModalNovoDocumento = ({
 
           {/* Nome do documento */}
           <div>
-            <label className="text-white/70 text-sm font-medium mb-1.5 block">Nome do Documento *</label>
+            <label className="text-gray-500 text-sm font-medium mb-1.5 block">Nome do Documento *</label>
             <input
               value={nome}
               onChange={e => setNome(e.target.value)}
               placeholder={`Ex: ${tpl.nome} — João Silva`}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
+              className="w-full bg-white/5 border border-gray-200 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
             />
           </div>
 
           {/* URL do PDF */}
           <div>
-            <label className="text-white/70 text-sm font-medium mb-1.5 block">URL do PDF *</label>
+            <label className="text-gray-500 text-sm font-medium mb-1.5 block">URL do PDF *</label>
             <input
               value={urlPdf}
               onChange={e => setUrlPdf(e.target.value)}
               placeholder="https://... (link público para o PDF)"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
+              className="w-full bg-white/5 border border-gray-200 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
             />
             <p className="text-white/30 text-xs mt-1">Insira o link público do PDF armazenado no Drive, Dropbox ou similar.</p>
           </div>
@@ -156,23 +156,23 @@ const ModalNovoDocumento = ({
           {/* Prazo + mensagem */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-white/70 text-sm font-medium mb-1.5 block">Prazo (dias)</label>
+              <label className="text-gray-500 text-sm font-medium mb-1.5 block">Prazo (dias)</label>
               <input
                 type="number"
                 min={1}
                 max={365}
                 value={prazo}
                 onChange={e => setPrazo(Number(e.target.value))}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500"
+                className="w-full bg-white/5 border border-gray-200 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-purple-500"
               />
             </div>
             <div>
-              <label className="text-white/70 text-sm font-medium mb-1.5 block">Mensagem</label>
+              <label className="text-gray-500 text-sm font-medium mb-1.5 block">Mensagem</label>
               <input
                 value={mensagem}
                 onChange={e => setMensagem(e.target.value)}
                 placeholder="Mensagem para os signatários"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
+                className="w-full bg-white/5 border border-gray-200 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
               />
             </div>
           </div>
@@ -180,16 +180,16 @@ const ModalNovoDocumento = ({
           {/* Signatários */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-white/70 text-sm font-medium">Signatários *</label>
+              <label className="text-gray-500 text-sm font-medium">Signatários *</label>
               <button onClick={addSigner} className="flex items-center gap-1 text-xs text-purple-400 hover:text-purple-300">
                 <Plus className="w-3.5 h-3.5" /> Adicionar
               </button>
             </div>
             <div className="space-y-3">
               {signers.map((s, i) => (
-                <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
+                <div key={i} className="bg-white/5 border border-gray-200 rounded-xl p-4 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-white/60 text-xs font-medium">Signatário {i + 1}</span>
+                    <span className="text-gray-500 text-xs font-medium">Signatário {i + 1}</span>
                     {signers.length > 1 && (
                       <button onClick={() => removeSigner(i)} className="text-red-400/60 hover:text-red-400">
                         <XCircle className="w-4 h-4" />
@@ -203,7 +203,7 @@ const ModalNovoDocumento = ({
                         value={s.name}
                         onChange={e => updateSigner(i, 'name', e.target.value)}
                         placeholder="Nome completo"
-                        className="w-full pl-8 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
+                        className="w-full pl-8 bg-white/5 border border-gray-200 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
                       />
                     </div>
                     <div className="relative">
@@ -212,7 +212,7 @@ const ModalNovoDocumento = ({
                         value={s.email}
                         onChange={e => updateSigner(i, 'email', e.target.value)}
                         placeholder="e-mail"
-                        className="w-full pl-8 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
+                        className="w-full pl-8 bg-white/5 border border-gray-200 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
                       />
                     </div>
                     <div className="relative">
@@ -221,15 +221,15 @@ const ModalNovoDocumento = ({
                         value={s.phone}
                         onChange={e => updateSigner(i, 'phone', e.target.value)}
                         placeholder="Telefone (5586999...)"
-                        className="w-full pl-8 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
+                        className="w-full pl-8 bg-white/5 border border-gray-200 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
                       />
                     </div>
                     <div className="flex items-center gap-4 pt-1">
-                      <label className="flex items-center gap-2 text-xs text-white/60 cursor-pointer">
+                      <label className="flex items-center gap-2 text-xs text-gray-500 cursor-pointer">
                         <input type="checkbox" checked={s.sendAutomaticEmail} onChange={e => updateSigner(i, 'sendAutomaticEmail', e.target.checked)} className="accent-purple-500" />
                         E-mail auto
                       </label>
-                      <label className="flex items-center gap-2 text-xs text-white/60 cursor-pointer">
+                      <label className="flex items-center gap-2 text-xs text-gray-500 cursor-pointer">
                         <input type="checkbox" checked={s.sendAutomaticWhatsapp} onChange={e => updateSigner(i, 'sendAutomaticWhatsapp', e.target.checked)} className="accent-green-500" />
                         WhatsApp
                       </label>
@@ -249,7 +249,7 @@ const ModalNovoDocumento = ({
 
           {/* Ações */}
           <div className="flex gap-3 pt-2">
-            <button onClick={onClose} className="flex-1 py-3 rounded-xl border border-white/10 text-white/60 hover:text-white hover:border-white/20 transition-all">
+            <button onClick={onClose} className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-500 hover:text-white hover:border-white/20 transition-all">
               Cancelar
             </button>
             <button
@@ -291,7 +291,7 @@ const DocumentCard = ({
   const totalSigners   = doc.signers?.length || 0
 
   return (
-    <div className="bg-[#0f1629] border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition-all">
+    <div className="bg-[#0f1629] border border-gray-200 rounded-2xl overflow-hidden hover:border-white/20 transition-all">
       <div className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -300,12 +300,12 @@ const DocumentCard = ({
             </div>
             <div className="min-w-0">
               <p className="text-white font-semibold truncate">{doc.name}</p>
-              <p className="text-white/40 text-xs mt-0.5">
+              <p className="text-gray-400 text-xs mt-0.5">
                 Criado {fmt(doc.createdAt)} · Token: <span className="font-mono">{doc.token.slice(0, 8)}…</span>
               </p>
               <div className="flex items-center gap-3 mt-2">
                 <StatusBadge status={doc.status} />
-                <span className="text-white/40 text-xs">{assinadosCount}/{totalSigners} assinaram</span>
+                <span className="text-gray-400 text-xs">{assinadosCount}/{totalSigners} assinaram</span>
               </div>
             </div>
           </div>
@@ -319,7 +319,7 @@ const DocumentCard = ({
               </a>
             )}
             <a href={doc.originalFileUrl} target="_blank" rel="noopener noreferrer"
-              className="p-2 bg-white/5 hover:bg-white/10 text-white/60 rounded-lg transition-all" title="Ver original">
+              className="p-2 bg-white/5 hover:bg-white/10 text-gray-500 rounded-lg transition-all" title="Ver original">
               <ExternalLink className="w-4 h-4" />
             </a>
             {doc.status === 'pending' && (
@@ -329,7 +329,7 @@ const DocumentCard = ({
               </button>
             )}
             <button onClick={() => setExpanded(!expanded)}
-              className="p-2 bg-white/5 hover:bg-white/10 text-white/60 rounded-lg transition-all">
+              className="p-2 bg-white/5 hover:bg-white/10 text-gray-500 rounded-lg transition-all">
               <ChevronLeft className={`w-4 h-4 transition-transform ${expanded ? '-rotate-90' : 'rotate-180'}`} />
             </button>
           </div>
@@ -338,13 +338,13 @@ const DocumentCard = ({
 
       {/* Signatários expandido */}
       {expanded && (
-        <div className="border-t border-white/10 p-5 space-y-3">
-          <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">Signatários</p>
+        <div className="border-t border-gray-200 p-5 space-y-3">
+          <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider">Signatários</p>
           {doc.signers?.map(signer => (
             <div key={signer.token} className="flex items-center justify-between gap-4 bg-white/5 rounded-xl px-4 py-3">
               <div>
                 <p className="text-white text-sm font-medium">{signer.name}</p>
-                <p className="text-white/40 text-xs">{signer.email}</p>
+                <p className="text-gray-400 text-xs">{signer.email}</p>
               </div>
               <div className="flex items-center gap-3">
                 <StatusBadge status={signer.status} />
@@ -422,11 +422,11 @@ export default function Assinaturas() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
             <FileSignature className="w-7 h-7 text-purple-400" />
             Assinaturas Digitais
           </h1>
-          <p className="text-white/50 text-sm mt-1">ZapSign — Contratos e documentos para assinatura eletrônica</p>
+          <p className="text-gray-400 text-sm mt-1">ZapSign — Contratos e documentos para assinatura eletrônica</p>
         </div>
         <div className="flex items-center gap-3">
           {/* Status de Conexão */}
@@ -438,7 +438,7 @@ export default function Assinaturas() {
             {conexao === 'ok'    ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
             {conexao === 'ok' ? `Conectado${conta ? ` · ${conta}` : ''}` : conexao === 'erro' ? 'Desconectado' : 'Verificando…'}
           </div>
-          <button onClick={carregar} className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-white/60 transition-all" title="Recarregar">
+          <button onClick={carregar} className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-gray-200 text-gray-500 transition-all" title="Recarregar">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <button
@@ -458,8 +458,8 @@ export default function Assinaturas() {
           { label: 'Assinados', value: stats.signed, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
           { label: 'Recusados', value: stats.refused, color: 'text-red-400', bg: 'bg-red-500/10' },
         ].map(s => (
-          <div key={s.label} className={`${s.bg} border border-white/10 rounded-2xl p-4`}>
-            <p className="text-white/50 text-xs font-medium">{s.label}</p>
+          <div key={s.label} className={`${s.bg} border border-gray-200 rounded-2xl p-4`}>
+            <p className="text-gray-400 text-xs font-medium">{s.label}</p>
             <p className={`text-3xl font-bold mt-1 ${s.color}`}>{s.value}</p>
           </div>
         ))}
@@ -473,7 +473,7 @@ export default function Assinaturas() {
             value={busca}
             onChange={e => setBusca(e.target.value)}
             placeholder="Buscar documento..."
-            className="w-full pl-9 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
+            className="w-full pl-9 bg-white/5 border border-gray-200 rounded-xl px-4 py-2 text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
           />
         </div>
         <div className="flex gap-2">
@@ -484,7 +484,7 @@ export default function Assinaturas() {
               className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${
                 filtroStatus === f
                   ? 'bg-purple-500/20 border-purple-500 text-purple-300'
-                  : 'bg-white/5 border-white/10 text-white/50 hover:border-white/20'
+                  : 'bg-white/5 border-gray-200 text-gray-400 hover:border-white/20'
               }`}
             >
               {{ todos: 'Todos', pending: '⏳ Aguardando', signed: '✅ Assinados', refused: '❌ Recusados' }[f]}
@@ -501,7 +501,7 @@ export default function Assinaturas() {
       ) : docsFiltrados.length === 0 ? (
         <div className="text-center py-20">
           <FileSignature className="w-12 h-12 text-white/20 mx-auto mb-3" />
-          <p className="text-white/40 font-medium">Nenhum documento encontrado</p>
+          <p className="text-gray-400 font-medium">Nenhum documento encontrado</p>
           <p className="text-white/25 text-sm mt-1">Clique em "Novo Documento" para enviar um contrato</p>
         </div>
       ) : (
@@ -518,15 +518,15 @@ export default function Assinaturas() {
           <button
             onClick={() => setPagina(p => Math.max(1, p - 1))}
             disabled={pagina === 1}
-            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-white/60 disabled:opacity-30 transition-all"
+            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-gray-200 text-gray-500 disabled:opacity-30 transition-all"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="text-white/50 text-sm">Página {pagina} de {totalPaginas}</span>
+          <span className="text-gray-400 text-sm">Página {pagina} de {totalPaginas}</span>
           <button
             onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))}
             disabled={pagina === totalPaginas}
-            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-white/60 disabled:opacity-30 transition-all"
+            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl border border-gray-200 text-gray-500 disabled:opacity-30 transition-all"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
