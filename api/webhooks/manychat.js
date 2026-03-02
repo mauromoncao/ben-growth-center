@@ -128,8 +128,45 @@ Responda em JSON: { "resumo": "...", "score": N, "urgencia": "...", "proxima_aca
     }
 
     // ── 8. Notificar via sistema interno (log / DB) ────────────
-    // Em produção: salvar no banco de dados
     console.log('ManyChat Lead:', JSON.stringify(crmPayload, null, 2))
+
+    // ── 8b. Notificar Plantonista se lead urgente (score >= 70) ──
+    const PLANTONISTA = process.env.PLANTONISTA_WHATSAPP  // +5586999484761
+    const WTOKEN     = process.env.WHATSAPP_TOKEN
+    const WID        = process.env.WHATSAPP_PHONE_NUMBER_ID
+    if (PLANTONISTA && WTOKEN && WID && crmPayload.score >= 70) {
+      try {
+        const urgEmoji = crmPayload.urgencia === 'alta' ? '🔴' : '🟡'
+        const alerta =
+          `${urgEmoji} LEAD URGENTE — MANYCHAT / BEN GROWTH\n\n` +
+          `👤 Nome: ${crmPayload.nome || 'N/A'}\n` +
+          `📱 Telefone: ${crmPayload.telefone || 'N/A'}\n` +
+          `📧 E-mail: ${crmPayload.email || 'N/A'}\n` +
+          `📋 Área: ${crmPayload.area || 'N/A'}\n` +
+          `💬 Problema: ${crmPayload.problema || 'N/A'}\n` +
+          `🌐 Canal: ${crmPayload.canal || 'N/A'}\n` +
+          `⭐ Score Dr. Ben: ${crmPayload.score}/100\n` +
+          `🚨 Urgência: ${(crmPayload.urgencia || 'media').toUpperCase()}\n\n` +
+          `📊 Análise IA: ${crmPayload.resumoIA || 'N/A'}\n\n` +
+          `⚡ Ação recomendada: contato imediato!`
+        await fetch(
+          `https://graph.facebook.com/v21.0/${WID}/messages`,
+          {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${WTOKEN}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              messaging_product: 'whatsapp',
+              to: PLANTONISTA.replace(/\D/g, ''),
+              type: 'text',
+              text: { body: alerta },
+            }),
+          }
+        )
+        console.log('Plantonista notificado (ManyChat lead urgente):', PLANTONISTA)
+      } catch (e) {
+        console.error('Erro ao notificar plantonista (ManyChat):', e.message)
+      }
+    }
 
     // ── 9. Retornar resposta para o ManyChat ──────────────────
     // ManyChat usa isso para personalizar o fluxo de resposta
