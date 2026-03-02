@@ -231,7 +231,45 @@ export default async function handler(req, res) {
 
     const msg = messages[0]
     const telefone = msg.from          // número do remetente
-    const tipo = msg.type              // 'text', 'interactive' etc.
+    const tipo = msg.type              // 'text', 'audio', 'interactive' etc.
+    const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN
+
+    // ── SECRETÁRIA IA — Detectar número do Dr. Mauro ────────
+    const PLANTONISTA = process.env.PLANTONISTA_WHATSAPP?.replace(/\D/g, '')
+    const ehDrMauro = PLANTONISTA && telefone === PLANTONISTA
+
+    // ── SECRETÁRIA IA — Mensagens de ÁUDIO ──────────────────
+    // Qualquer áudio enviado pelo Dr. Mauro → Secretária agenda
+    if (tipo === 'audio' && msg.audio?.id) {
+      console.log('[Flow] Áudio recebido de', telefone, '— roteando para Secretária IA')
+      try {
+        const secretariaRes = await fetch(
+          `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://ben-growth-center.vercel.app'}/api/secretaria`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              audioId: msg.audio.id,
+              audioMime: msg.audio.mime_type || 'audio/ogg',
+              telefone,
+            }),
+          }
+        )
+        const result = await secretariaRes.json()
+        return res.status(200).json({
+          status: 'audio_agendado',
+          compromisso: result.compromisso,
+          transcricao: result.transcricao,
+        })
+      } catch (e) {
+        console.error('[Flow] Erro Secretária:', e)
+        await enviarWhatsApp(telefone,
+          '⚠️ Não consegui processar o áudio. Tente enviar como texto.',
+          WHATSAPP_TOKEN)
+        return res.status(200).json({ status: 'audio_error' })
+      }
+    }
+
     const textoRecebido = tipo === 'text'
       ? msg.text?.body
       : msg.interactive?.button_reply?.title || msg.interactive?.list_reply?.title || ''
@@ -240,7 +278,43 @@ export default async function handler(req, res) {
       return res.status(200).json({ status: 'empty_message' })
     }
 
-    const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN
+    // ── SECRETÁRIA IA — Comandos de texto do Dr. Mauro ──────
+    // Se for o Dr. Mauro enviando texto com palavra-chave de agenda
+    const textoLowerFlow = textoRecebido.toLowerCase().trim()
+    const isAgendaCommand = ehDrMauro && (
+      textoLowerFlow.startsWith('agendar') ||
+      textoLowerFlow.startsWith('agenda ') ||
+      textoLowerFlow === 'agenda' ||
+      textoLowerFlow === 'hoje' ||
+      textoLowerFlow === 'compromissos' ||
+      textoLowerFlow === 'minha agenda' ||
+      textoLowerFlow.startsWith('cancelar comp_') ||
+      textoLowerFlow.includes('audiência') || textoLowerFlow.includes('audiencia') ||
+      textoLowerFlow.includes('reunião') || textoLowerFlow.includes('reuniao') ||
+      textoLowerFlow.includes('prazo') ||
+      textoLowerFlow.includes('consulta amanhã') || textoLowerFlow.includes('consulta amanha')
+    )
+
+    if (isAgendaCommand) {
+      console.log('[Flow] Comando agenda de', telefone, ':', textoRecebido)
+      try {
+        const secretariaRes = await fetch(
+          `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://ben-growth-center.vercel.app'}/api/secretaria`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ texto: textoRecebido, telefone }),
+          }
+        )
+        const result = await secretariaRes.json()
+        return res.status(200).json({
+          status: 'agenda_processado',
+          compromisso: result.compromisso,
+        })
+      } catch (e) {
+        console.error('[Flow] Erro agenda:', e)
+      }
+    }
 
     // ── Busca ou cria sessão do contato ─────────────────────
     let sessao = sessoes.get(telefone)

@@ -14,6 +14,9 @@
     { "source": "/api/google-ads/:path*", "destination": "/api/google-ads.js" },
     { "source": "/api/bridge", "destination": "/api/bridge.js" },
     { "source": "/api/bridge/:path*", "destination": "/api/bridge.js" },
+    { "source": "/api/secretaria", "destination": "/api/secretaria.js" },
+    { "source": "/api/secretaria/:path*", "destination": "/api/secretaria.js" },
+    { "source": "/api/flow/whatsapp", "destination": "/api/flow/whatsapp.js" },
     { "source": "/api/agents/run", "destination": "/api/agents/run.js" },
     { "source": "/api/voice", "destination": "/api/voice.js" },
     { "source": "/api/memory", "destination": "/api/memory.js" },
@@ -34,6 +37,7 @@
     { "path": "/api/cron/lex-conteudo", "schedule": "0 7 * * *" },
     { "path": "/api/cron/lex-campanhas", "schedule": "0 8,18 * * *" },
     { "path": "/api/cron/lex-relatorio", "schedule": "0 9 * * 1" },
-    { "path": "/api/cron/lex-monitor", "schedule": "0 */2 * * *" }
+    { "path": "/api/cron/lex-monitor", "schedule": "0 */2 * * *" },
+    { "path": "/api/cron/agenda-alertas", "schedule": "*/15 * * * *" }
   ]
 }
