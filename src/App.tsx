@@ -5,8 +5,9 @@ import LoginPage from './pages/LoginPage'
 import {
   LayoutDashboard, Megaphone, FileText,
   Users, Bot, Search, Settings, LogOut, Bell,
-  Building2, Shield, MessageSquare,
-  BarChart3, Plug, Workflow, TrendingUp, Scale, FileSignature, DollarSign
+  Briefcase, Shield, MessageSquare,
+  BarChart3, Plug, Workflow, TrendingUp, Scale, FileSignature, DollarSign,
+  Target, GitBranch, LineChart, CreditCard, Cpu, Zap, Kanban, Headphones
 } from 'lucide-react'
 
 // Pages
@@ -23,12 +24,12 @@ import Configuracoes   from './pages/Configuracoes'
 import Plantonista     from './pages/Plantonista'
 import DrBenIntegracao from './pages/DrBenIntegracao'
 import Integracoes     from './pages/Integracoes'
-import FlowBuilder       from './pages/FlowBuilder'
-import IntegracaoJuris   from './pages/IntegracaoJuris'
-import Assinaturas       from './pages/Assinaturas'
-import Financeiro        from './pages/Financeiro'
-import MetaAds          from './pages/MetaAds'
-import GoogleAds        from './pages/GoogleAds'
+import FlowBuilder     from './pages/FlowBuilder'
+import IntegracaoJuris from './pages/IntegracaoJuris'
+import Assinaturas     from './pages/Assinaturas'
+import Financeiro      from './pages/Financeiro'
+import MetaAds         from './pages/MetaAds'
+import GoogleAds       from './pages/GoogleAds'
 
 // ─── Rota privada ─────────────────────────────────────────────
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -36,112 +37,171 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />
 }
 
+// ─── Estrutura de navegação ────────────────────────────────────
 const navGroups = [
   {
-    label: 'VISÃO GERAL',
+    label: 'PAINEL',
     items: [
-      { to: '/',         icon: Building2,       label: 'Central Comercial', exact: true },
+      { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', exact: true },
     ],
   },
   {
-    label: 'CRM & ATENDIMENTO',
+    label: 'BEN HUB',
     items: [
-      { to: '/crm',          icon: Users,          label: 'CRM — Pipeline' },
-      { to: '/plantonista',  icon: Shield,         label: 'Plantonista & Alertas' },
-      { to: '/dr-ben',       icon: MessageSquare,  label: 'Dr. Ben — IA' },
-      { to: '/flow-builder', icon: Workflow,       label: 'Dr. Ben Flow' },
+      { to: '/',                  icon: Briefcase,  label: 'Hub Comercial', exact: true },
+      { to: '/integracao-juris',  icon: Scale,      label: 'Integração Juris' },
     ],
   },
   {
-    label: 'TRÁFEGO & MARKETING',
+    label: 'CRM & LEADS',
     items: [
-      { to: '/campanhas',     icon: Megaphone,      label: 'Campanhas' },
-      { to: '/meta-ads',      icon: BarChart3,      label: 'Meta Ads' },
-      { to: '/google-ads',    icon: TrendingUp,     label: 'Google Ads' },
-      { to: '/analytics',     icon: BarChart3,      label: 'Analytics' },
-      { to: '/conteudo',      icon: FileText,       label: 'Conteúdo IA' },
-      { to: '/palavras-chave',icon: Search,         label: 'Palavras-chave' },
+      { to: '/crm',   icon: Kanban, label: 'CRM' },
+      { to: '/leads', icon: Users,  label: 'Leads' },
     ],
   },
   {
-    label: 'INTELIGÊNCIA',
+    label: 'MARA IA',
     items: [
-      { to: '/agentes',   icon: Bot,            label: 'Agentes IA' },
-      { to: '/dashboard', icon: LayoutDashboard,label: 'Dashboard Ads' },
+      { to: '/plantonista', icon: Headphones, label: 'MARA IA' },
     ],
   },
   {
-    label: 'DOCUMENTOS',
+    label: 'MARKETING',
     items: [
-      { to: '/assinaturas', icon: FileSignature, label: 'Assinaturas ZapSign' },
-      { to: '/financeiro',  icon: DollarSign,    label: 'Financeiro Asaas' },
+      { to: '/campanhas',      icon: Megaphone,  label: 'Campanhas' },
+      { to: '/conteudo',       icon: FileText,   label: 'Conteúdo' },
+      { to: '/palavras-chave', icon: Search,     label: 'Palavras-chave' },
+      { to: '/google-ads',     icon: BarChart3,  label: 'Google Ads' },
+      { to: '/meta-ads',       icon: Target,     label: 'Meta Ads' },
     ],
   },
   {
-    label: 'ECOSSISTEMA',
+    label: 'AGENTES IA',
     items: [
-      { to: '/integracao-juris', icon: Scale,   label: 'Ben Juris Center' },
-      { to: '/integracoes',      icon: Plug,    label: 'Integrações' },
+      { to: '/agentes',      icon: Bot,       label: 'Agentes' },
+      { to: '/flow-builder', icon: GitBranch, label: 'Flow Builder' },
+      { to: '/analytics',    icon: LineChart, label: 'Analytics' },
     ],
   },
   {
     label: 'SISTEMA',
     items: [
-      { to: '/configuracoes', icon: Settings, label: 'Configurações' },
+      { to: '/financeiro',       icon: DollarSign,    label: 'Financeiro' },
+      { to: '/assinaturas',      icon: CreditCard,    label: 'Assinaturas' },
+      { to: '/integracoes',      icon: Zap,           label: 'Integrações' },
+      { to: '/dr-ben',           icon: Cpu,           label: 'Dr.Ben Integração' },
+      { to: '/configuracoes',    icon: Settings,      label: 'Configurações' },
     ],
   },
 ]
 
+// ─── Mapa de breadcrumb por rota ───────────────────────────────
+const breadcrumbMap: Record<string, { section: string; page: string }> = {
+  '/dashboard':       { section: 'PAINEL',       page: 'Dashboard' },
+  '/':                { section: 'BEN HUB',       page: 'Hub Comercial' },
+  '/integracao-juris':{ section: 'BEN HUB',       page: 'Integração Juris' },
+  '/crm':             { section: 'CRM & LEADS',   page: 'CRM' },
+  '/leads':           { section: 'CRM & LEADS',   page: 'Leads' },
+  '/plantonista':     { section: 'MARA IA',        page: 'MARA IA' },
+  '/campanhas':       { section: 'MARKETING',      page: 'Campanhas' },
+  '/conteudo':        { section: 'MARKETING',      page: 'Conteúdo' },
+  '/palavras-chave':  { section: 'MARKETING',      page: 'Palavras-chave' },
+  '/google-ads':      { section: 'MARKETING',      page: 'Google Ads' },
+  '/meta-ads':        { section: 'MARKETING',      page: 'Meta Ads' },
+  '/agentes':         { section: 'AGENTES IA',     page: 'Agentes' },
+  '/flow-builder':    { section: 'AGENTES IA',     page: 'Flow Builder' },
+  '/analytics':       { section: 'AGENTES IA',     page: 'Analytics' },
+  '/financeiro':      { section: 'SISTEMA',        page: 'Financeiro' },
+  '/assinaturas':     { section: 'SISTEMA',        page: 'Assinaturas' },
+  '/integracoes':     { section: 'SISTEMA',        page: 'Integrações' },
+  '/dr-ben':          { section: 'SISTEMA',        page: 'Dr.Ben Integração' },
+  '/configuracoes':   { section: 'SISTEMA',        page: 'Configurações' },
+}
+
+// ─── Sidebar ───────────────────────────────────────────────────
 function Sidebar() {
   const location = useLocation()
+  const { logout } = useAuth()
+
   return (
     <aside
-      className="w-64 min-h-screen flex flex-col fixed left-0 top-0 z-40 overflow-y-auto"
+      className="w-56 min-h-screen flex flex-col fixed left-0 top-0 z-40 overflow-y-auto"
       style={{ background: '#FFFFFF', borderRight: '1px solid #E5E7EB' }}
     >
-      {/* Logo */}
-      <div className="px-5 py-4 flex-shrink-0" style={{ borderBottom: '1px solid #F3F4F6' }}>
+      {/* Logo / Brand */}
+      <div className="px-4 py-4 flex-shrink-0" style={{ borderBottom: '1px solid #F3F4F6' }}>
         <div className="flex items-center gap-3">
+          {/* Círculo dourado com B */}
           <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: '#1E40AF' }}
+            className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{ background: '#D4A017' }}
           >
-            <TrendingUp size={16} style={{ color: '#FFFFFF' }} />
+            <span className="text-sm font-bold text-white">B</span>
           </div>
           <div>
-            <h1 className="font-bold text-sm leading-tight" style={{ color: '#111827' }}>Ben Growth Center</h1>
-            <p className="text-xs font-medium" style={{ color: '#D4A017' }}>Inteligência Comercial</p>
+            <h1 className="font-bold text-sm leading-tight" style={{ color: '#111827' }}>
+              Ben Growth Center
+            </h1>
+            <p className="text-[10px] font-medium tracking-wide" style={{ color: '#9CA3AF' }}>
+              Centro de Inteligência Comercial
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-5">
+      {/* Navegação */}
+      <nav className="flex-1 px-2 py-3 space-y-3 overflow-y-auto">
         {navGroups.map(group => (
           <div key={group.label}>
-            <p className="text-xs font-semibold px-2 mb-1 tracking-wider"
-              style={{ color: '#9CA3AF' }}>
+            <p
+              className="text-[10px] font-semibold px-2 mb-1 tracking-wider uppercase"
+              style={{ color: '#9CA3AF' }}
+            >
               {group.label}
             </p>
             <div className="space-y-0.5">
               {group.items.map(item => {
                 const isActive = item.exact
                   ? location.pathname === item.to
-                  : location.pathname.startsWith(item.to)
+                  : location.pathname === item.to || location.pathname.startsWith(item.to + '/')
                 return (
                   <NavLink
                     key={item.to}
                     to={item.to}
-                    className="flex items-center gap-2.5 py-2 rounded-lg transition-all text-sm"
-                    style={isActive
-                      ? { background: '#EFF6FF', color: '#1E40AF', fontWeight: 600, borderLeft: '3px solid #1E40AF', paddingLeft: '9px', paddingRight: '8px' }
-                      : { color: '#6B7280', borderLeft: '3px solid transparent', paddingLeft: '9px', paddingRight: '8px' }
+                    end={item.exact}
+                    className="flex items-center gap-2 py-1.5 rounded-md transition-all text-[13px] font-medium"
+                    style={
+                      isActive
+                        ? {
+                            background: '#EFF6FF',
+                            color: '#1E40AF',
+                            fontWeight: 600,
+                            borderLeft: '3px solid #1E40AF',
+                            paddingLeft: '9px',
+                            paddingRight: '8px',
+                          }
+                        : {
+                            color: '#6B7280',
+                            borderLeft: '3px solid transparent',
+                            paddingLeft: '9px',
+                            paddingRight: '8px',
+                          }
                     }
-                    onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.background = '#F9FAFB'; (e.currentTarget as HTMLElement).style.color = '#374151'; } }}
-                    onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#6B7280'; } }}
+                    onMouseEnter={e => {
+                      if (!isActive) {
+                        ;(e.currentTarget as HTMLElement).style.background = '#F9FAFB'
+                        ;(e.currentTarget as HTMLElement).style.color = '#374151'
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (!isActive) {
+                        ;(e.currentTarget as HTMLElement).style.background = 'transparent'
+                        ;(e.currentTarget as HTMLElement).style.color = '#6B7280'
+                      }
+                    }}
                   >
                     <item.icon className="w-4 h-4 flex-shrink-0" />
-                    <span className="font-medium">{item.label}</span>
+                    <span>{item.label}</span>
                   </NavLink>
                 )
               })}
@@ -150,28 +210,34 @@ function Sidebar() {
         ))}
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 flex-shrink-0" style={{ borderTop: '1px solid #F3F4F6' }}>
-        <div className="mb-3">
-          <div className="flex items-center gap-2 rounded-lg px-3 py-1.5"
-            style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-xs font-medium" style={{ color: '#16A34A' }}>Sistema Ativo</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 px-2 py-2">
-          <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ background: '#D4A017', color: '#FFFFFF' }}>
-            <span className="text-xs font-bold">MM</span>
+      {/* Rodapé */}
+      <div className="px-3 py-3 flex-shrink-0" style={{ borderTop: '1px solid #F3F4F6' }}>
+        <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg"
+          style={{ background: '#F9FAFB' }}>
+          {/* Avatar dourado */}
+          <div
+            className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{ background: '#D4A017', color: '#FFFFFF' }}
+          >
+            <span className="text-[10px] font-bold">MM</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold truncate" style={{ color: '#111827' }}>Mauro Monção</p>
-            <p className="text-xs truncate" style={{ color: '#9CA3AF' }}>Tributarista · OAB/PI</p>
+            <p className="text-xs font-semibold truncate" style={{ color: '#111827' }}>
+              Mauro Monção
+            </p>
+            <p className="text-[10px] truncate" style={{ color: '#9CA3AF' }}>
+              OAB/PI · Tributarista
+            </p>
           </div>
-          <button className="transition-colors p-1" style={{ color: '#9CA3AF' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#EF4444')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#9CA3AF')}>
-            <LogOut className="w-4 h-4" />
+          <button
+            onClick={logout}
+            title="Sair"
+            className="p-1 rounded transition-colors flex-shrink-0"
+            style={{ color: '#9CA3AF' }}
+            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#EF4444')}
+            onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#9CA3AF')}
+          >
+            <LogOut className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
@@ -179,47 +245,83 @@ function Sidebar() {
   )
 }
 
+// ─── TopBar ────────────────────────────────────────────────────
 function TopBar() {
+  const location = useLocation()
+  const { user } = useAuth()
+
+  // Iniciais do usuário para o avatar
+  const initials = user?.nome
+    ? user.nome.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase()
+    : 'MM'
+
+  // Breadcrumb baseado na rota atual
+  const crumb = breadcrumbMap[location.pathname] || { section: 'BEN HUB', page: 'Hub Comercial' }
+
   return (
     <header
-      className="h-14 fixed top-0 right-0 left-64 z-30 flex items-center justify-between px-6"
+      className="h-14 fixed top-0 left-0 right-0 z-30 flex items-center"
       style={{ background: '#FFFFFF', borderBottom: '1px solid #E5E7EB' }}
     >
-      <div>
-        <p className="font-semibold text-sm" style={{ color: '#111827' }}>
-          Ben Growth Center
-        </p>
-        <p className="text-xs capitalize" style={{ color: '#9CA3AF' }}>
-          {new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-        </p>
+      {/* Zona da Sidebar: briefcase centralizado em w-56 (224px) */}
+      <div
+        className="flex items-center justify-center flex-shrink-0"
+        style={{ width: '224px', borderRight: '1px solid #E5E7EB', height: '100%' }}
+      >
+        <Briefcase className="w-5 h-5" style={{ color: '#1E40AF' }} />
       </div>
-      <div className="flex items-center gap-3">
-        {/* Status agentes */}
-        <div className="flex items-center gap-1.5 rounded-full px-3 py-1"
-          style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', color: '#16A34A', fontSize: '0.75rem', fontWeight: 500 }}>
-          <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-          <span>7 Agentes Ativos</span>
-        </div>
-        {/* Notificações */}
-        <button className="relative p-2 rounded-lg transition-colors"
+
+      {/* Breadcrumb */}
+      <div className="flex-1 flex items-center px-6">
+        <span className="text-xs font-semibold" style={{ color: '#9CA3AF' }}>
+          {crumb.section}
+        </span>
+        <span className="mx-2 text-xs" style={{ color: '#D1D5DB' }}>›</span>
+        <span className="text-sm font-semibold" style={{ color: '#111827' }}>
+          {crumb.page}
+        </span>
+      </div>
+
+      {/* Direita: Bell + separador + Avatar */}
+      <div className="flex items-center px-5 gap-3">
+        {/* Sino */}
+        <button
+          className="relative p-2 rounded-lg transition-colors"
           style={{ color: '#9CA3AF' }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#374151')}
-          onMouseLeave={e => (e.currentTarget.style.color = '#9CA3AF')}>
+          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#374151')}
+          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#9CA3AF')}
+          title="Notificações"
+        >
           <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full" />
+          <span
+            className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
+            style={{ background: '#F59E0B' }}
+          />
         </button>
-        {/* Avatar + Logout */}
-        <LogoutButton />
+
+        {/* Separador vertical */}
+        <div className="w-px h-6" style={{ background: '#E5E7EB' }} />
+
+        {/* Avatar com iniciais — fundo azul institucional */}
+        <div
+          className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer select-none"
+          style={{ background: '#1E40AF', color: '#FFFFFF' }}
+          title={user?.nome || 'Usuário'}
+        >
+          <span className="text-xs font-bold">{initials}</span>
+        </div>
       </div>
     </header>
   )
 }
 
+// ─── Layout ────────────────────────────────────────────────────
 function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex" style={{ background: '#F7F9FC', minHeight: '100vh' }}>
       <Sidebar />
-      <div className="flex-1 ml-64">
+      {/* Conteúdo principal deslocado pela sidebar (w-56 = 224px) */}
+      <div className="flex-1" style={{ marginLeft: '224px' }}>
         <TopBar />
         <main className="pt-14 min-h-screen" style={{ background: '#F7F9FC' }}>
           <div className="p-6">{children}</div>
@@ -229,62 +331,46 @@ function Layout({ children }: { children: React.ReactNode }) {
   )
 }
 
-function LogoutButton() {
-  const { user, logout } = useAuth()
-  const initials = user?.nome?.split(' ').map(n => n[0]).slice(0, 2).join('') || 'MM'
-  return (
-    <div className="flex items-center gap-2">
-      <div className="w-8 h-8 rounded-full flex items-center justify-center"
-        style={{ background: '#1E40AF', color: '#FFFFFF' }}>
-        <span className="text-xs font-bold">{initials}</span>
-      </div>
-      <button
-        onClick={logout}
-        title="Sair"
-        className="p-1.5 rounded-lg transition-colors"
-        style={{ color: '#9CA3AF' }}
-        onMouseEnter={e => (e.currentTarget.style.color = '#EF4444')}
-        onMouseLeave={e => (e.currentTarget.style.color = '#9CA3AF')}>
-        <LogOut className="w-4 h-4" />
-      </button>
-    </div>
-  )
-}
-
+// ─── Rotas ────────────────────────────────────────────────────
 function AppRoutes() {
   const { isAuthenticated } = useAuth()
   return (
     <Routes>
-      <Route path="/login" element={
-        isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />
-      } />
-      <Route path="/*" element={
-        <PrivateRoute>
-          <Layout>
-            <Routes>
-              <Route path="/"                   element={<HubComercial />} />
-              <Route path="/crm"                element={<CRM />} />
-              <Route path="/plantonista"         element={<Plantonista />} />
-              <Route path="/dr-ben"             element={<DrBenIntegracao />} />
-              <Route path="/campanhas"          element={<Campanhas />} />
-              <Route path="/analytics"          element={<Analytics />} />
-              <Route path="/conteudo"           element={<Conteudo />} />
-              <Route path="/palavras-chave"     element={<PalavrasChave />} />
-              <Route path="/agentes"            element={<Agentes />} />
-              <Route path="/dashboard"          element={<Dashboard />} />
-              <Route path="/integracoes"        element={<Integracoes />} />
-              <Route path="/flow-builder"       element={<FlowBuilder />} />
-              <Route path="/integracao-juris"   element={<IntegracaoJuris />} />
-              <Route path="/assinaturas"         element={<Assinaturas />} />
-              <Route path="/financeiro"          element={<Financeiro />} />
-              <Route path="/meta-ads"            element={<MetaAds />} />
-              <Route path="/google-ads"          element={<GoogleAds />} />
-              <Route path="/configuracoes"      element={<Configuracoes />} />
-              <Route path="*"                   element={<Navigate to="/" replace />} />
-            </Routes>
-          </Layout>
-        </PrivateRoute>
-      } />
+      <Route
+        path="/login"
+        element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />}
+      />
+      <Route
+        path="/*"
+        element={
+          <PrivateRoute>
+            <Layout>
+              <Routes>
+                <Route path="/"                   element={<HubComercial />} />
+                <Route path="/dashboard"          element={<Dashboard />} />
+                <Route path="/crm"                element={<CRM />} />
+                <Route path="/leads"              element={<Leads />} />
+                <Route path="/plantonista"         element={<Plantonista />} />
+                <Route path="/dr-ben"             element={<DrBenIntegracao />} />
+                <Route path="/campanhas"          element={<Campanhas />} />
+                <Route path="/analytics"          element={<Analytics />} />
+                <Route path="/conteudo"           element={<Conteudo />} />
+                <Route path="/palavras-chave"     element={<PalavrasChave />} />
+                <Route path="/agentes"            element={<Agentes />} />
+                <Route path="/integracoes"        element={<Integracoes />} />
+                <Route path="/flow-builder"       element={<FlowBuilder />} />
+                <Route path="/integracao-juris"   element={<IntegracaoJuris />} />
+                <Route path="/assinaturas"         element={<Assinaturas />} />
+                <Route path="/financeiro"          element={<Financeiro />} />
+                <Route path="/meta-ads"            element={<MetaAds />} />
+                <Route path="/google-ads"          element={<GoogleAds />} />
+                <Route path="/configuracoes"      element={<Configuracoes />} />
+                <Route path="*"                   element={<Navigate to="/" replace />} />
+              </Routes>
+            </Layout>
+          </PrivateRoute>
+        }
+      />
     </Routes>
   )
 }
