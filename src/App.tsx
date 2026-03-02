@@ -126,10 +126,10 @@ function Sidebar() {
   return (
     <aside
       className="w-56 min-h-screen flex flex-col fixed left-0 top-0 z-40 overflow-y-auto"
-      style={{ background: '#FFFFFF', borderRight: '1px solid #E5E7EB' }}
+      style={{ background: '#0f2044', borderRight: '1px solid #0a1830' }}
     >
       {/* Logo / Brand */}
-      <div className="px-4 py-4 flex-shrink-0" style={{ borderBottom: '1px solid #F3F4F6' }}>
+      <div className="px-4 py-4 flex-shrink-0" style={{ borderBottom: '1px solid #1a3060' }}>
         <div className="flex items-center gap-3">
           {/* Círculo dourado com B */}
           <div
@@ -139,10 +139,10 @@ function Sidebar() {
             <span className="text-sm font-bold text-white">B</span>
           </div>
           <div>
-            <h1 className="font-bold text-sm leading-tight" style={{ color: '#111827' }}>
+            <h1 className="font-bold text-sm leading-tight" style={{ color: '#FFFFFF' }}>
               Ben Growth Center
             </h1>
-            <p className="text-[10px] font-medium tracking-wide" style={{ color: '#9CA3AF' }}>
+            <p className="text-[10px] font-medium tracking-wide" style={{ color: '#93C5FD' }}>
               Centro de Inteligência Comercial
             </p>
           </div>
@@ -155,7 +155,7 @@ function Sidebar() {
           <div key={group.label}>
             <p
               className="text-[10px] font-semibold px-2 mb-1 tracking-wider uppercase"
-              style={{ color: '#9CA3AF' }}
+              style={{ color: '#60A5FA' }}
             >
               {group.label}
             </p>
@@ -173,15 +173,15 @@ function Sidebar() {
                     style={
                       isActive
                         ? {
-                            background: '#EFF6FF',
-                            color: '#1E40AF',
+                            background: '#0a1830',
+                            color: '#FFFFFF',
                             fontWeight: 600,
-                            borderLeft: '3px solid #1E40AF',
+                            borderLeft: '3px solid #D4A017',
                             paddingLeft: '9px',
                             paddingRight: '8px',
                           }
                         : {
-                            color: '#6B7280',
+                            color: '#BFDBFE',
                             borderLeft: '3px solid transparent',
                             paddingLeft: '9px',
                             paddingRight: '8px',
@@ -189,14 +189,14 @@ function Sidebar() {
                     }
                     onMouseEnter={e => {
                       if (!isActive) {
-                        ;(e.currentTarget as HTMLElement).style.background = '#F9FAFB'
-                        ;(e.currentTarget as HTMLElement).style.color = '#374151'
+                        ;(e.currentTarget as HTMLElement).style.background = '#1a3060'
+                        ;(e.currentTarget as HTMLElement).style.color = '#FFFFFF'
                       }
                     }}
                     onMouseLeave={e => {
                       if (!isActive) {
                         ;(e.currentTarget as HTMLElement).style.background = 'transparent'
-                        ;(e.currentTarget as HTMLElement).style.color = '#6B7280'
+                        ;(e.currentTarget as HTMLElement).style.color = '#BFDBFE'
                       }
                     }}
                   >
@@ -211,9 +211,9 @@ function Sidebar() {
       </nav>
 
       {/* Rodapé */}
-      <div className="px-3 py-3 flex-shrink-0" style={{ borderTop: '1px solid #F3F4F6' }}>
+      <div className="px-3 py-3 flex-shrink-0" style={{ borderTop: '1px solid #1a3060' }}>
         <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg"
-          style={{ background: '#F9FAFB' }}>
+          style={{ background: '#0a1830' }}>
           {/* Avatar dourado */}
           <div
             className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
@@ -222,10 +222,10 @@ function Sidebar() {
             <span className="text-[10px] font-bold">MM</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold truncate" style={{ color: '#111827' }}>
+            <p className="text-xs font-semibold truncate" style={{ color: '#FFFFFF' }}>
               Mauro Monção
             </p>
-            <p className="text-[10px] truncate" style={{ color: '#9CA3AF' }}>
+            <p className="text-[10px] truncate" style={{ color: '#93C5FD' }}>
               OAB/PI · Tributarista
             </p>
           </div>
@@ -233,9 +233,9 @@ function Sidebar() {
             onClick={logout}
             title="Sair"
             className="p-1 rounded transition-colors flex-shrink-0"
-            style={{ color: '#9CA3AF' }}
-            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#EF4444')}
-            onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#9CA3AF')}
+            style={{ color: '#60A5FA' }}
+            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#FCA5A5')}
+            onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#60A5FA')}
           >
             <LogOut className="w-3.5 h-3.5" />
           </button>
