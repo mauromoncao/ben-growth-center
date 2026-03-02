@@ -1,6 +1,6 @@
 // ============================================================
 // BEN GROWTH CENTER — Auth Context
-// Acesso: mauromoncaoestudos@gmail.com / 12345678
+// Acesso: mauromoncaoestudos@gmail.com / BenGrowth@2026!
 // ============================================================
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
@@ -25,7 +25,13 @@ const STORAGE_KEY = 'ben_growth_auth'
 const CREDENCIAIS = [
   {
     email: 'mauromoncaoestudos@gmail.com',
-    senha: '12345678',
+    senha: 'BenGrowth@2026!',
+    nome: 'Mauro Monção',
+    modulo: 'Ben Growth Center',
+  },
+  {
+    email: 'mauro@moncaoadvogados.com.br',
+    senha: 'BenGrowth@2026!',
     nome: 'Mauro Monção',
     modulo: 'Ben Growth Center',
   },
