@@ -1,13 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Scale, TrendingUp, ArrowRight, ArrowLeft, ArrowLeftRight,
   CheckCircle2, Clock, AlertCircle, RefreshCw, Users,
-  DollarSign, FileText, Bell, ExternalLink, Zap
+  DollarSign, FileText, Bell, ExternalLink, Zap, Send
 } from 'lucide-react'
 import {
   MOCK_CROSS_EVENTS, MOCK_LEADS_PIPELINE, MOCK_SINAIS_JURIS,
   BEN_MODULES, getCorEventType, getLabelEventType,
   calcularTaxaConversaoJuris, getEventosPendentes,
+  listarEventosBridge, sincronizarComJuris, enviarLeadParaJuris,
   type CrossModuleEvent
 } from '../lib/crossModuleIntegration'
 
@@ -64,12 +65,42 @@ function EventoCard({ evento }: { evento: CrossModuleEvent }) {
 export default function IntegracaoJuris() {
   const [abaAtiva, setAbaAtiva] = useState<'fluxo' | 'leads' | 'processos'>('fluxo')
   const [sincronizando, setSincronizando] = useState(false)
-  const pendentes = getEventosPendentes()
+  const [eventos, setEventos] = useState<CrossModuleEvent[]>(MOCK_CROSS_EVENTS)
+  const [mensagemStatus, setMensagemStatus] = useState('')
+  const [enviandoLead, setEnviandoLead] = useState<string | null>(null)
+  const pendentes = eventos.filter(e => e.status === 'pendente')
   const taxaConversao = calcularTaxaConversaoJuris()
 
-  const handleSincronizar = () => {
+  useEffect(() => {
+    listarEventosBridge().then(evts => { if (evts?.length) setEventos(evts) })
+  }, [])
+
+  const handleSincronizar = async () => {
     setSincronizando(true)
-    setTimeout(() => setSincronizando(false), 2000)
+    setMensagemStatus('')
+    try {
+      const result = await sincronizarComJuris()
+      setMensagemStatus(result.mensagem)
+      const evts = await listarEventosBridge()
+      if (evts?.length) setEventos(evts)
+    } catch {
+      setMensagemStatus('Erro ao sincronizar')
+    } finally {
+      setSincronizando(false)
+      setTimeout(() => setMensagemStatus(''), 4000)
+    }
+  }
+
+  const handleEnviarLead = async (lead: typeof MOCK_LEADS_PIPELINE[0]) => {
+    setEnviandoLead(lead.id)
+    const result = await enviarLeadParaJuris({
+      nome: lead.nome, telefone: lead.telefone, email: lead.email,
+      area: lead.areaJuridica, score: lead.score,
+      valorEstimado: lead.valorEstimado, urgencia: lead.urgencia,
+    })
+    setMensagemStatus(result.mensagem)
+    setEnviandoLead(null)
+    setTimeout(() => setMensagemStatus(''), 4000)
   }
 
   return (
@@ -114,7 +145,13 @@ export default function IntegracaoJuris() {
         </div>
       </div>
 
-      {/* ── Módulos conectados ──────────────────────────────── */}
+      {/* ── Banner de status ────────────────────────────────── */}
+      {mensagemStatus && (
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+          <p className="text-emerald-300 text-sm font-medium">{mensagemStatus}</p>
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-4">
         <div className="card border border-green-500/30" style={{ background: 'rgba(0,179,126,0.08)' }}>
           <div className="flex items-center gap-3 mb-3">
@@ -218,7 +255,7 @@ export default function IntegracaoJuris() {
           <p className="text-white/50 text-xs">
             Eventos trocados entre os módulos — Growth Center ↔ Ben Juris Center em tempo real
           </p>
-          {MOCK_CROSS_EVENTS.map(evt => (
+          {eventos.map(evt => (
             <EventoCard key={evt.id} evento={evt} />
           ))}
         </div>
@@ -276,6 +313,18 @@ export default function IntegracaoJuris() {
                      lead.statusJuris === 'triagem'         ? '🔍 Em Triagem' : '⏳ Aguardando'}
                   </span>
                   <p className="text-white/40 text-xs mt-2">{lead.dataCaptura}</p>
+                  {lead.statusJuris === 'aguardando' && (
+                    <button
+                      onClick={() => handleEnviarLead(lead)}
+                      disabled={enviandoLead === lead.id}
+                      className="mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-500/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30 transition-all disabled:opacity-50"
+                    >
+                      {enviandoLead === lead.id
+                        ? <RefreshCw className="w-3 h-3 animate-spin" />
+                        : <Send className="w-3 h-3" />}
+                      {enviandoLead === lead.id ? 'Enviando...' : 'Enviar ao Juris'}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

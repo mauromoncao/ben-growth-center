@@ -1,7 +1,79 @@
 // ============================================================
 // BEN ECOSYSTEM — Cross-Module Integration Bridge
 // Comunicação bidirecional: Ben Growth Center ↔ Ben Juris Center
+// API real: /api/bridge  — Fallback: dados mock
 // ============================================================
+
+const BRIDGE_API = '/api/bridge'
+
+// ── Funções reais de comunicação ─────────────────────────────
+
+export async function listarEventosBridge(): Promise<CrossModuleEvent[]> {
+  try {
+    const r = await fetch(`${BRIDGE_API}?action=listar&modulo=growth`)
+    const data = await r.json()
+    return data.eventos || MOCK_CROSS_EVENTS
+  } catch {
+    return MOCK_CROSS_EVENTS
+  }
+}
+
+export async function enviarLeadParaJuris(lead: {
+  nome: string; telefone: string; email?: string
+  area: string; score: number; valorEstimado?: number; urgencia: string
+}): Promise<{ success: boolean; mensagem: string }> {
+  try {
+    const r = await fetch(BRIDGE_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'enviar_lead', ...lead }),
+    })
+    const data = await r.json()
+    return { success: data.success, mensagem: data.mensagem || 'Lead enviado ao Juris Center' }
+  } catch {
+    return { success: false, mensagem: 'Erro de conexão com a bridge' }
+  }
+}
+
+export async function enviarEventoBridge(
+  tipo: CrossModuleEventType,
+  payload: Record<string, unknown>,
+  agenteOrigem?: string
+): Promise<{ success: boolean }> {
+  try {
+    const r = await fetch(BRIDGE_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'enviar_evento', tipo, payload, agenteOrigem }),
+    })
+    const data = await r.json()
+    return { success: data.success }
+  } catch {
+    return { success: false }
+  }
+}
+
+export async function sincronizarComJuris(): Promise<{ success: boolean; mensagem: string; eventos_juris?: number }> {
+  try {
+    const r = await fetch(BRIDGE_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'sincronizar' }),
+    })
+    return r.json()
+  } catch {
+    return { success: false, mensagem: 'Falha na sincronização' }
+  }
+}
+
+export async function getStatusBridge(): Promise<{ supabase: string; versao: string; timestamp: string }> {
+  try {
+    const r = await fetch(`${BRIDGE_API}?action=status`)
+    return r.json()
+  } catch {
+    return { supabase: 'offline', versao: '2.0', timestamp: new Date().toISOString() }
+  }
+}
 
 export const BEN_MODULES = {
   GROWTH: {
