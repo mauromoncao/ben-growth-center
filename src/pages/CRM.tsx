@@ -354,8 +354,8 @@ function ModalAgendamento({ lead, onClose, onConfirm }: {
 
   return (
     <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
-      <div className="bg-white/5 rounded-2xl w-full max-w-md shadow-2xl">
-        <div className="flex items-center justify-between p-5 border-b border-white/8">
+      <div className="bg-[#0f1e2e] rounded-2xl w-full max-w-md shadow-2xl border border-slate-700">
+        <div className="flex items-center justify-between p-5 border-b border-slate-700">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
               <Video className="w-5 h-5 text-blue-600" />
@@ -365,7 +365,7 @@ function ModalAgendamento({ lead, onClose, onConfirm }: {
               <p className="text-white/50 text-xs">{lead.nome} · {lead.area}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/6 rounded-lg">
+          <button onClick={onClose} className="p-2 hover:bg-slate-700 rounded-lg">
             <X className="w-4 h-4 text-white/50" />
           </button>
         </div>
@@ -445,7 +445,7 @@ function ModalAgendamento({ lead, onClose, onConfirm }: {
             </div>
 
             {reuniaoData && (
-              <div className="bg-white/4 rounded-xl p-3 space-y-2">
+              <div className="bg-slate-800 rounded-xl p-3 space-y-2 border border-slate-600">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-white/60">🎥 Link Google Meet</span>
                   <button
@@ -517,8 +517,8 @@ function ModalContrato({ lead, onClose, onConfirm }: {
 
   return (
     <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
-      <div className="bg-white/5 rounded-2xl w-full max-w-md shadow-2xl">
-        <div className="flex items-center justify-between p-5 border-b border-white/8">
+      <div className="bg-[#0f1e2e] rounded-2xl w-full max-w-md shadow-2xl border border-slate-700">
+        <div className="flex items-center justify-between p-5 border-b border-slate-700">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
               <FileSignature className="w-5 h-5 text-violet-600" />
@@ -528,7 +528,7 @@ function ModalContrato({ lead, onClose, onConfirm }: {
               <p className="text-white/50 text-xs">{lead.nome} · Assinatura digital</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/6 rounded-lg">
+          <button onClick={onClose} className="p-2 hover:bg-slate-700 rounded-lg">
             <X className="w-4 h-4 text-white/50" />
           </button>
         </div>
@@ -578,7 +578,7 @@ function ModalContrato({ lead, onClose, onConfirm }: {
               <p className="text-emerald-600 text-sm mt-1">Aguardando assinatura de {lead.nome}</p>
             </div>
 
-            <div className="bg-white/4 rounded-xl p-3 space-y-2">
+            <div className="bg-slate-800 rounded-xl p-3 space-y-2 border border-slate-600">
               <span className="text-xs text-white/60">🔗 Link de assinatura</span>
               <p className="text-xs font-mono text-violet-600 break-all">{signUrl}</p>
               <button
@@ -658,8 +658,8 @@ function ModalCobranca({ lead, onClose, onConfirm }: {
 
   return (
     <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
-      <div className="bg-white/5 rounded-2xl w-full max-w-md shadow-2xl">
-        <div className="flex items-center justify-between p-5 border-b border-white/8">
+      <div className="bg-[#0f1e2e] rounded-2xl w-full max-w-md shadow-2xl border border-slate-700">
+        <div className="flex items-center justify-between p-5 border-b border-slate-700">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
               <CreditCard className="w-5 h-5 text-emerald-600" />
@@ -669,7 +669,7 @@ function ModalCobranca({ lead, onClose, onConfirm }: {
               <p className="text-white/50 text-xs">{lead.nome} · Pix · Boleto · Cartão</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/6 rounded-lg">
+          <button onClick={onClose} className="p-2 hover:bg-slate-700 rounded-lg">
             <X className="w-4 h-4 text-white/50" />
           </button>
         </div>
@@ -744,7 +744,7 @@ function ModalCobranca({ lead, onClose, onConfirm }: {
             </div>
 
             {cobrancaData?.pixQrCode && (
-              <div className="bg-white/4 rounded-xl p-3 space-y-1">
+              <div className="bg-slate-800 rounded-xl p-3 space-y-1 border border-slate-600">
                 <span className="text-xs text-white/60 block">⚡ Pix copia e cola</span>
                 <p className="text-xs font-mono text-white/90 break-all">{cobrancaData.pixQrCode}</p>
                 <button
@@ -899,9 +899,9 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
   return (
     <>
       <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <div className="bg-white/5 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
+        <div className="bg-[#0f1e2e] rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl border border-slate-700">
           {/* Header */}
-          <div className="flex items-start justify-between p-5 border-b border-white/8">
+          <div className="flex items-start justify-between p-5 border-b border-slate-700">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-navy rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-lg">{lead.nome[0]}</span>
@@ -915,7 +915,7 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
                 </div>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-white/6 rounded-lg transition-colors">
+            <button onClick={onClose} className="p-2 hover:bg-slate-700 rounded-lg transition-colors">
               <X className="w-5 h-5 text-white/50" />
             </button>
           </div>
@@ -934,13 +934,13 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
                     <span className="text-amber-700 text-xs font-bold">{lead.score}/100</span>
                   </div>
                 </div>
-                <p className="text-white/90 text-sm">{lead.resumoIA}</p>
+                <p className="text-amber-800 text-sm">{lead.resumoIA}</p>
               </div>
             </div>
           </div>
 
           {/* Abas */}
-          <div className="flex border-b border-white/8">
+          <div className="flex border-b border-slate-700">
             {[
               { id: 'conversa', label: '💬 Conversa' },
               { id: 'dados', label: '👤 Dados' },
@@ -955,7 +955,7 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
           </div>
 
           {/* Conteúdo das abas */}
-          <div className="flex-1 overflow-y-auto p-5">
+          <div className="flex-1 overflow-y-auto p-5 bg-slate-800/30">
 
             {/* ABA: Conversa */}
             {abaAtiva === 'conversa' && (
@@ -969,8 +969,8 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
                     )}
                     <div className={`max-w-xs rounded-2xl px-3 py-2 text-sm ${
                       msg.role === 'lead' ? 'bg-navy text-white rounded-tr-sm' :
-                      msg.role === 'dr_ben' ? 'bg-amber-50 border border-amber-200 text-white/90 rounded-tl-sm' :
-                      'bg-blue-50 border border-blue-200 text-white/90 rounded-tl-sm'
+                      msg.role === 'dr_ben' ? 'bg-amber-50 border border-amber-200 text-gray-800 rounded-tl-sm' :
+                      'bg-blue-50 border border-blue-200 text-gray-800 rounded-tl-sm'
                     }`}>
                       {msg.role !== 'lead' && (
                         <p className={`text-xs font-medium mb-0.5 ${msg.role === 'dr_ben' ? 'text-amber-600' : 'text-blue-600'}`}>
@@ -978,13 +978,13 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
                         </p>
                       )}
                       <p>{msg.texto}</p>
-                      <p className={`text-xs mt-1 ${msg.role === 'lead' ? 'text-gold-200' : 'text-white/50'}`}>{msg.hora}</p>
+                      <p className={`text-xs mt-1 ${msg.role === 'lead' ? 'text-slate-300' : 'text-gray-400'}`}>{msg.hora}</p>
                     </div>
                   </div>
                 ))}
                 <div className="mt-4 flex gap-2">
                   <input type="text" placeholder="Enviar mensagem como advogado..."
-                    className="flex-1 border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/55" />
+                    className="flex-1 bg-white border border-slate-300 text-gray-800 placeholder-gray-400 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
                   <button className="btn-primary px-4 py-2 text-sm">
                     <Send className="w-4 h-4" />
                   </button>
@@ -1004,7 +1004,7 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
                     { label: 'Criado em', value: lead.criadoEm, icon: <Calendar className="w-4 h-4" /> },
                     { label: 'Plantonista', value: lead.plantonista || 'Não atribuído', icon: <User className="w-4 h-4" /> },
                   ].map(item => (
-                    <div key={item.label} className="bg-white/4 rounded-xl p-3">
+                    <div key={item.label} className="bg-slate-800 rounded-xl p-3 border border-slate-600">
                       <div className="flex items-center gap-2 text-white/50 mb-1">
                         {item.icon}
                         <span className="text-xs">{item.label}</span>
@@ -1445,7 +1445,7 @@ export default function CRM() {
       {visualizacao === 'lista' && (
         <div className="card p-0 overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-white/4 border-b border-white/8">
+            <thead className="bg-white/4 border-b border-slate-700">
               <tr>
                 <th className="text-left px-4 py-3 text-white/60 font-medium">Lead</th>
                 <th className="text-left px-4 py-3 text-white/60 font-medium">Área</th>
