@@ -5,7 +5,7 @@ import LoginPage from './pages/LoginPage'
 import {
   LayoutDashboard, Megaphone, FileText,
   Users, Bot, Search, Settings, LogOut, Bell,
-  ChevronRight, Building2, Shield, MessageSquare,
+  Building2, Shield, MessageSquare,
   BarChart3, Plug, Workflow, TrendingUp, Scale, FileSignature, DollarSign
 } from 'lucide-react'
 
@@ -97,30 +97,30 @@ function Sidebar() {
   return (
     <aside
       className="w-64 min-h-screen flex flex-col fixed left-0 top-0 z-40 overflow-y-auto"
-      style={{ background: '#0f2044', borderRight: '1px solid rgba(255,255,255,0.07)' }}
+      style={{ background: '#FFFFFF', borderRight: '1px solid #E5E7EB' }}
     >
       {/* Logo */}
-      <div className="p-5 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="px-5 py-4 flex-shrink-0" style={{ borderBottom: '1px solid #F3F4F6' }}>
         <div className="flex items-center gap-3">
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md"
-            style={{ background: 'linear-gradient(135deg, #1e3470, #0f2044)', border: '1px solid rgba(212,160,23,0.40)' }}
+            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: '#1E40AF' }}
           >
-            <TrendingUp size={18} style={{ color: '#D4A017' }} />
+            <TrendingUp size={16} style={{ color: '#FFFFFF' }} />
           </div>
           <div>
-            <h1 className="font-bold text-sm leading-tight text-white font-sans">Ben Growth Center</h1>
-            <p className="text-xs font-medium font-sans" style={{ color: '#D4A017' }}>Inteligência Comercial</p>
+            <h1 className="font-bold text-sm leading-tight" style={{ color: '#111827' }}>Ben Growth Center</h1>
+            <p className="text-xs font-medium" style={{ color: '#D4A017' }}>Inteligência Comercial</p>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-3 space-y-4">
+      <nav className="flex-1 px-3 py-4 space-y-5">
         {navGroups.map(group => (
           <div key={group.label}>
-            <p className="text-xs font-semibold px-3 mb-1.5 font-sans tracking-wider"
-              style={{ color: 'rgba(255,255,255,0.90)' }}>
+            <p className="text-xs font-semibold px-2 mb-1 tracking-wider"
+              style={{ color: '#9CA3AF' }}>
               {group.label}
             </p>
             <div className="space-y-0.5">
@@ -132,17 +132,16 @@ function Sidebar() {
                   <NavLink
                     key={item.to}
                     to={item.to}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all font-sans"
+                    className="flex items-center gap-2.5 py-2 rounded-lg transition-all text-sm"
                     style={isActive
-                      ? { background: '#D4A017', color: '#0f2044', fontWeight: 700 }
-                      : { color: 'rgba(159,176,215,0.85)' }
+                      ? { background: '#EFF6FF', color: '#1E40AF', fontWeight: 600, borderLeft: '3px solid #1E40AF', paddingLeft: '9px', paddingRight: '8px' }
+                      : { color: '#6B7280', borderLeft: '3px solid transparent', paddingLeft: '9px', paddingRight: '8px' }
                     }
-                    onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)'; (e.currentTarget as HTMLElement).style.color = '#ffffff'; } }}
-                    onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'rgba(159,176,215,0.85)'; } }}
+                    onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.background = '#F9FAFB'; (e.currentTarget as HTMLElement).style.color = '#374151'; } }}
+                    onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#6B7280'; } }}
                   >
                     <item.icon className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-sm font-medium">{item.label}</span>
-                    {isActive && <ChevronRight className="w-3 h-3 ml-auto" />}
+                    <span className="font-medium">{item.label}</span>
                   </NavLink>
                 )
               })}
@@ -152,26 +151,26 @@ function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 flex-shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="p-4 flex-shrink-0" style={{ borderTop: '1px solid #F3F4F6' }}>
         <div className="mb-3">
-          <div className="flex items-center gap-2 rounded-xl px-3 py-1.5"
-            style={{ background: 'rgba(0,179,126,0.12)', border: '1px solid rgba(0,179,126,0.28)' }}>
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs font-medium font-sans" style={{ color: '#6ee7b7' }}>Sistema Ativo</span>
+          <div className="flex items-center gap-2 rounded-lg px-3 py-1.5"
+            style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-xs font-medium" style={{ color: '#16A34A' }}>Sistema Ativo</span>
           </div>
         </div>
         <div className="flex items-center gap-3 px-2 py-2">
           <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ background: '#D4A017', color: '#0f2044' }}>
-            <span className="text-sm font-bold">MM</span>
+            style={{ background: '#D4A017', color: '#FFFFFF' }}>
+            <span className="text-xs font-bold">MM</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-white text-sm font-semibold font-sans truncate">Mauro Monção</p>
-            <p className="text-xs font-sans truncate" style={{ color: 'rgba(159,176,215,0.65)' }}>Tributarista · OAB/PI</p>
+            <p className="text-sm font-semibold truncate" style={{ color: '#111827' }}>Mauro Monção</p>
+            <p className="text-xs truncate" style={{ color: '#9CA3AF' }}>Tributarista · OAB/PI</p>
           </div>
-          <button className="transition-colors" style={{ color: 'rgba(159,176,215,0.65)' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#ffffff')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(159,176,215,0.65)')}>
+          <button className="transition-colors p-1" style={{ color: '#9CA3AF' }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#EF4444')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#9CA3AF')}>
             <LogOut className="w-4 h-4" />
           </button>
         </div>
@@ -184,28 +183,28 @@ function TopBar() {
   return (
     <header
       className="h-14 fixed top-0 right-0 left-64 z-30 flex items-center justify-between px-6"
-      style={{ background: '#0f2044', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
+      style={{ background: '#FFFFFF', borderBottom: '1px solid #E5E7EB' }}
     >
       <div>
-        <p className="font-semibold text-sm font-serif text-white" style={{ letterSpacing: '-0.01em' }}>
+        <p className="font-semibold text-sm" style={{ color: '#111827' }}>
           Ben Growth Center
         </p>
-        <p className="text-xs font-sans" style={{ color: 'rgba(159,176,215,0.70)' }}>
+        <p className="text-xs capitalize" style={{ color: '#9CA3AF' }}>
           {new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
         </p>
       </div>
       <div className="flex items-center gap-3">
         {/* Status agentes */}
-        <div className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
-          style={{ background: 'rgba(0,179,126,0.15)', border: '1px solid rgba(0,179,126,0.35)', color: '#6ee7b7', fontSize: '0.75rem', fontWeight: 500 }}>
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="font-sans">7 Agentes Ativos</span>
+        <div className="flex items-center gap-1.5 rounded-full px-3 py-1"
+          style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', color: '#16A34A', fontSize: '0.75rem', fontWeight: 500 }}>
+          <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+          <span>7 Agentes Ativos</span>
         </div>
         {/* Notificações */}
         <button className="relative p-2 rounded-lg transition-colors"
-          style={{ color: 'rgba(159,176,215,0.70)' }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#ffffff')}
-          onMouseLeave={e => (e.currentTarget.style.color = 'rgba(159,176,215,0.70)')}>
+          style={{ color: '#9CA3AF' }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#374151')}
+          onMouseLeave={e => (e.currentTarget.style.color = '#9CA3AF')}>
           <Bell className="w-5 h-5" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full" />
         </button>
@@ -218,11 +217,11 @@ function TopBar() {
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex" style={{ background: '#0f2044', minHeight: '100vh' }}>
+    <div className="flex" style={{ background: '#F7F9FC', minHeight: '100vh' }}>
       <Sidebar />
       <div className="flex-1 ml-64">
         <TopBar />
-        <main className="pt-14 min-h-screen" style={{ background: '#0f2044' }}>
+        <main className="pt-14 min-h-screen" style={{ background: '#F7F9FC' }}>
           <div className="p-6">{children}</div>
         </main>
       </div>
@@ -236,16 +235,16 @@ function LogoutButton() {
   return (
     <div className="flex items-center gap-2">
       <div className="w-8 h-8 rounded-full flex items-center justify-center"
-        style={{ background: '#D4A017', color: '#0f2044' }}>
+        style={{ background: '#1E40AF', color: '#FFFFFF' }}>
         <span className="text-xs font-bold">{initials}</span>
       </div>
       <button
         onClick={logout}
         title="Sair"
         className="p-1.5 rounded-lg transition-colors"
-        style={{ color: 'rgba(159,176,215,0.60)' }}
-        onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
-        onMouseLeave={e => (e.currentTarget.style.color = 'rgba(159,176,215,0.60)')}>
+        style={{ color: '#9CA3AF' }}
+        onMouseEnter={e => (e.currentTarget.style.color = '#EF4444')}
+        onMouseLeave={e => (e.currentTarget.style.color = '#9CA3AF')}>
         <LogOut className="w-4 h-4" />
       </button>
     </div>
