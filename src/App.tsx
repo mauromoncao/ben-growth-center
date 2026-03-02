@@ -261,23 +261,23 @@ function TopBar() {
   return (
     <header
       className="h-14 fixed top-0 left-0 right-0 z-30 flex items-center"
-      style={{ background: '#FFFFFF', borderBottom: '1px solid #E5E7EB' }}
+      style={{ background: '#0f2044', borderBottom: '1px solid #0a1830' }}
     >
       {/* Zona da Sidebar: briefcase centralizado em w-56 (224px) */}
       <div
         className="flex items-center justify-center flex-shrink-0"
-        style={{ width: '224px', borderRight: '1px solid #E5E7EB', height: '100%' }}
+        style={{ width: '224px', borderRight: '1px solid #1a3060', height: '100%' }}
       >
-        <Briefcase className="w-5 h-5" style={{ color: '#1E40AF' }} />
+        <Briefcase className="w-5 h-5" style={{ color: '#FFFFFF' }} />
       </div>
 
       {/* Breadcrumb */}
       <div className="flex-1 flex items-center px-6">
-        <span className="text-xs font-semibold" style={{ color: '#9CA3AF' }}>
+        <span className="text-xs font-semibold" style={{ color: '#93C5FD' }}>
           {crumb.section}
         </span>
-        <span className="mx-2 text-xs" style={{ color: '#D1D5DB' }}>›</span>
-        <span className="text-sm font-semibold" style={{ color: '#111827' }}>
+        <span className="mx-2 text-xs" style={{ color: '#60A5FA' }}>›</span>
+        <span className="text-sm font-semibold" style={{ color: '#FFFFFF' }}>
           {crumb.page}
         </span>
       </div>
@@ -287,9 +287,9 @@ function TopBar() {
         {/* Sino */}
         <button
           className="relative p-2 rounded-lg transition-colors"
-          style={{ color: '#9CA3AF' }}
-          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#374151')}
-          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#9CA3AF')}
+          style={{ color: '#FFFFFF' }}
+          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#BFDBFE')}
+          onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#FFFFFF')}
           title="Notificações"
         >
           <Bell className="w-5 h-5" />
@@ -300,12 +300,12 @@ function TopBar() {
         </button>
 
         {/* Separador vertical */}
-        <div className="w-px h-6" style={{ background: '#E5E7EB' }} />
+        <div className="w-px h-6" style={{ background: '#1a3060' }} />
 
         {/* Avatar com iniciais — fundo azul institucional */}
         <div
           className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer select-none"
-          style={{ background: '#1E40AF', color: '#FFFFFF' }}
+          style={{ background: '#D4A017', color: '#FFFFFF' }}
           title={user?.nome || 'Usuário'}
         >
           <span className="text-xs font-bold">{initials}</span>
