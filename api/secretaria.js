@@ -1,5 +1,5 @@
 // ============================================================
-// BEN GROWTH CENTER — Secretária IA WhatsApp
+// BEN GROWTH CENTER — MARA IA — Secretária Inteligente WhatsApp
 // Rota: POST /api/secretaria
 // Recebe áudio ou texto do WhatsApp → transcreve → interpreta
 // → salva compromisso → confirma + agenda alerta
@@ -104,7 +104,7 @@ async function interpretarCompromisso(texto, dataAtual) {
     return extrairCompromissoRegex(texto, dataAtual)
   }
 
-  const prompt = `Você é a Secretária IA do Dr. Mauro Monção, advogado em Teresina/PI.
+  const prompt = `Você é a MARA IA, secretária inteligente do Dr. Mauro Monção, advogado em Teresina/PI.
 Data e hora atual: ${dataAtual} (fuso: America/Fortaleza, UTC-3)
 
 Analise a mensagem e extraia as informações do compromisso.
@@ -157,7 +157,7 @@ Regras:
       return JSON.parse(jsonMatch[0])
     }
   } catch (e) {
-    console.error('[Secretaria] Erro Gemini:', e)
+    console.error('[MARA IA] Erro Gemini:', e)
   }
 
   return extrairCompromissoRegex(texto, dataAtual)
@@ -223,7 +223,7 @@ async function salvarCompromisso(compromisso) {
     id,
     ...compromisso,
     criadoEm: new Date().toISOString(),
-    criadoPor: 'secretaria-ia-whatsapp',
+    criadoPor: 'mara-ia-whatsapp',
     status: 'agendado',
   }
 
@@ -278,7 +278,7 @@ async function salvarCompromisso(compromisso) {
         }
       }
     } catch (e) {
-      console.error('[Secretaria] Erro Pinecone:', e.message)
+      console.error('[MARA IA] Erro Pinecone:', e.message)
       // Continuar mesmo sem Pinecone
     }
   }
@@ -319,7 +319,7 @@ async function enviarWhatsApp(para, mensagem) {
   const phoneId = process.env.WHATSAPP_PHONE_NUMBER_ID
 
   if (!token || !phoneId) {
-    console.log('[Secretaria] WhatsApp não configurado, log:', mensagem)
+    console.log('[MARA IA] WhatsApp não configurado, log:', mensagem)
     return null
   }
 
@@ -342,7 +342,7 @@ async function enviarWhatsApp(para, mensagem) {
     )
     return res.json()
   } catch (e) {
-    console.error('[Secretaria] Erro envio WhatsApp:', e)
+    console.error('[MARA IA] Erro envio WhatsApp:', e)
     return null
   }
 }
@@ -359,7 +359,7 @@ function montarConfirmacao(c) {
   }
   const prioridade = { alta: '🔴', media: '🟡', baixa: '🟢' }
 
-  return `✅ *Compromisso Registrado!*\n\n` +
+  return `✅ *MARA IA — Compromisso Registrado!*\n\n` +
     `${icones[c.tipo] || '📅'} *${c.titulo}*\n` +
     `📆 ${formatarDataHora(c.dataHora)}\n` +
     (c.cliente ? `👤 Cliente: ${c.cliente}\n` : '') +
@@ -455,12 +455,12 @@ export default async function handler(req, res) {
 
     if (audioId && WHATSAPP_TOKEN) {
       try {
-        console.log('[Secretaria] Transcrevendo áudio:', audioId)
+        console.log('[MARA IA] Transcrevendo áudio:', audioId)
         const audioBuffer = await baixarMidiaWhatsApp(audioId, WHATSAPP_TOKEN)
         textoFinal = await transcreverAudio(audioBuffer, audioMime || 'audio/ogg')
-        console.log('[Secretaria] Transcrição:', textoFinal)
+        console.log('[MARA IA] Transcrição:', textoFinal)
       } catch (e) {
-        console.error('[Secretaria] Erro transcrição:', e)
+        console.error('[MARA IA] Erro transcrição:', e)
         if (remetente) {
           await enviarWhatsApp(remetente,
             '⚠️ Não consegui transcrever o áudio. Pode me enviar como texto?')
@@ -518,7 +518,7 @@ export default async function handler(req, res) {
     }
 
     // ── Interpretar e salvar compromisso ──────────────────
-    console.log('[Secretaria] Interpretando:', textoFinal)
+    console.log('[MARA IA] Interpretando:', textoFinal)
     const compromisso = await interpretarCompromisso(textoFinal, dataAtual)
     const registrado = await salvarCompromisso(compromisso)
 
@@ -556,7 +556,7 @@ export default async function handler(req, res) {
               criadoPorVoz: !!audioId,
               transcricao: textoFinal,
             },
-            agentOrigem: 'secretaria-ia',
+            agentOrigem: 'mara-ia',
           },
         }),
       }).catch(() => {}) // Não bloquear se bridge falhar
@@ -571,7 +571,7 @@ export default async function handler(req, res) {
     })
 
   } catch (error) {
-    console.error('[Secretaria] Erro:', error)
+    console.error('[MARA IA] Erro:', error)
     return res.status(500).json({
       success: false,
       error: error.message || 'Erro interno',

@@ -1,5 +1,5 @@
 // ============================================================
-// BEN GROWTH CENTER — Cron: Alertas de Agenda
+// BEN GROWTH CENTER — Cron: Alertas de Agenda (MARA IA)
 // Rota: GET /api/cron/agenda-alertas
 // Schedule: a cada 15 minutos (*/15 * * * *)
 // Verifica compromissos próximos e envia alerta ao plantonista
@@ -7,7 +7,7 @@
 
 export const config = { maxDuration: 30 }
 
-// Importar agenda da secretária (compartilhado via módulo)
+// Importar agenda da MARA IA (compartilhado via módulo)
 // Em produção: buscar do Pinecone/Supabase
 import { AGENDA, enviarWhatsApp, formatarDataHora } from '../secretaria.js'
 
@@ -64,7 +64,7 @@ export default async function handler(req, res) {
             dataHora: comp.dataHora,
           })
 
-          console.log(`[Cron Agenda] Alerta ${minutosAntes}min enviado: ${comp.titulo}`)
+          console.log(`[MARA IA Cron] Alerta ${minutosAntes}min enviado: ${comp.titulo}`)
         }
       }
 
@@ -84,7 +84,7 @@ export default async function handler(req, res) {
     })
 
   } catch (error) {
-    console.error('[Cron Agenda] Erro:', error)
+    console.error('[MARA IA Cron] Erro:', error)
     return res.status(500).json({ success: false, error: error.message })
   }
 }

@@ -239,9 +239,9 @@ export default async function handler(req, res) {
     const ehDrMauro = PLANTONISTA && telefone === PLANTONISTA
 
     // ── SECRETÁRIA IA — Mensagens de ÁUDIO ──────────────────
-    // Qualquer áudio enviado pelo Dr. Mauro → Secretária agenda
+    // Qualquer áudio enviado pelo Dr. Mauro → MARA IA agenda
     if (tipo === 'audio' && msg.audio?.id) {
-      console.log('[Flow] Áudio recebido de', telefone, '— roteando para Secretária IA')
+      console.log('[Flow] Áudio recebido de', telefone, '— roteando para MARA IA')
       try {
         const secretariaRes = await fetch(
           `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://ben-growth-center.vercel.app'}/api/secretaria`,
@@ -262,9 +262,9 @@ export default async function handler(req, res) {
           transcricao: result.transcricao,
         })
       } catch (e) {
-        console.error('[Flow] Erro Secretária:', e)
+        console.error('[Flow] Erro MARA IA:', e)
         await enviarWhatsApp(telefone,
-          '⚠️ Não consegui processar o áudio. Tente enviar como texto.',
+          '⚠️ Olá! Sou a MARA IA. Não consegui processar o áudio. Tente enviar como texto.',
           WHATSAPP_TOKEN)
         return res.status(200).json({ status: 'audio_error' })
       }
