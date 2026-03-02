@@ -955,7 +955,7 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
           </div>
 
           {/* Conteúdo das abas */}
-          <div className="flex-1 overflow-y-auto p-5 bg-slate-800/30">
+          <div className="flex-1 overflow-y-auto p-5" style={{backgroundColor: '#1a2a3a'}}>
 
             {/* ABA: Conversa */}
             {abaAtiva === 'conversa' && (
@@ -967,18 +967,21 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
                         {msg.role === 'dr_ben' ? <Bot className="w-4 h-4 text-amber-600" /> : <User className="w-4 h-4 text-blue-600" />}
                       </div>
                     )}
-                    <div className={`max-w-xs rounded-2xl px-3 py-2 text-sm ${
-                      msg.role === 'lead' ? 'bg-navy text-white rounded-tr-sm' :
-                      msg.role === 'dr_ben' ? 'bg-amber-50 border border-amber-200 text-gray-800 rounded-tl-sm' :
-                      'bg-blue-50 border border-blue-200 text-gray-800 rounded-tl-sm'
-                    }`}>
+                    <div className={`max-w-xs rounded-2xl px-3 py-2 text-sm ${msg.role === 'lead' ? 'rounded-tr-sm' : 'rounded-tl-sm'}`}
+                      style={{
+                        backgroundColor: msg.role === 'lead' ? '#0D1B2A' :
+                          msg.role === 'dr_ben' ? '#FEF3C7' : '#EFF6FF',
+                        color: msg.role === 'lead' ? '#FFFFFF' : '#1E293B',
+                        border: msg.role === 'lead' ? 'none' :
+                          msg.role === 'dr_ben' ? '1px solid #FCD34D' : '1px solid #93C5FD',
+                      }}>
                       {msg.role !== 'lead' && (
-                        <p className={`text-xs font-medium mb-0.5 ${msg.role === 'dr_ben' ? 'text-amber-600' : 'text-blue-600'}`}>
+                        <p className="text-xs font-medium mb-0.5" style={{color: msg.role === 'dr_ben' ? '#B45309' : '#1D4ED8'}}>
                           {msg.role === 'dr_ben' ? '🤖 Dr. Ben' : '👤 ' + (lead.plantonista || 'Advogado')}
                         </p>
                       )}
                       <p>{msg.texto}</p>
-                      <p className={`text-xs mt-1 ${msg.role === 'lead' ? 'text-slate-300' : 'text-gray-400'}`}>{msg.hora}</p>
+                      <p className="text-xs mt-1" style={{color: msg.role === 'lead' ? '#94A3B8' : '#6B7280'}}>{msg.hora}</p>
                     </div>
                   </div>
                 ))}
