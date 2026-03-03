@@ -1,22 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Wifi, WifiOff, RefreshCw, Smartphone, MessageSquare, Users, AlertTriangle, CheckCircle, Loader } from 'lucide-react'
 
-// Evolution API no VPS Hostinger
-const EVOLUTION_URL = 'http://181.215.135.202:8080'
-const EVOLUTION_KEY = 'BenEvolution2026'
-const INSTANCE      = 'drben'
-
-async function evoFetch(path: string, opts: RequestInit = {}) {
-  const res = await fetch(`${EVOLUTION_URL}${path}`, {
-    ...opts,
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': EVOLUTION_KEY,
-      ...(opts.headers ?? {}),
-    },
-  })
-  return res.json()
-}
+// Proxy Vercel → Evolution API no VPS Hostinger (resolve CORS https→http)
+const PROXY = '/api/whatsapp-proxy'
 
 export default function WhatsAppConnect() {
   const [status, setStatus]   = useState<'disconnected' | 'connecting' | 'open'>('disconnected')
@@ -28,11 +14,12 @@ export default function WhatsAppConnect() {
   // ── Buscar status da instância ──────────────────────────
   const buscarStatus = useCallback(async () => {
     try {
-      const data = await evoFetch(`/instance/connectionState/${INSTANCE}`)
-      const state = data?.instance?.state ?? data?.state ?? ''
-      if (state === 'open')       setStatus('open')
+      const res  = await fetch(`${PROXY}?action=status`)
+      const data = await res.json()
+      const state = data?.state ?? data?.status ?? ''
+      if (state === 'open')                             setStatus('open')
       else if (state === 'connecting' || state === 'qrcode') setStatus('connecting')
-      else                         setStatus('disconnected')
+      else                                              setStatus('disconnected')
       setLastUpdate(new Date().toLocaleTimeString('pt-BR'))
     } catch (e) {
       console.error('Erro ao buscar status:', e)
@@ -45,18 +32,15 @@ export default function WhatsAppConnect() {
     setQrcode(null)
     setStatus('connecting')
     try {
-      // Conectar a instância
-      await evoFetch(`/instance/connect/${INSTANCE}`, { method: 'GET' })
-      // Buscar QR Code
-      const data = await evoFetch(`/instance/connect/${INSTANCE}`)
-      if (data?.base64)       setQrcode(data.base64)
-      else if (data?.qrcode?.base64) setQrcode(data.qrcode.base64)
-      else if (data?.code)    {
-        // Buscar QR Code direto
-        const qrData = await evoFetch(`/instance/fetchInstances`)
-        const inst = qrData?.find?.((i: any) => i?.instance?.instanceName === INSTANCE)
-        if (inst?.instance?.qrcode?.base64) setQrcode(inst.instance.qrcode.base64)
-      }
+      const res  = await fetch(`${PROXY}?action=connect`)
+      const data = await res.json()
+      if (data?.qrcode) setQrcode(data.qrcode)
+      // Buscar QR Code após conectar
+      setTimeout(async () => {
+        const r2   = await fetch(`${PROXY}?action=qrcode`)
+        const d2   = await r2.json()
+        if (d2?.qrcode) setQrcode(d2.qrcode)
+      }, 2000)
     } catch (e) {
       console.error('Erro ao gerar QR Code:', e)
     } finally {
@@ -67,13 +51,11 @@ export default function WhatsAppConnect() {
   // ── Buscar QR Code da instância existente ──────────────
   const buscarQRCode = useCallback(async () => {
     try {
-      const data = await evoFetch(`/instance/fetchInstances`)
-      const inst = Array.isArray(data)
-        ? data.find((i: any) => i?.instance?.instanceName === INSTANCE)
-        : null
-      if (inst?.instance?.qrcode?.base64) {
-        setQrcode(inst.instance.qrcode.base64)
-        setStatus('connecting')
+      const res  = await fetch(`${PROXY}?action=qrcode`)
+      const data = await res.json()
+      if (data?.qrcode) {
+        setQrcode(data.qrcode)
+        setStatus(prev => prev === 'open' ? 'open' : 'connecting')
       }
     } catch (e) {
       console.error('Erro ao buscar QR Code:', e)
@@ -83,7 +65,7 @@ export default function WhatsAppConnect() {
   // ── Desconectar ──────────────────────────────────────────
   const desconectar = async () => {
     if (!confirm('Deseja desconectar o WhatsApp do sistema?')) return
-    await evoFetch(`/instance/logout/${INSTANCE}`, { method: 'DELETE' })
+    await fetch(`${PROXY}?action=disconnect`, { method: 'POST' })
     setStatus('disconnected')
     setQrcode(null)
   }

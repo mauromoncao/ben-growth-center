@@ -18,6 +18,7 @@
     { "source": "/api/secretaria/:path*", "destination": "/api/secretaria.js" },
     { "source": "/api/flow/whatsapp",        "destination": "/api/flow/whatsapp.js" },
     { "source": "/api/whatsapp-evolution",   "destination": "/api/whatsapp-evolution.js" },
+    { "source": "/api/whatsapp-proxy",       "destination": "/api/whatsapp-proxy.js" },
     { "source": "/api/agents/run", "destination": "/api/agents/run.js" },
     { "source": "/api/voice", "destination": "/api/voice.js" },
     { "source": "/api/memory", "destination": "/api/memory.js" },
