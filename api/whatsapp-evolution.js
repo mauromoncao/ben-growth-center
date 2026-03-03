@@ -139,12 +139,13 @@ async function enviarMensagem(numero, texto) {
     return
   }
   try {
+    // Evolution v1.8.x usa { textMessage: { text: "..." } }
     const res = await fetch(
       `${EVOLUTION_URL}/message/sendText/${EVOLUTION_INSTANCE}`,
       {
         method:  'POST',
         headers: { 'Content-Type': 'application/json', 'apikey': EVOLUTION_KEY },
-        body:    JSON.stringify({ number: numero, text: texto }),
+        body:    JSON.stringify({ number: numero, textMessage: { text: texto } }),
       }
     )
     const data = await res.json()
