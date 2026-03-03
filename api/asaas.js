@@ -4,7 +4,9 @@
 // Token: produção
 // ============================================================
 
-const ASAAS_TOKEN = '$aact_prod_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmYwOTFmZWYxLTRkYmQtNGVmOC1iOTg1LWQzMDU5M2FlOGFlYTo6JGFhY2hfZDEzYjJhNjUtNjZhZS00NGU4LWEwOTMtYTBmNDE4YTg2YzA3'
+// ⚠️ NUNCA coloque a chave diretamente aqui — use variável de ambiente no Vercel
+// Vercel → Settings → Environment Variables → ASAAS_TOKEN
+const ASAAS_TOKEN = process.env.ASAAS_TOKEN
 const ASAAS_BASE  = 'https://api.asaas.com/v3'
 
 const headers = () => ({
