@@ -2,14 +2,16 @@
 // BEN GROWTH CENTER — API de Leads / CRM
 // Rota: GET/POST/PATCH /api/leads
 //
-// Armazena leads em memória global (persiste enquanto o
-// serverless está quente). Para produção real, trocar por
-// banco de dados (Vercel KV, Supabase, etc.)
+// BANCO: VPS Hostinger (SQLite via dr-ben-leads API na porta 3001)
+// FALLBACK: memória global (se VPS indisponível)
 // ============================================================
 
 export const config = { maxDuration: 10 }
 
-// ── Armazenamento em memória global ─────────────────────────
+// ── URL da API de Leads na VPS ───────────────────────────────
+const VPS_LEADS_URL = process.env.VPS_LEADS_URL || 'http://181.215.135.202:3001'
+
+// ── Fallback em memória (se VPS indisponível) ────────────────
 if (!global.__crmLeads) global.__crmLeads = new Map()
 
 function gerarId() {
@@ -20,18 +22,39 @@ function agora() {
   return new Date().toISOString()
 }
 
-// ── Helper: lead por número de WhatsApp ─────────────────────
-function encontrarLeadPorNumero(numero) {
-  const numeroNorm = numero.replace(/\D/g, '')
-  for (const [id, lead] of global.__crmLeads) {
-    if (lead.telefone && lead.telefone.replace(/\D/g, '').endsWith(numeroNorm.slice(-10))) {
-      return lead
-    }
-    if (lead.numero && lead.numero.replace(/\D/g, '').endsWith(numeroNorm.slice(-10))) {
-      return lead
-    }
+function horaFormatada() {
+  return new Date().toLocaleTimeString('pt-BR', {
+    timeZone: 'America/Fortaleza',
+    hour: '2-digit', minute: '2-digit',
+  })
+}
+
+function encontrarLeadMemoriaPorNumero(numero) {
+  const numeroNorm = (numero || '').replace(/\D/g, '').slice(-11)
+  for (const [, lead] of global.__crmLeads) {
+    const t = (lead.telefone || '').replace(/\D/g, '').slice(-11)
+    const n = (lead.numero   || '').replace(/\D/g, '').slice(-11)
+    if ((t && t === numeroNorm) || (n && n === numeroNorm)) return lead
   }
   return null
+}
+
+// ── Tentar VPS, fallback em memória ─────────────────────────
+async function vpsRequest(path, method = 'GET', body = null) {
+  try {
+    const opts = {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(5000), // 5s timeout
+    }
+    if (body) opts.body = JSON.stringify(body)
+    const res  = await fetch(`${VPS_LEADS_URL}${path}`, opts)
+    const data = await res.json()
+    return { ok: true, data, status: res.status }
+  } catch (e) {
+    console.warn(`[Leads] VPS indisponível (${e.message}) — usando memória`)
+    return { ok: false, error: e.message }
+  }
 }
 
 // ── Handler principal ────────────────────────────────────────
@@ -42,130 +65,96 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end()
 
-  const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {})
+  const body    = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {})
   const { action } = req.query
 
-  // ── GET /api/leads — listar todos os leads ────────────────
+  // ── GET /api/leads — listar todos ────────────────────────
   if (req.method === 'GET') {
+    const vps = await vpsRequest('/leads')
+    if (vps.ok) return res.status(200).json(vps.data)
+
+    // Fallback memória
     const leads = Array.from(global.__crmLeads.values())
       .sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm))
-
-    return res.status(200).json({
-      ok: true,
-      total: leads.length,
-      leads,
-    })
+    return res.status(200).json({ ok: true, total: leads.length, leads, fonte: 'memoria' })
   }
 
-  // ── POST /api/leads — criar ou atualizar lead ─────────────
+  // ── POST /api/leads — criar/atualizar lead ────────────────
   if (req.method === 'POST') {
 
-    // Criar novo lead (chamado pelo webhook do Dr. Ben)
-    if (action === 'create' || !action) {
-      const {
-        nome, telefone, numero, area, urgencia,
-        resumo, canal, mensagem, conversa,
-      } = body
+    if (!action || action === 'create') {
+      // Tentar VPS primeiro
+      const vps = await vpsRequest('/leads', 'POST', body)
+      if (vps.ok) return res.status(vps.status).json(vps.data)
 
-      // Verificar se lead com mesmo número já existe
-      const existing = encontrarLeadPorNumero(telefone || numero || '')
+      // Fallback memória
+      const { nome, telefone, numero, area, urgencia, resumo, canal, mensagem } = body
+      const existing = encontrarLeadMemoriaPorNumero(telefone || numero || '')
 
       if (existing) {
-        // Atualizar lead existente com novos dados
-        if (nome && !existing.nome) existing.nome = nome
+        if (nome && existing.nome === 'Novo Lead') existing.nome = nome
         if (area && area !== 'outros') existing.area = area
         if (urgencia) existing.urgencia = urgencia
-        if (resumo) existing.resumoIA = resumo
-
-        // Adicionar mensagem ao histórico
+        if (resumo)   existing.resumoIA  = resumo
         if (mensagem) {
           existing.conversa = existing.conversa || []
-          existing.conversa.push({
-            role: 'lead',
-            texto: mensagem,
-            hora: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Fortaleza', hour: '2-digit', minute: '2-digit' }),
-          })
+          existing.conversa.push({ role: 'lead', texto: mensagem, hora: horaFormatada() })
         }
-
         existing.ultimaInteracao = agora()
         global.__crmLeads.set(existing.id, existing)
-
-        console.log(`[CRM] Lead atualizado: ${existing.id} — ${existing.nome || existing.telefone}`)
-        return res.status(200).json({ ok: true, action: 'updated', lead: existing })
+        return res.status(200).json({ ok: true, action: 'updated', lead: existing, fonte: 'memoria' })
       }
 
-      // Criar novo lead
       const id = gerarId()
-      const novoLead = {
-        id,
-        nome:             nome || 'Novo Lead',
-        telefone:         telefone || numero || '',
-        numero:           numero || telefone || '',
-        email:            '',
-        area:             area || 'outros',
-        origem:           canal || 'whatsapp',
-        status:           'novo',
-        urgencia:         urgencia || 'media',
-        score:            50,
-        criadoEm:         agora(),
-        ultimaInteracao:  agora(),
-        resumoIA:         resumo || '',
-        conversa:         conversa || (mensagem ? [{
-          role: 'lead',
-          texto: mensagem,
-          hora: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Fortaleza', hour: '2-digit', minute: '2-digit' }),
-        }] : []),
-        plantonista:      null,
-        valor:            null,
-        tags:             [canal || 'whatsapp'],
-        reunioes:         [],
-        contratos:        [],
-        cobrancas:        [],
-        driveLink:        null,
+      const lead = {
+        id, nome: nome || 'Novo Lead',
+        telefone: telefone || numero || '',
+        numero:   numero || telefone || '',
+        email: '', area: area || 'outros',
+        origem: canal || 'whatsapp', status: 'novo',
+        urgencia: urgencia || 'media', score: 50,
+        criadoEm: agora(), ultimaInteracao: agora(),
+        resumoIA: resumo || '',
+        tags: [canal || 'whatsapp'],
+        conversa: mensagem ? [{ role: 'lead', texto: mensagem, hora: horaFormatada() }] : [],
+        reunioes: [], contratos: [], cobrancas: [],
       }
-
-      global.__crmLeads.set(id, novoLead)
-      console.log(`[CRM] Novo lead criado: ${id} — ${nome || numero}`)
-      return res.status(201).json({ ok: true, action: 'created', lead: novoLead })
+      global.__crmLeads.set(id, lead)
+      return res.status(201).json({ ok: true, action: 'created', lead, fonte: 'memoria' })
     }
 
-    // Adicionar mensagem à conversa de um lead
     if (action === 'mensagem') {
-      const { leadId, numero: num, role, texto } = body
+      // Tentar VPS
+      const vps = await vpsRequest('/leads/mensagem', 'POST', body)
+      if (vps.ok) return res.status(200).json(vps.data)
 
-      let lead = leadId
-        ? global.__crmLeads.get(leadId)
-        : encontrarLeadPorNumero(num || '')
-
-      if (!lead) {
-        return res.status(404).json({ ok: false, error: 'Lead não encontrado' })
-      }
+      // Fallback memória
+      const { numero, role, texto } = body
+      const lead = encontrarLeadMemoriaPorNumero(numero || '')
+      if (!lead) return res.status(404).json({ ok: false, error: 'Lead não encontrado' })
 
       lead.conversa = lead.conversa || []
-      lead.conversa.push({
-        role: role || 'lead',
-        texto,
-        hora: new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Fortaleza', hour: '2-digit', minute: '2-digit' }),
-      })
+      lead.conversa.push({ role: role || 'lead', texto, hora: horaFormatada() })
       lead.ultimaInteracao = agora()
       global.__crmLeads.set(lead.id, lead)
-
-      return res.status(200).json({ ok: true, lead })
+      return res.status(200).json({ ok: true, lead, fonte: 'memoria' })
     }
   }
 
-  // ── PATCH /api/leads — atualizar status/dados de um lead ──
+  // ── PATCH /api/leads — atualizar lead ────────────────────
   if (req.method === 'PATCH') {
     const { id, ...updates } = body
+    // Tentar VPS
+    const vps = await vpsRequest(`/leads/${id}`, 'PATCH', updates)
+    if (vps.ok) return res.status(200).json(vps.data)
 
+    // Fallback memória
     if (!id || !global.__crmLeads.has(id)) {
       return res.status(404).json({ ok: false, error: 'Lead não encontrado' })
     }
-
     const lead = { ...global.__crmLeads.get(id), ...updates, ultimaInteracao: agora() }
     global.__crmLeads.set(id, lead)
-
-    return res.status(200).json({ ok: true, lead })
+    return res.status(200).json({ ok: true, lead, fonte: 'memoria' })
   }
 
   return res.status(405).json({ error: 'Method not allowed' })

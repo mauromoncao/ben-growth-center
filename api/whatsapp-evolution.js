@@ -20,14 +20,28 @@ const EVOLUTION_KEY      = process.env.EVOLUTION_API_KEY   ?? ''
 const EVOLUTION_INSTANCE = process.env.EVOLUTION_INSTANCE  ?? 'drben'
 const DR_MAURO_WHATSAPP  = process.env.PLANTONISTA_WHATSAPP ?? ''
 
-// ── URL base do próprio serviço (para chamadas internas) ────
+// ── URL base do próprio serviço e da VPS ────────────────────
 function getBaseUrl() {
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
   return 'https://ben-growth-center.vercel.app'
 }
 
-// ── Registrar mensagem no CRM ────────────────────────────────
+// URL da API de Leads na VPS (SQLite persistente)
+const VPS_LEADS_URL = process.env.VPS_LEADS_URL || 'http://181.215.135.202:3001'
+
+// ── Registrar mensagem no CRM (VPS SQLite → fallback Vercel) ─
 async function crmRegistrarMensagem(numero, role, texto) {
+  // Tentar VPS diretamente (mais rápido, persistente)
+  try {
+    await fetch(`${VPS_LEADS_URL}/leads/mensagem`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ numero, role, texto }),
+      signal: AbortSignal.timeout(3000),
+    })
+    return
+  } catch {}
+  // Fallback: Vercel API
   try {
     await fetch(`${getBaseUrl()}/api/leads?action=mensagem`, {
       method: 'POST',
@@ -41,13 +55,26 @@ async function crmRegistrarMensagem(numero, role, texto) {
 
 // ── Criar ou atualizar lead no CRM ──────────────────────────
 async function crmCriarLead({ nome, telefone, numero, area, urgencia, resumo }) {
+  const payload = { nome, telefone, numero, area, urgencia, resumo, canal: 'whatsapp' }
+  // Tentar VPS diretamente
+  try {
+    await fetch(`${VPS_LEADS_URL}/leads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3000),
+    })
+    console.log(`[CRM] Lead salvo na VPS: ${nome} — ${telefone || numero}`)
+    return
+  } catch {}
+  // Fallback: Vercel API
   try {
     await fetch(`${getBaseUrl()}/api/leads`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome, telefone, numero, area, urgencia, resumo, canal: 'whatsapp' }),
+      body: JSON.stringify(payload),
     })
-    console.log(`[CRM] Lead registrado: ${nome} — ${telefone || numero}`)
+    console.log(`[CRM] Lead salvo (memória): ${nome} — ${telefone || numero}`)
   } catch (e) {
     console.error('[CRM] Erro ao criar lead:', e.message)
   }
