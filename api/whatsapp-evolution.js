@@ -297,9 +297,19 @@ export default async function handler(req, res) {
     if (
       evento === 'messages.upsert' ||
       evento === 'MESSAGES_UPSERT'  ||
-      body?.data?.message
+      body?.data?.message            ||
+      body?.data?.messages
     ) {
-      const msgData = body?.data ?? body
+      // Evolution v1.8.6 envia { data: { messages: [{key, message, ...}] } }
+      // Evolution v2.x envia   { data: { key, message, ... } }
+      // Normalizar para sempre ter msgData com key e message no nível raiz
+      let msgData = body?.data ?? body
+      
+      // Se messages é um array, pegar o primeiro item
+      if (Array.isArray(msgData?.messages) && msgData.messages.length > 0) {
+        msgData = msgData.messages[0]
+      }
+      
       const fromMe  = msgData?.key?.fromMe ?? msgData?.message?.fromMe ?? false
 
       // Ignorar mensagens enviadas pelo próprio bot
@@ -308,10 +318,15 @@ export default async function handler(req, res) {
       const numero = (msgData?.key?.remoteJid ?? msgData?.from ?? '').replace('@s.whatsapp.net', '')
       const texto  = msgData?.message?.conversation
                   ?? msgData?.message?.extendedTextMessage?.text
+                  ?? msgData?.message?.imageMessage?.caption
+                  ?? msgData?.message?.videoMessage?.caption
                   ?? msgData?.text
                   ?? ''
 
-      if (!numero || !texto) return res.status(200).json({ ok: true })
+      if (!numero || !texto) {
+        console.log('[Webhook] Mensagem sem número ou texto — ignorando. msgData:', JSON.stringify(msgData).slice(0, 150))
+        return res.status(200).json({ ok: true })
+      }
 
       // ── Detectar se é o Dr. Mauro (dono) ─────────────────
       const numeroNorm = numero.replace(/\D/g, '')
