@@ -42,15 +42,36 @@ const plantonistasMock: Plantonista[] = [
   },
 ]
 
-const escalaMock: EscalaDia[] = [
-  { diaSemana: 'Segunda',     data: '03/03',   plantonistaId: 'p1', turno: '08h–18h', hoje: false },
-  { diaSemana: 'Terça',       data: '04/03',   plantonistaId: 'p1', turno: '08h–18h', hoje: false },
-  { diaSemana: 'Quarta',      data: '05/03',   plantonistaId: 'p1', turno: '08h–18h', hoje: false },
-  { diaSemana: 'Quinta',      data: '06/03',   plantonistaId: 'p1', turno: '08h–18h', hoje: false },
-  { diaSemana: 'Sexta',       data: '07/03',   plantonistaId: 'p1', turno: '08h–18h', hoje: false },
-  { diaSemana: 'Sábado',      data: '08/03',   plantonistaId: 'p1', turno: '08h–13h', hoje: false },
-  { diaSemana: 'Domingo',     data: '09/03',   plantonistaId: 'p1', turno: 'Plantão',  hoje: false },
-]
+// ─── Gera escala dinâmica para a semana atual ─────────────────
+function gerarEscalaSemana(): EscalaDia[] {
+  const hoje = new Date()
+  // Encontrar a segunda-feira desta semana
+  const diaSemana = hoje.getDay() // 0=dom, 1=seg, ..., 6=sab
+  const diffParaSegunda = diaSemana === 0 ? -6 : 1 - diaSemana
+  const segunda = new Date(hoje)
+  segunda.setDate(hoje.getDate() + diffParaSegunda)
+
+  const nomes = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
+  const turnos = ['08h–18h', '08h–18h', '08h–18h', '08h–18h', '08h–18h', '08h–13h', 'Plantão']
+
+  return nomes.map((nome, i) => {
+    const dia = new Date(segunda)
+    dia.setDate(segunda.getDate() + i)
+    const dd = String(dia.getDate()).padStart(2, '0')
+    const mm = String(dia.getMonth() + 1).padStart(2, '0')
+    const ehHoje =
+      dia.getDate() === hoje.getDate() &&
+      dia.getMonth() === hoje.getMonth() &&
+      dia.getFullYear() === hoje.getFullYear()
+    return {
+      diaSemana: nome,
+      data: `${dd}/${mm}`,
+      plantonistaId: 'p1',
+      turno: turnos[i],
+      hoje: ehHoje,
+    }
+  })
+}
 
 // ─── Componente de Alerta Push (simulado) ────────────────────
 function AlertaPush({ onClose }: { onClose: () => void }) {
@@ -100,6 +121,9 @@ export default function Plantonista() {
   const [notificacoesAtivas, setNotificacoesAtivas] = useState(true)
   const [mostrarAlerta, setMostrarAlerta] = useState(false)
   const [pwaInstalado, setPwaInstalado] = useState(false)
+
+  // Gera escala dinamicamente (semana atual)
+  const escalaDinamica = gerarEscalaSemana()
 
   const aguardando = crmLeadsMock.filter(l => l.status === 'aguardando')
   const plantonistaHoje = plantonistasMock.find(p => p.id === plantonistaAtivo)!
@@ -301,16 +325,16 @@ export default function Plantonista() {
         </div>
       </div>
 
-      {/* Escala semanal */}
+      {/* Escala semanal — datas dinâmicas */}
       <div className="card">
         <h2 className="font-semibold text-white mb-4 flex items-center gap-2">
           <Calendar className="w-5 h-5" /> Escala Semanal
         </h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {escalaMock.slice(0, 7).map(dia => {
+          {escalaDinamica.map(dia => {
             const p = plantonistasMock.find(pl => pl.id === dia.plantonistaId)!
             return (
-              <div key={dia.diaSemana} className={`border rounded-xl p-3 ${dia.hoje ? 'border-white/40 bg-navy-50' : 'border-gray-100'}`}>
+              <div key={dia.diaSemana} className={`border rounded-xl p-3 ${dia.hoje ? 'border-white/40 bg-navy-50 ring-2 ring-gold' : 'border-gray-100'}`}>
                 <p className={`font-semibold text-sm ${dia.hoje ? 'text-gold' : 'text-gray-600'}`}>
                   {dia.diaSemana} {dia.hoje && '(Hoje)'}
                 </p>
