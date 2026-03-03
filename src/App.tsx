@@ -30,6 +30,7 @@ import Assinaturas     from './pages/Assinaturas'
 import Financeiro      from './pages/Financeiro'
 import MetaAds         from './pages/MetaAds'
 import GoogleAds       from './pages/GoogleAds'
+import WhatsAppConnect from './pages/WhatsAppConnect'
 
 // ─── Rota privada ─────────────────────────────────────────────
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -62,7 +63,8 @@ const navGroups = [
   {
     label: 'MARA IA',
     items: [
-      { to: '/plantonista', icon: Headphones, label: 'MARA IA' },
+      { to: '/plantonista',   icon: Headphones,    label: 'MARA IA' },
+      { to: '/whatsapp',      icon: MessageSquare, label: 'WhatsApp Dr. Ben' },
     ],
   },
   {
@@ -103,6 +105,7 @@ const breadcrumbMap: Record<string, { section: string; page: string }> = {
   '/crm':             { section: 'CRM & LEADS',   page: 'CRM' },
   '/leads':           { section: 'CRM & LEADS',   page: 'Leads' },
   '/plantonista':     { section: 'MARA IA',        page: 'MARA IA' },
+  '/whatsapp':         { section: 'MARA IA',        page: 'WhatsApp Dr. Ben' },
   '/campanhas':       { section: 'MARKETING',      page: 'Campanhas' },
   '/conteudo':        { section: 'MARKETING',      page: 'Conteúdo' },
   '/palavras-chave':  { section: 'MARKETING',      page: 'Palavras-chave' },
@@ -351,6 +354,7 @@ function AppRoutes() {
                 <Route path="/crm"                element={<CRM />} />
                 <Route path="/leads"              element={<Leads />} />
                 <Route path="/plantonista"         element={<Plantonista />} />
+                <Route path="/whatsapp"             element={<WhatsAppConnect />} />
                 <Route path="/dr-ben"             element={<DrBenIntegracao />} />
                 <Route path="/campanhas"          element={<Campanhas />} />
                 <Route path="/analytics"          element={<Analytics />} />
