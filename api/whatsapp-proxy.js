@@ -1,9 +1,9 @@
 // Proxy para Evolution API no VPS Hostinger
 // Resolve problema de CORS: https (Vercel) → http (VPS)
 
-const EVOLUTION_URL = 'http://181.215.135.202:8080'
-const EVOLUTION_KEY = 'BenEvolution2026'
-const INSTANCE      = 'drben'
+const EVOLUTION_URL = process.env.EVOLUTION_API_URL || ''
+const EVOLUTION_KEY = process.env.EVOLUTION_API_KEY || ''
+const INSTANCE      = process.env.EVOLUTION_INSTANCE || 'drben'
 
 export default async function handler(req, res) {
   // CORS

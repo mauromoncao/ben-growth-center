@@ -13,11 +13,11 @@
 export const config = { maxDuration: 30 }
 
 const GEMINI_KEY         = process.env.GEMINI_API_KEY
-const EVOLUTION_URL      = process.env.EVOLUTION_API_URL   ?? 'http://181.215.135.202:8080'
-const EVOLUTION_KEY      = process.env.EVOLUTION_API_KEY   ?? 'BenEvolution2026'
+const EVOLUTION_URL      = process.env.EVOLUTION_API_URL   ?? ''
+const EVOLUTION_KEY      = process.env.EVOLUTION_API_KEY   ?? ''
 const EVOLUTION_INSTANCE = process.env.EVOLUTION_INSTANCE  ?? 'drben'
 // Número do DR. MAURO — a MARA IA avisa aqui
-const DR_MAURO_WHATSAPP  = process.env.PLANTONISTA_WHATSAPP ?? '5586999484761'
+const DR_MAURO_WHATSAPP  = process.env.PLANTONISTA_WHATSAPP ?? ''
 
 // ── Config MARA IA (carregada dinamicamente) ────────────────
 let _maraConfig = null

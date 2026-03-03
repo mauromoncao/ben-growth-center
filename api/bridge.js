@@ -12,7 +12,7 @@ const SUPABASE_REST = process.env.SUPABASE_REST_URL  // ex: https://xxx.supabase
 const SUPABASE_KEY  = process.env.SUPABASE_ANON_KEY  // anon key pública
 const JURIS_URL     = 'https://ben-juris-center.vercel.app'
 const GROWTH_URL    = 'https://ben-growth-center.vercel.app'
-const BRIDGE_SECRET = process.env.JWT_SECRET || 'ben_jwt_mauro_moncao_2026_enterprise_secret_key_advogados'
+const BRIDGE_SECRET = process.env.JWT_SECRET || ''
 
 // ── Helpers ──────────────────────────────────────────────────
 function cors(res) {

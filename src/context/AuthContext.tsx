@@ -1,6 +1,7 @@
 // ============================================================
 // BEN GROWTH CENTER — Auth Context
-// Acesso: mauromoncaoestudos@gmail.com / BenGrowth@2026!
+// Credenciais gerenciadas via variáveis de ambiente no Vercel.
+// NÃO armazene senhas em código-fonte.
 // ============================================================
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
@@ -21,21 +22,23 @@ const AuthContext = createContext<AuthContextType | null>(null)
 
 const STORAGE_KEY = 'ben_growth_auth'
 
-// Credenciais válidas — alterar senha via painel de Configurações
+// Credenciais lidas de variáveis de ambiente injetadas em build-time
+// Configure no Vercel: VITE_AUTH_EMAIL_1, VITE_AUTH_SENHA_1, etc.
+// Para desenvolvimento local: crie .env.local (nunca comite esse arquivo)
 const CREDENCIAIS = [
   {
-    email: 'mauromoncaoestudos@gmail.com',
-    senha: 'BenGrowth@2026!',
+    email: import.meta.env.VITE_AUTH_EMAIL_1 || '',
+    senha: import.meta.env.VITE_AUTH_SENHA_1 || '',
     nome: 'Mauro Monção',
     modulo: 'Ben Growth Center',
   },
   {
-    email: 'mauro@moncaoadvogados.com.br',
-    senha: 'BenGrowth@2026!',
+    email: import.meta.env.VITE_AUTH_EMAIL_2 || '',
+    senha: import.meta.env.VITE_AUTH_SENHA_2 || '',
     nome: 'Mauro Monção',
     modulo: 'Ben Growth Center',
   },
-]
+].filter(c => c.email && c.senha)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(() => {

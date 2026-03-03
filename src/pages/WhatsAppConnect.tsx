@@ -236,7 +236,6 @@ export default function WhatsAppConnect() {
             <Wifi size={16} className="text-blue-600 mt-0.5 shrink-0" />
             <p className="text-xs text-blue-700">
               Evolution API rodando no <strong>VPS Hostinger</strong> (São Paulo) — 24/7 ativo.
-              IP: <code className="font-mono">181.215.135.202</code>
             </p>
           </div>
 

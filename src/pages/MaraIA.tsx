@@ -646,10 +646,10 @@ export default function MaraIA() {
           </p>
           {[
             { key: 'GEMINI_API_KEY',           status: 'obrigatorio', desc: 'Chave da IA Gemini — ativa as respostas inteligentes' },
-            { key: 'EVOLUTION_API_URL',         status: 'configurado', desc: 'http://181.215.135.202:8080 — URL do VPS Hostinger' },
-            { key: 'EVOLUTION_API_KEY',         status: 'configurado', desc: 'BenEvolution2026 — chave de autenticação da Evolution API' },
-            { key: 'EVOLUTION_INSTANCE',        status: 'configurado', desc: 'drben — nome da instância WhatsApp' },
-            { key: 'PLANTONISTA_WHATSAPP',      status: 'configurado', desc: '5586999484761 — número para alertas urgentes' },
+            { key: 'EVOLUTION_API_URL',         status: 'configurado', desc: 'URL do VPS Hostinger (Evolution API)' },
+            { key: 'EVOLUTION_API_KEY',         status: 'configurado', desc: 'Chave de autenticação da Evolution API' },
+            { key: 'EVOLUTION_INSTANCE',        status: 'configurado', desc: 'Nome da instância WhatsApp (ex: drben)' },
+            { key: 'PLANTONISTA_WHATSAPP',      status: 'configurado', desc: 'Número do Dr. Mauro para alertas MARA IA' },
             { key: 'OPENAI_API_KEY',            status: 'opcional',    desc: 'Para transcrição de áudios (Whisper) — opcional' },
             { key: 'PINECONE_API_KEY',          status: 'opcional',    desc: 'Memória de longo prazo das conversas — opcional' },
           ].map(v => (
