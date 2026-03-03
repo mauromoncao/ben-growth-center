@@ -1,12 +1,22 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Wifi, WifiOff, RefreshCw, Smartphone, MessageSquare, Users, AlertTriangle, CheckCircle, Loader } from 'lucide-react'
 
-const SUPABASE_URL  = 'https://xjjxnzoapqswagqbvdto.supabase.co'
-const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY
-  ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhqanhuem9hcHFzd2FncWJ2ZHRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NzcyODQsImV4cCI6MjA4ODA1MzI4NH0.e6s1y85msoV3pmMvUmEh-veqvjKLr7PLAqHrjvjEauI'
+// Evolution API no VPS Hostinger
+const EVOLUTION_URL = 'http://181.215.135.202:8080'
+const EVOLUTION_KEY = 'BenEvolution2026'
+const INSTANCE      = 'drben'
 
-// URL das Edge Functions
-const FN_QRCODE = `${SUPABASE_URL}/functions/v1/whatsapp-qrcode`
+async function evoFetch(path: string, opts: RequestInit = {}) {
+  const res = await fetch(`${EVOLUTION_URL}${path}`, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': EVOLUTION_KEY,
+      ...(opts.headers ?? {}),
+    },
+  })
+  return res.json()
+}
 
 export default function WhatsAppConnect() {
   const [status, setStatus]   = useState<'disconnected' | 'connecting' | 'open'>('disconnected')
@@ -15,33 +25,38 @@ export default function WhatsAppConnect() {
   const [loading, setLoading] = useState(false)
   const [lastUpdate, setLastUpdate] = useState<string>('')
 
-  // ── Buscar status e QR Code ─────────────────────────────
+  // ── Buscar status da instância ──────────────────────────
   const buscarStatus = useCallback(async () => {
     try {
-      const res  = await fetch(`${FN_QRCODE}?action=status`, {
-        headers: { Authorization: `Bearer ${SUPABASE_ANON}` },
-      })
-      const data = await res.json()
-      setStatus(data.status === 'open' ? 'open' : data.status === 'connecting' ? 'connecting' : 'disconnected')
-      if (data.qrcode) setQrcode(data.qrcode)
+      const data = await evoFetch(`/instance/connectionState/${INSTANCE}`)
+      const state = data?.instance?.state ?? data?.state ?? ''
+      if (state === 'open')       setStatus('open')
+      else if (state === 'connecting' || state === 'qrcode') setStatus('connecting')
+      else                         setStatus('disconnected')
       setLastUpdate(new Date().toLocaleTimeString('pt-BR'))
     } catch (e) {
       console.error('Erro ao buscar status:', e)
     }
   }, [])
 
-  // ── Solicitar novo QR Code ───────────────────────────────
+  // ── Solicitar QR Code ───────────────────────────────────
   const solicitarQRCode = async () => {
     setLoading(true)
     setQrcode(null)
     setStatus('connecting')
     try {
-      const res  = await fetch(`${FN_QRCODE}?action=refresh`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${SUPABASE_ANON}` },
-      })
-      const data = await res.json()
-      if (data.qrcode) setQrcode(data.qrcode)
+      // Conectar a instância
+      await evoFetch(`/instance/connect/${INSTANCE}`, { method: 'GET' })
+      // Buscar QR Code
+      const data = await evoFetch(`/instance/connect/${INSTANCE}`)
+      if (data?.base64)       setQrcode(data.base64)
+      else if (data?.qrcode?.base64) setQrcode(data.qrcode.base64)
+      else if (data?.code)    {
+        // Buscar QR Code direto
+        const qrData = await evoFetch(`/instance/fetchInstances`)
+        const inst = qrData?.find?.((i: any) => i?.instance?.instanceName === INSTANCE)
+        if (inst?.instance?.qrcode?.base64) setQrcode(inst.instance.qrcode.base64)
+      }
     } catch (e) {
       console.error('Erro ao gerar QR Code:', e)
     } finally {
@@ -49,46 +64,40 @@ export default function WhatsAppConnect() {
     }
   }
 
+  // ── Buscar QR Code da instância existente ──────────────
+  const buscarQRCode = useCallback(async () => {
+    try {
+      const data = await evoFetch(`/instance/fetchInstances`)
+      const inst = Array.isArray(data)
+        ? data.find((i: any) => i?.instance?.instanceName === INSTANCE)
+        : null
+      if (inst?.instance?.qrcode?.base64) {
+        setQrcode(inst.instance.qrcode.base64)
+        setStatus('connecting')
+      }
+    } catch (e) {
+      console.error('Erro ao buscar QR Code:', e)
+    }
+  }, [])
+
   // ── Desconectar ──────────────────────────────────────────
   const desconectar = async () => {
     if (!confirm('Deseja desconectar o WhatsApp do sistema?')) return
-    await fetch(`${FN_QRCODE}?action=disconnect`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${SUPABASE_ANON}` },
-    })
+    await evoFetch(`/instance/logout/${INSTANCE}`, { method: 'DELETE' })
     setStatus('disconnected')
     setQrcode(null)
   }
 
-  // ── Buscar leads recentes ────────────────────────────────
-  const buscarLeads = useCallback(async () => {
-    try {
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/whatsapp_leads?select=*&order=criado_em.desc&limit=10`,
-        {
-          headers: {
-            apikey: SUPABASE_ANON,
-            Authorization: `Bearer ${SUPABASE_ANON}`,
-          },
-        }
-      )
-      const data = await res.json()
-      if (Array.isArray(data)) setLeads(data)
-    } catch (e) {
-      console.error('Erro ao buscar leads:', e)
-    }
-  }, [])
-
-  // ── Polling a cada 5 segundos quando conectando ─────────
+  // ── Polling a cada 5 segundos ───────────────────────────
   useEffect(() => {
     buscarStatus()
-    buscarLeads()
+    buscarQRCode()
     const interval = setInterval(() => {
       buscarStatus()
-      if (status === 'open') buscarLeads()
+      buscarQRCode()
     }, 5000)
     return () => clearInterval(interval)
-  }, [buscarStatus, buscarLeads, status])
+  }, [buscarStatus, buscarQRCode])
 
   const statusColor = {
     open:         'text-green-600 bg-green-50 border-green-200',
@@ -156,7 +165,7 @@ export default function WhatsAppConnect() {
           )}
 
           {/* Status: Conectando + QR Code */}
-          {status === 'connecting' && qrcode && (
+          {(status === 'connecting' || status === 'disconnected') && qrcode && (
             <div className="text-center space-y-4">
               <div className="bg-white p-4 rounded-xl border-2 border-[#0f2044] inline-block">
                 <img
@@ -184,8 +193,8 @@ export default function WhatsAppConnect() {
             </div>
           )}
 
-          {/* Status: Desconectado */}
-          {status === 'disconnected' && (
+          {/* Status: Desconectado sem QR Code */}
+          {status === 'disconnected' && !qrcode && (
             <div className="text-center py-8 space-y-4">
               <WifiOff size={64} className="mx-auto text-gray-300" />
               <div>
@@ -204,6 +213,14 @@ export default function WhatsAppConnect() {
                   : <><Smartphone size={18} /> Conectar WhatsApp</>
                 }
               </button>
+            </div>
+          )}
+
+          {/* Conectando sem QR Code ainda */}
+          {status === 'connecting' && !qrcode && (
+            <div className="text-center py-8 space-y-4">
+              <Loader size={64} className="mx-auto text-[#D4A017] animate-spin" />
+              <p className="text-gray-500">Aguardando QR Code...</p>
             </div>
           )}
         </div>
@@ -232,6 +249,15 @@ export default function WhatsAppConnect() {
             ))}
           </div>
 
+          {/* Info VPS */}
+          <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-50 border border-blue-200">
+            <Wifi size={16} className="text-blue-600 mt-0.5 shrink-0" />
+            <p className="text-xs text-blue-700">
+              Evolution API rodando no <strong>VPS Hostinger</strong> (São Paulo) — 24/7 ativo.
+              IP: <code className="font-mono">181.215.135.202</code>
+            </p>
+          </div>
+
           {/* Aviso */}
           <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200">
             <AlertTriangle size={16} className="text-amber-600 mt-0.5 shrink-0" />
@@ -244,26 +270,14 @@ export default function WhatsAppConnect() {
       </div>
 
       {/* ── Leads recentes ─────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-[#0f2044] flex items-center gap-2">
-            <Users size={20} className="text-[#D4A017]" />
-            Leads Recentes — Dr. Ben
-          </h2>
-          <button
-            onClick={buscarLeads}
-            className="flex items-center gap-1 text-xs text-gray-500 hover:text-[#0f2044] transition"
-          >
-            <RefreshCw size={12} /> Atualizar
-          </button>
-        </div>
-
-        {leads.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">
-            <MessageSquare size={40} className="mx-auto mb-2 opacity-30" />
-            <p className="text-sm">Nenhum lead ainda — conecte o WhatsApp para começar</p>
+      {leads.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-[#0f2044] flex items-center gap-2">
+              <Users size={20} className="text-[#D4A017]" />
+              Leads Recentes — Dr. Ben
+            </h2>
           </div>
-        ) : (
           <div className="space-y-2">
             {leads.map((lead, i) => (
               <div
@@ -300,8 +314,8 @@ export default function WhatsAppConnect() {
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
     </div>
   )
