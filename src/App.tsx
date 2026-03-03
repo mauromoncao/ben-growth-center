@@ -66,7 +66,7 @@ const navGroups = [
     items: [
       { to: '/mara-ia',       icon: Bot,           label: 'MARA IA' },
       { to: '/plantonista',   icon: Headphones,    label: 'Plantonista' },
-      { to: '/whatsapp',      icon: MessageSquare, label: 'WhatsApp Dr. Ben' },
+      { to: '/whatsapp',      icon: MessageSquare, label: 'Dr. Ben — WhatsApp' },
     ],
   },
   {
@@ -106,9 +106,9 @@ const breadcrumbMap: Record<string, { section: string; page: string }> = {
   '/integracao-juris':{ section: 'BEN HUB',       page: 'Integração Juris' },
   '/crm':             { section: 'CRM & LEADS',   page: 'CRM' },
   '/leads':           { section: 'CRM & LEADS',   page: 'Leads' },
-  '/mara-ia':         { section: 'MARA IA',        page: 'MARA IA — Configuração' },
+  '/mara-ia':         { section: 'MARA IA',        page: 'MARA IA — Assistente Pessoal' },
   '/plantonista':     { section: 'MARA IA',        page: 'Plantonista' },
-  '/whatsapp':         { section: 'MARA IA',        page: 'WhatsApp Dr. Ben' },
+  '/whatsapp':        { section: 'MARA IA',        page: 'Dr. Ben — Assistente Jurídico' },
   '/campanhas':       { section: 'MARKETING',      page: 'Campanhas' },
   '/conteudo':        { section: 'MARKETING',      page: 'Conteúdo' },
   '/palavras-chave':  { section: 'MARKETING',      page: 'Palavras-chave' },

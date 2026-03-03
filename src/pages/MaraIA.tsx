@@ -239,10 +239,10 @@ export default function MaraIA() {
             <div className="w-10 h-10 bg-[#0f2044] rounded-xl flex items-center justify-center">
               <Bot size={22} className="text-[#D4A017]" />
             </div>
-            MARA IA — Configuração
+            MARA IA — Assistente Pessoal
           </h1>
           <p className="text-gray-500 text-sm mt-1">
-            Configure a personalidade, regras e comportamento da assistente jurídica
+            Sua assistente pessoal — avisa você após o Dr. Ben qualificar cada lead
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -310,7 +310,35 @@ export default function MaraIA() {
       </div>
 
       {/* ── Identidade ──────────────────────────────────────── */}
-      <Secao titulo="Identidade da MARA IA" icone={<Bot size={16} className="text-[#D4A017]" />}>
+      {/* Banner explicativo dos papéis */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="p-4 rounded-2xl border-2 border-[#0f2044] bg-[#0f2044]/5">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 bg-[#0f2044] rounded-xl flex items-center justify-center">
+              <Bot size={18} className="text-[#D4A017]" />
+            </div>
+            <div>
+              <p className="font-bold text-[#0f2044]">Dr. Ben</p>
+              <p className="text-xs text-gray-500">Assistente Jurídico</p>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600">Atende os <strong>clientes</strong> no WhatsApp <strong>(86) 9482-0054</strong>, coleta dados e faz a triagem jurídica.</p>
+        </div>
+        <div className="p-4 rounded-2xl border-2 border-[#D4A017] bg-amber-50">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 bg-[#D4A017] rounded-xl flex items-center justify-center">
+              <Bot size={18} className="text-white" />
+            </div>
+            <div>
+              <p className="font-bold text-[#0f2044]">MARA IA</p>
+              <p className="text-xs text-gray-500">Assistente Pessoal</p>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600">Avisa o <strong>Dr. Mauro</strong> no <strong>(86) 99948-4761</strong> assim que o Dr. Ben conclui a triagem de cada lead.</p>
+        </div>
+      </div>
+
+      <Secao titulo="Configurações do Dr. Ben" icone={<Bot size={16} className="text-[#D4A017]" />}>
         <div className="mt-4 space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
@@ -455,7 +483,7 @@ export default function MaraIA() {
       </Secao>
 
       {/* ── Regras de Repasse ───────────────────────────────── */}
-      <Secao titulo="Triagem & Repasse ao Plantonista" icone={<Zap size={16} className="text-[#D4A017]" />}>
+      <Secao titulo="Triagem do Dr. Ben & Aviso da MARA IA" icone={<Zap size={16} className="text-[#D4A017]" />}>
         <div className="mt-4 space-y-5">
 
           {/* Número de mensagens para triagem */}
@@ -463,7 +491,7 @@ export default function MaraIA() {
             <div className="flex items-center justify-between mb-1">
               <div>
                 <label className="text-sm font-semibold text-gray-700">Mensagens até a triagem</label>
-                <p className="text-xs text-gray-500 mt-0.5">Após este número de mensagens do cliente, o Dr. Ben faz a triagem e notifica você automaticamente</p>
+                <p className="text-xs text-gray-500 mt-0.5">Após este número de mensagens do cliente, o Dr. Ben faz a triagem e a MARA IA avisa você automaticamente no <strong>(86) 99948-4761</strong></p>
               </div>
               <span className="text-[#0f2044] font-bold text-2xl w-12 text-center">{config.mensagensParaTriagem}</span>
             </div>
@@ -484,7 +512,7 @@ export default function MaraIA() {
             <label className="block text-sm font-semibold text-gray-700 mb-1">
               Palavras-chave que adiantam a triagem (opcional)
             </label>
-            <p className="text-xs text-gray-400 mb-2">Se o cliente digitar uma dessas palavras, a triagem acontece na 1ª mensagem, antes de atingir o número configurado acima.</p>
+            <p className="text-xs text-gray-400 mb-2">Se o cliente digitar uma dessas palavras, o Dr. Ben faz a triagem imediatamente e a MARA IA te avisa na 1ª mensagem, sem esperar o número configurado acima.</p>
             <div className="flex flex-wrap gap-2 mb-3">
               {config.repassePalavras.map((p, i) => (
                 <span key={i} className="flex items-center gap-1 bg-red-50 border border-red-200 text-red-700 text-xs px-3 py-1 rounded-full">
@@ -549,13 +577,13 @@ export default function MaraIA() {
       </Secao>
 
       {/* ── Testar MARA IA ──────────────────────────────────── */}
-      <Secao titulo="Testar MARA IA ao Vivo" icone={<Play size={16} className="text-[#D4A017]" />} defaultOpen={false}>
+      <Secao titulo="Testar Dr. Ben ao Vivo" icone={<Play size={16} className="text-[#D4A017]" />} defaultOpen={false}>
         <div className="mt-4 space-y-4">
           <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-2">
             <Info size={14} className="text-blue-500 mt-0.5 shrink-0" />
             <p className="text-xs text-blue-700">
-              Simule uma conversa com a MARA IA usando as configurações acima.
-              Requer <code className="font-mono bg-blue-100 px-1 rounded">VITE_GEMINI_KEY</code> configurada nas env do Vercel.
+              Simule como o <strong>Dr. Ben</strong> responde a um cliente com as instruções configuradas acima.
+              A <strong>MARA IA</strong> avisaria você após a {config.mensagensParaTriagem}ª mensagem com o resumo da triagem.
             </p>
           </div>
           <div className="flex gap-3">

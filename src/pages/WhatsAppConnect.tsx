@@ -99,9 +99,9 @@ export default function WhatsAppConnect() {
       {/* ── Header ─────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#0f2044]">WhatsApp — Dr. Ben</h1>
+          <h1 className="text-2xl font-bold text-[#0f2044]">Dr. Ben — Assistente Jurídico</h1>
           <p className="text-gray-500 text-sm mt-1">
-            Conecte o número <strong>+55 86 9482-0054</strong> para ativar o Dr. Ben IA
+            Conecte o número <strong>(86) 9482-0054</strong> — Dr. Ben atende os clientes 24/7
           </p>
         </div>
         <div className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-semibold ${statusColor}`}>
@@ -216,15 +216,15 @@ export default function WhatsAppConnect() {
 
           <div className="space-y-3">
             {[
-              { icon: '📱', title: 'Escaneie o QR Code', desc: 'Use o número +55 86 9482-0054 para conectar' },
-              { icon: '🤖', title: 'Dr. Ben responde', desc: 'IA jurídica responde clientes automaticamente 24/7' },
-              { icon: '⚡', title: 'Leads urgentes', desc: 'Plantonista recebe alerta de casos prioritários' },
-              { icon: '📋', title: 'CRM integrado', desc: 'Todas as conversas salvas no sistema' },
+              { icon: '📱', title: 'Escaneie o QR Code', desc: 'Use o número (86) 9482-0054 para conectar' },
+              { icon: '⚖️', title: 'Dr. Ben responde', desc: 'Assistente jurídico atende clientes automaticamente 24/7' },
+              { icon: '📋', title: 'Triagem completa', desc: 'Dr. Ben coleta dados, área e urgência do caso' },
+              { icon: '🤖', title: 'MARA IA avisa', desc: 'Você recebe o resumo no (86) 99948-4761 após a triagem' },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50">
                 <span className="text-2xl">{item.icon}</span>
                 <div>
-                  <p className="font-semibold text-[#0f2044] text-sm">{item.title}</p>
+              <p className="font-semibold text-[#0f2044] text-sm">{item.title}</p>
                   <p className="text-gray-500 text-xs">{item.desc}</p>
                 </div>
               </div>
