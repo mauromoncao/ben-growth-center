@@ -110,7 +110,7 @@ export default function WhatsAppConnect() {
         <div>
           <h1 className="text-2xl font-bold text-[#0f2044]">WhatsApp — Dr. Ben</h1>
           <p className="text-gray-500 text-sm mt-1">
-            Conecte o número <strong>+55 86 9519-8919</strong> para ativar o Dr. Ben IA
+            Conecte o número <strong>+55 86 9482-0054</strong> para ativar o Dr. Ben IA
           </p>
         </div>
         <div className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-semibold ${statusColor}`}>
@@ -217,7 +217,7 @@ export default function WhatsAppConnect() {
 
           <div className="space-y-3">
             {[
-              { icon: '📱', title: 'Escaneie o QR Code', desc: 'Use o número +55 86 9519-8919 para conectar' },
+              { icon: '📱', title: 'Escaneie o QR Code', desc: 'Use o número +55 86 9482-0054 para conectar' },
               { icon: '🤖', title: 'Dr. Ben responde', desc: 'IA jurídica responde clientes automaticamente 24/7' },
               { icon: '⚡', title: 'Leads urgentes', desc: 'Plantonista recebe alerta de casos prioritários' },
               { icon: '📋', title: 'CRM integrado', desc: 'Todas as conversas salvas no sistema' },
