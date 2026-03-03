@@ -8,8 +8,9 @@
 export const config = { maxDuration: 30 }
 
 const GEMINI_KEY  = process.env.GEMINI_API_KEY
-const EVOLUTION_URL    = process.env.EVOLUTION_API_URL   // Ex: https://seu-app.railway.app
-const EVOLUTION_KEY    = process.env.EVOLUTION_API_KEY   // apikey do Evolution
+// VPS Hostinger — Evolution API 24/7
+const EVOLUTION_URL    = process.env.EVOLUTION_API_URL   ?? 'http://181.215.135.202:8080'
+const EVOLUTION_KEY    = process.env.EVOLUTION_API_KEY   ?? 'BenEvolution2026'
 const EVOLUTION_INSTANCE = process.env.EVOLUTION_INSTANCE ?? 'drben'
 const PLANTONISTA = process.env.PLANTONISTA_WHATSAPP ?? '5586999484761'
 
