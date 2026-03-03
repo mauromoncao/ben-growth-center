@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   Phone, MessageCircle, Mail, Clock, AlertCircle,
   ChevronRight, User, Bot, Star, X,
@@ -1333,6 +1333,37 @@ export default function CRM() {
   const [leads, setLeads] = useState<CRMLead[]>(crmLeadsMock)
   const [fichaAberta, setFichaAberta] = useState<CRMLead | null>(null)
   const [visualizacao, setVisualizacao] = useState<'kanban' | 'lista'>('kanban')
+  const [carregando, setCarregando] = useState(false)
+
+  // Buscar leads reais da API (complementar aos mocks)
+  const carregarLeads = useCallback(async () => {
+    try {
+      setCarregando(true)
+      const res = await fetch('/api/leads')
+      if (res.ok) {
+        const data = await res.json()
+        if (data.leads && data.leads.length > 0) {
+          // Mesclar leads da API com mocks (API tem prioridade para IDs iguais)
+          setLeads(prev => {
+            const apiIds = new Set(data.leads.map((l: CRMLead) => l.id))
+            const mocksSemDuplicatas = prev.filter(l => !apiIds.has(l.id))
+            return [...data.leads, ...mocksSemDuplicatas]
+          })
+        }
+      }
+    } catch (e) {
+      console.warn('[CRM] Erro ao carregar leads da API:', e)
+    } finally {
+      setCarregando(false)
+    }
+  }, [])
+
+  // Carregar ao montar e a cada 30 segundos (atualização automática)
+  useEffect(() => {
+    carregarLeads()
+    const interval = setInterval(carregarLeads, 30000)
+    return () => clearInterval(interval)
+  }, [carregarLeads])
 
   const totalValor = leads.filter(l => l.status === 'convertido').reduce((a, l) => a + (l.valor || 0), 0)
   const aguardando = leads.filter(l => l.status === 'aguardando').length
@@ -1353,9 +1384,19 @@ export default function CRM() {
           <h1 className="text-2xl font-bold" style={{ color: "#111827" }}>CRM — Gestão Comercial</h1>
           <p className="text-gray-500 text-sm mt-1">
             Pipeline · ZapSign · Asaas · Google Meet · {leads.length} leads ativos
+            {carregando && <span className="ml-2 text-blue-500 animate-pulse">● atualizando...</span>}
           </p>
         </div>
         <div className="flex gap-3">
+          <button
+            onClick={carregarLeads}
+            disabled={carregando}
+            title="Atualizar leads do WhatsApp"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 text-sm hover:bg-blue-100 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${carregando ? 'animate-spin' : ''}`} />
+            Atualizar
+          </button>
           {aguardando > 0 && (
             <div className="flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-full px-4 py-2 animate-pulse">
               <AlertCircle className="w-4 h-4 text-amber-500" />

@@ -65,6 +65,14 @@
       "destination": "/api/flow/whatsapp.js"
     },
     {
+      "source": "/api/leads",
+      "destination": "/api/leads.js"
+    },
+    {
+      "source": "/api/leads/:path*",
+      "destination": "/api/leads.js"
+    },
+    {
       "source": "/api/whatsapp-evolution",
       "destination": "/api/whatsapp-evolution.js"
     },

@@ -2,75 +2,59 @@
 // BEN GROWTH CENTER — Webhook Evolution API
 // Rota: POST /api/whatsapp-evolution
 //
-// DR. BEN   = Assistente Jurídico — atende os CLIENTES
-// MARA IA   = Assistente Pessoal  — avisa o DR. MAURO
+// DR. BEN   = Assistente Jurídico — atende os CLIENTES via WhatsApp
+// MARA IA   = Assistente Pessoal  — avisa o DR. MAURO quando
+//             Dr. Ben coleta o contato do cliente
 //
-// Fluxo:
-//   Cliente → Dr. Ben (triagem jurídica)
-//   Dr. Ben → MARA IA avisa Dr. Mauro com resumo do lead
+// PROMPT: idêntico ao drben-oficial/api/chat.js
+// MODEL:  gemini-2.5-flash (igual ao site/widget)
+// FORMAT: system_instruction + contents[] (igual ao site/widget)
 // ============================================================
 
 export const config = { maxDuration: 30 }
 
+// ── Variáveis de ambiente ────────────────────────────────────
 const GEMINI_KEY         = process.env.GEMINI_API_KEY
 const EVOLUTION_URL      = process.env.EVOLUTION_API_URL   ?? ''
 const EVOLUTION_KEY      = process.env.EVOLUTION_API_KEY   ?? ''
 const EVOLUTION_INSTANCE = process.env.EVOLUTION_INSTANCE  ?? 'drben'
-// Número do DR. MAURO — a MARA IA avisa aqui
 const DR_MAURO_WHATSAPP  = process.env.PLANTONISTA_WHATSAPP ?? ''
 
-// ── Config MARA IA (carregada dinamicamente) ────────────────
-let _maraConfig = null
-async function getMaraConfig() {
-  if (_maraConfig && _maraConfig._cachedAt && (Date.now() - _maraConfig._cachedAt < 300000)) {
-    return _maraConfig
-  }
-  try {
-    const base = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : 'https://ben-growth-center.vercel.app'
-    const r = await fetch(`${base}/api/mara-config`)
-    if (r.ok) {
-      const d = await r.json()
-      _maraConfig = { ...d.config, _cachedAt: Date.now() }
-      return _maraConfig
-    }
-  } catch {}
-  return null
+// ── URL base do próprio serviço (para chamadas internas) ────
+function getBaseUrl() {
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+  return 'https://ben-growth-center.vercel.app'
 }
 
-// ── Sessões em memória ──────────────────────────────────────
-const sessoes = new Map()
-
-// ── Enviar mensagem via Evolution API ───────────────────────
-async function enviarMensagem(numero, texto) {
-  if (!EVOLUTION_URL || !EVOLUTION_KEY) {
-    console.log('[Evolution] ENV não configurada — simulando envio para', numero)
-    return
-  }
+// ── Registrar mensagem no CRM ────────────────────────────────
+async function crmRegistrarMensagem(numero, role, texto) {
   try {
-    const res = await fetch(
-      `${EVOLUTION_URL}/message/sendText/${EVOLUTION_INSTANCE}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': EVOLUTION_KEY },
-        body: JSON.stringify({ number: numero, text: texto }),
-      }
-    )
-    const data = await res.json()
-    console.log('[Evolution] Mensagem enviada:', data)
-    return data
+    await fetch(`${getBaseUrl()}/api/leads?action=mensagem`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ numero, role, texto }),
+    })
   } catch (e) {
-    console.error('[Evolution] Erro ao enviar:', e.message)
+    console.error('[CRM] Erro ao registrar mensagem:', e.message)
   }
 }
 
-// ── DR. BEN — Assistente Jurídico dos clientes ──────────────
-async function consultarDrBen(historico, novaMensagem) {
-  const maraConfig = await getMaraConfig()
+// ── Criar ou atualizar lead no CRM ──────────────────────────
+async function crmCriarLead({ nome, telefone, numero, area, urgencia, resumo }) {
+  try {
+    await fetch(`${getBaseUrl()}/api/leads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, telefone, numero, area, urgencia, resumo, canal: 'whatsapp' }),
+    })
+    console.log(`[CRM] Lead registrado: ${nome} — ${telefone || numero}`)
+  } catch (e) {
+    console.error('[CRM] Erro ao criar lead:', e.message)
+  }
+}
 
-  // Prompt completo — migrado do projeto drben original
-  const DR_BEN_PROMPT_COMPLETO = `Você é o Dr. Ben, assistente jurídico digital do escritório Mauro Monção Advogados Associados (OAB/PI · CE · MA), com sede em Parnaíba-PI.
+// ── PROMPT OFICIAL — idêntico ao drben-oficial/api/chat.js ──
+const DR_BEN_SYSTEM_PROMPT = `Você é o Dr. Ben, assistente jurídico digital do escritório Mauro Monção Advogados Associados (OAB/PI · CE · MA), com sede em Parnaíba-PI.
 
 Sua missão é realizar a triagem inicial do visitante, entender o problema jurídico e encaminhar para o advogado especialista correto. Você NÃO emite pareceres, NÃO representa o cliente e NÃO promete resultados.
 
@@ -116,111 +100,144 @@ Encerre gentilmente.
 - Quando identificar a área jurídica, inclua: [AREA:tributario|previdenciario|bancario|imobiliario|familia|publico|trabalhista|consumidor|outros]
 - Quando avaliar urgência, inclua: [URGENCY:low|medium|high|critical]`
 
-  const promptBase = maraConfig?.promptBase || DR_BEN_PROMPT_COMPLETO
+// ── Sessões em memória (histórico por número de WhatsApp) ───
+// Estrutura: { history: [{role, parts}], triagem: {...}, notificado: bool }
+if (!global.__drbenSessoes)  global.__drbenSessoes  = new Map()
+if (!global.__drbenTriagem)  global.__drbenTriagem  = new Map()
 
-  const saudacaoPadrao = maraConfig?.saudacao ||
-    'Olá! Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção Advogados. Como posso te ajudar hoje?'
-
-  if (!GEMINI_KEY) return { resposta: saudacaoPadrao }
-
-  const prompt =
-    `${promptBase}\n\nHistórico da conversa:\n${historico}\n\nCliente: ${novaMensagem}\nDr. Ben:`
-
+// ── Enviar mensagem via Evolution API ───────────────────────
+async function enviarMensagem(numero, texto) {
+  if (!EVOLUTION_URL || !EVOLUTION_KEY) {
+    console.log('[Evolution] ENV não configurada — simulando envio para', numero)
+    return
+  }
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+      `${EVOLUTION_URL}/message/sendText/${EVOLUTION_INSTANCE}`,
       {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 500, temperature: 0.7 },
-        }),
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': EVOLUTION_KEY },
+        body:    JSON.stringify({ number: numero, text: texto }),
       }
     )
     const data = await res.json()
-    const resposta = data?.candidates?.[0]?.content?.parts?.[0]?.text
-      ?? 'Desculpe, não consegui processar sua mensagem. Tente novamente.'
-    return { resposta }
+    console.log('[Evolution] Mensagem enviada:', JSON.stringify(data).slice(0, 100))
+    return data
   } catch (e) {
-    console.error('[Dr. Ben] Erro Gemini:', e.message)
-    return { resposta: 'Olá! Sou o Dr. Ben. Tive um problema técnico momentâneo. Por favor, aguarde.' }
+    console.error('[Evolution] Erro ao enviar:', e.message)
   }
 }
 
-// ── DR. BEN — Triagem do lead após coletar dados ────────────
-async function fazerTriagem(historico) {
-  if (!GEMINI_KEY) return null
+// ── Extrair marcadores do texto da IA (igual ao drben-oficial) ─
+function extrairMarcadores(texto) {
+  const resultado = { contact: null, area: null, urgencia: null }
 
-  const prompt =
-    `Você é o Dr. Ben, assistente jurídico. Analise esta conversa e faça a triagem do lead para o Dr. Mauro Monção.
+  // [CONTACT:{"name":"...","phone":"..."}]
+  const contactMatch = texto.match(/\[CONTACT:(\{[^}]+\})\]/)
+  if (contactMatch) {
+    try { resultado.contact = JSON.parse(contactMatch[1]) } catch {}
+  }
 
-Conversa:
-${historico}
+  // [AREA:tributario]
+  const areaMatch = texto.match(/\[AREA:([\w|]+)\]/)
+  if (areaMatch) resultado.area = areaMatch[1].split('|')[0]
 
-Responda APENAS um JSON válido, sem markdown:
-{
-  "nome": "nome do cliente ou null",
-  "area": "tributario|previdenciario|bancario|trabalhista|civil|outro",
-  "resumo": "resumo do problema em 1 frase objetiva",
-  "urgencia": "alta|media|baixa",
-  "observacao": "detalhes importantes para o Dr. Mauro"
-}`
+  // [URGENCY:high]
+  const urgenciaMatch = texto.match(/\[URGENCY:(\w+)\]/)
+  if (urgenciaMatch) resultado.urgencia = urgenciaMatch[1]
+
+  return resultado
+}
+
+// ── DR. BEN — chama Gemini com system_instruction + contents[] ─
+// Formato IDÊNTICO ao drben-oficial/api/chat.js
+async function consultarDrBen(history, novaMensagem) {
+  const fallback = 'Desculpe, estou com uma instabilidade técnica no momento. Por favor, fale diretamente com nossa equipe pelo WhatsApp: (86) 99482-0054'
+
+  if (!GEMINI_KEY) return fallback
+
+  // Adicionar a nova mensagem do cliente ao histórico para esta chamada
+  const contents = [
+    ...history.slice(-20),
+    { role: 'user', parts: [{ text: novaMensagem }] },
+  ]
+
+  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`
+
+  const payload = {
+    system_instruction: { parts: [{ text: DR_BEN_SYSTEM_PROMPT }] },
+    contents,
+    generationConfig: { maxOutputTokens: 8192, temperature: 0.7 },
+  }
 
   try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 300, temperature: 0.1 },
-        }),
-      }
-    )
-    const data = await res.json()
-    const texto = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
-    const match = texto.match(/\{[\s\S]*\}/)
-    if (match) return JSON.parse(match[0])
-  } catch (e) {
-    console.error('[Dr. Ben Triagem] Erro:', e.message)
+    const response = await fetch(geminiUrl, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      const errText = await response.text()
+      console.error('[Dr. Ben] Gemini erro:', response.status, errText.slice(0, 200))
+      return fallback
+    }
+
+    const data = await response.json()
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
+    return text ?? fallback
+  } catch (err) {
+    console.error('[Dr. Ben] fetch error:', err.message)
+    return fallback
   }
-  return null
 }
 
-// ── MARA IA — Avisa o Dr. Mauro após triagem do Dr. Ben ─────
-async function maraAvisarDrMauro(dados) {
-  if (!EVOLUTION_URL || !EVOLUTION_KEY) return
+// ── MARA IA — Avisa Dr. Mauro via WhatsApp (igual ao drben-oficial) ─
+async function maraAvisarDrMauro({ nome, telefone, numero, area, urgencia, resumo }) {
+  if (!EVOLUTION_URL || !EVOLUTION_KEY || !DR_MAURO_WHATSAPP) {
+    console.log('[MARA IA] Configuração incompleta — aviso não enviado')
+    return
+  }
 
-  const urgenciaEmoji = { alta: '🔴', media: '🟡', baixa: '🟢' }[dados.urgencia] ?? '🟡'
+  const urgenciaEmoji = { low: '🟢', medium: '🟡', high: '🔴', critical: '🚨' }[urgencia] ?? '🟡'
+  const urgenciaLabel = { low: 'BAIXA', medium: 'MÉDIA', high: 'ALTA', critical: 'CRÍTICA' }[urgencia] ?? 'MÉDIA'
+
   const areaLabel = {
     tributario:    '🧾 Tributário',
     previdenciario:'👴 Previdenciário',
     bancario:      '🏦 Bancário',
+    imobiliario:   '🏠 Imobiliário',
+    familia:       '👨‍👩‍👧 Família e Sucessões',
+    publico:       '⚖️ Advocacia Pública',
     trabalhista:   '👷 Trabalhista',
-    civil:         '⚖️ Cível',
-    outro:         '📋 Outro',
-  }[dados.area] ?? dados.area
+    consumidor:    '🛒 Consumidor',
+    outros:        '📋 Outros',
+  }[area] ?? ('📋 ' + (area ?? 'Outros'))
 
   const hora = new Date().toLocaleTimeString('pt-BR', {
     timeZone: 'America/Fortaleza',
     hour: '2-digit', minute: '2-digit',
   })
 
+  // Número para link do WhatsApp: preferir telefone informado, senão usar número do remetente
+  const foneContato = telefone ?? numero
+  const whatsappLink = foneContato
+    ? `https://wa.me/55${foneContato.replace(/\D/g, '')}`
+    : null
+
   const msg =
     `🤖 *MARA IA — Novo lead qualificado!*\n` +
     `_Dr. Ben concluiu a triagem às ${hora}_\n\n` +
-    `👤 *Cliente:* ${dados.nome ?? 'Não informado'}\n` +
-    `📱 *Número:* +${dados.numero}\n` +
+    `👤 *Cliente:* ${nome ?? 'Não informado'}\n` +
+    `📱 *WhatsApp:* ${telefone ?? ('via +' + numero)}\n` +
     `${areaLabel}\n` +
-    `${urgenciaEmoji} *Urgência:* ${(dados.urgencia ?? 'media').toUpperCase()}\n` +
-    `💬 *Resumo:* ${dados.resumo ?? dados.ultimaMensagem}\n` +
-    (dados.observacao ? `📝 *Obs:* ${dados.observacao}\n` : '') +
-    `\n_Toque no número para assumir o atendimento._`
+    `${urgenciaEmoji} *Urgência:* ${urgenciaLabel}\n` +
+    (resumo ? `💬 *Resumo:* ${resumo}\n` : '') +
+    (whatsappLink ? `\n👉 ${whatsappLink}` : '') +
+    `\n\n_Toque no link para iniciar o atendimento._`
 
   await enviarMensagem(DR_MAURO_WHATSAPP, msg)
-  console.log(`[MARA IA] Dr. Mauro avisado sobre lead: ${dados.numero}`)
+  console.log(`[MARA IA] Dr. Mauro avisado sobre lead de ${numero}`)
 }
 
 // ── Handler principal ────────────────────────────────────────
@@ -233,8 +250,10 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     return res.status(200).json({
-      status: 'ok',
+      status:  'ok',
       service: 'Dr. Ben (Assistente Jurídico) + MARA IA (Assistente Pessoal)',
+      prompt:  'Prompt oficial 7 etapas — drben-oficial sync',
+      model:   'gemini-2.5-flash',
     })
   }
 
@@ -246,12 +265,16 @@ export default async function handler(req, res) {
 
     const evento = body?.event ?? body?.type ?? ''
 
-    // ── Mensagem recebida de cliente ──────────────────────
-    if (evento === 'messages.upsert' || evento === 'MESSAGES_UPSERT' || body?.data?.message) {
+    // ── Mensagem recebida de cliente ─────────────────────────
+    if (
+      evento === 'messages.upsert' ||
+      evento === 'MESSAGES_UPSERT'  ||
+      body?.data?.message
+    ) {
       const msgData = body?.data ?? body
       const fromMe  = msgData?.key?.fromMe ?? msgData?.message?.fromMe ?? false
 
-      // Ignorar mensagens do próprio bot
+      // Ignorar mensagens enviadas pelo próprio bot
       if (fromMe) return res.status(200).json({ ok: true })
 
       const numero = (msgData?.key?.remoteJid ?? msgData?.from ?? '').replace('@s.whatsapp.net', '')
@@ -263,32 +286,31 @@ export default async function handler(req, res) {
       if (!numero || !texto) return res.status(200).json({ ok: true })
 
       // ── Detectar se é o Dr. Mauro (dono) ─────────────────
-      // Normalizar: remover +, espaços, traços
-      const numeroNorm     = numero.replace(/\D/g, '')
-      const mauroNorm      = DR_MAURO_WHATSAPP.replace(/\D/g, '')
-      const ehDrMauro      = mauroNorm && numeroNorm.endsWith(mauroNorm.slice(-10))
+      const numeroNorm = numero.replace(/\D/g, '')
+      const mauroNorm  = DR_MAURO_WHATSAPP.replace(/\D/g, '')
+      const ehDrMauro  = mauroNorm && numeroNorm.endsWith(mauroNorm.slice(-10))
 
-      // Comandos especiais do Dr. Mauro
       if (ehDrMauro) {
         const cmd = texto.trim().toLowerCase()
 
         // /reset — zerar sessão de teste
         if (cmd === '/reset' || cmd === 'reset') {
-          sessoes.delete(numero)
+          global.__drbenSessoes.delete(numero)
+          global.__drbenTriagem.delete(numero)
           await enviarMensagem(numero, '✅ *Sessão resetada!*\nAgora sou um cliente novo para você. Pode mandar mensagem normalmente.')
           return res.status(200).json({ ok: true, acao: 'reset' })
         }
 
         // /status — ver estado do sistema
         if (cmd === '/status' || cmd === 'status') {
-          const sessao = sessoes.get(numero)
+          const sessao = global.__drbenSessoes.get(numero)
           const msg = [
             '📊 *Status Dr. Ben*',
-            `• Sessões ativas: ${sessoes.size}`,
-            `• Sua sessão: ${sessao ? `${sessao.historico.length} msgs` : 'nenhuma'}`,
-            `• Triagem feita: ${sessao?.triagemFeita ? '✅' : '❌'}`,
-            `• Gemini: ${GEMINI_KEY ? '✅' : '❌'}`,
-            `• Evolution: ${EVOLUTION_URL ? '✅' : '❌'}`,
+            `• Sessões ativas: ${global.__drbenSessoes.size}`,
+            `• Sua sessão: ${sessao ? `${sessao.length} msgs no histórico` : 'nenhuma'}`,
+            `• Gemini: ${GEMINI_KEY ? '✅ gemini-2.5-flash' : '❌ sem chave'}`,
+            `• Evolution: ${EVOLUTION_URL ? '✅ ' + EVOLUTION_URL : '❌ não configurado'}`,
+            `• Prompt: ✅ Oficial 7 etapas (drben-oficial sync)`,
             '',
             '_Comandos: /reset | /status | /teste_',
           ].join('\n')
@@ -296,16 +318,16 @@ export default async function handler(req, res) {
           return res.status(200).json({ ok: true, acao: 'status' })
         }
 
-        // /teste — forçar modo cliente (Dr. Mauro interage como se fosse cliente)
+        // /teste — forçar modo cliente
         if (cmd === '/teste' || cmd === 'teste') {
-          sessoes.delete(numero)
+          global.__drbenSessoes.delete(numero)
+          global.__drbenTriagem.delete(numero)
           await enviarMensagem(numero, '🧪 *Modo teste ativado!*\nVou te atender como se fosse um cliente novo.\nMande sua próxima mensagem normalmente.')
           return res.status(200).json({ ok: true, acao: 'modo_teste' })
         }
 
-        // Se já tem sessão ativa = está testando → atende normalmente
-        // Se não tem sessão = primeira mensagem → avisar sobre comandos
-        if (!sessoes.has(numero)) {
+        // Sem sessão ativa = primeira mensagem do Dr. Mauro → menu
+        if (!global.__drbenSessoes.has(numero)) {
           await enviarMensagem(numero, [
             '👋 *Olá, Dr. Mauro!*',
             '',
@@ -314,73 +336,107 @@ export default async function handler(req, res) {
             '• */reset* — zerar sessão atual',
             '• */status* — ver estado do sistema',
             '',
-            '_Ou envie /teste para começar._',
+            '_Ou envie /teste para iniciar uma conversa de teste._',
           ].join('\n'))
           return res.status(200).json({ ok: true, acao: 'menu_dono' })
         }
-        // Tem sessão ativa → continua como cliente (modo teste)
+        // Tem sessão ativa → modo teste: continua como cliente
       }
 
       console.log(`[Dr. Ben] Mensagem de ${numero}${ehDrMauro ? ' (Dr. Mauro/teste)' : ''}: "${texto}"`)
 
-      // Criar/recuperar sessão do cliente
-      if (!sessoes.has(numero)) {
-        sessoes.set(numero, { historico: [], nome: null, triagemFeita: false })
+      // ── Criar ou recuperar sessão (histórico Gemini) ──────
+      if (!global.__drbenSessoes.has(numero)) {
+        global.__drbenSessoes.set(numero, [])
       }
-      const sessao = sessoes.get(numero)
-
-      // Histórico formatado para contexto
-      const historicoTexto = sessao.historico
-        .slice(-6)
-        .map(m => `${m.role === 'user' ? 'Cliente' : 'Dr. Ben'}: ${m.text}`)
-        .join('\n')
-
-      // ── Dr. Ben responde ao cliente ───────────────────────
-      const { resposta } = await consultarDrBen(historicoTexto, texto)
-
-      sessao.historico.push({ role: 'user', text: texto })
-      sessao.historico.push({ role: 'bot',  text: resposta })
-
-      // ── Após 3ª mensagem: Dr. Ben faz triagem ────────────
-      // MARA IA avisa o Dr. Mauro com o resumo completo
-      const maraConfig = await getMaraConfig()
-      const msgParaTriagem = maraConfig?.mensagensParaTriagem ?? 3
-      const totalMsgCliente = sessao.historico.filter(m => m.role === 'user').length
-
-      if (totalMsgCliente >= msgParaTriagem && !sessao.triagemFeita) {
-        sessao.triagemFeita = true
-
-        const historicoCompleto = sessao.historico
-          .map(m => `${m.role === 'user' ? 'Cliente' : 'Dr. Ben'}: ${m.text}`)
-          .join('\n')
-
-        // Triagem + aviso MARA IA em paralelo (não bloqueia resposta ao cliente)
-        fazerTriagem(historicoCompleto).then(triagem => {
-          maraAvisarDrMauro({
-            numero,
-            nome:          triagem?.nome       ?? null,
-            area:          triagem?.area        ?? 'outro',
-            urgencia:      triagem?.urgencia    ?? 'media',
-            resumo:        triagem?.resumo      ?? texto,
-            observacao:    triagem?.observacao  ?? null,
-            ultimaMensagem: texto,
-          })
-        }).catch(e => console.error('[MARA IA] Erro ao avisar Dr. Mauro:', e))
-
-        console.log(`[Dr. Ben] Triagem concluída após ${totalMsgCliente} msgs — MARA IA notificando Dr. Mauro`)
+      if (!global.__drbenTriagem.has(numero)) {
+        global.__drbenTriagem.set(numero, {
+          nome:      null,
+          telefone:  null,
+          area:      null,
+          urgencia:  null,
+          notificado: false,
+        })
       }
 
-      // ── Dr. Ben envia resposta ao cliente ─────────────────
-      await enviarMensagem(numero, resposta)
+      const history      = global.__drbenSessoes.get(numero)
+      const dadosTriagem = global.__drbenTriagem.get(numero)
+
+      // ── Registrar mensagem do cliente no CRM ─────────────
+      crmRegistrarMensagem(numero, 'lead', texto)
+
+      // ── Dr. Ben responde (gemini-2.5-flash + system_instruction) ─
+      const aiText = await consultarDrBen(history, texto)
+
+      // Salvar no histórico no formato correto do Gemini (contents[])
+      history.push({ role: 'user',  parts: [{ text: texto   }] })
+      history.push({ role: 'model', parts: [{ text: aiText  }] })
+
+      // ── Extrair marcadores da resposta (igual ao drben-oficial) ─
+      const marcadores = extrairMarcadores(aiText)
+
+      if (marcadores.area)    dadosTriagem.area    = marcadores.area
+      if (marcadores.urgencia) dadosTriagem.urgencia = marcadores.urgencia
+      if (marcadores.contact) {
+        dadosTriagem.nome     = marcadores.contact.name  ?? dadosTriagem.nome
+        dadosTriagem.telefone = marcadores.contact.phone ?? dadosTriagem.telefone
+      }
+
+      // ── Limpar marcadores antes de enviar ao cliente ──────
+      const cleanReply = aiText
+        .replace(/\[CONTACT:\{[^}]*\}\]/g, '')
+        .replace(/\[AREA:[\w|]+\]/g, '')
+        .replace(/\[URGENCY:\w+\]/g, '')
+        .trim()
+
+      // ── Registrar resposta do Dr. Ben no CRM ─────────────
+      crmRegistrarMensagem(numero, 'dr_ben', cleanReply)
+
+      // ── MARA IA avisa Dr. Mauro UMA ÚNICA VEZ quando contato coletado ─
+      if (dadosTriagem.nome && dadosTriagem.telefone && !dadosTriagem.notificado) {
+        dadosTriagem.notificado = true
+
+        // Resumo = ~3ª mensagem do cliente (problema jurídico)
+        const mensagensCliente = history
+          .filter(m => m.role === 'user')
+          .map(m => m.parts[0].text)
+        const resumo = mensagensCliente.length > 1
+          ? mensagensCliente[Math.min(2, mensagensCliente.length - 1)]
+          : mensagensCliente[0]
+
+        // Criar lead no CRM com todos os dados coletados
+        crmCriarLead({
+          nome:     dadosTriagem.nome,
+          telefone: dadosTriagem.telefone,
+          numero,
+          area:     dadosTriagem.area    ?? 'outros',
+          urgencia: dadosTriagem.urgencia ?? 'medium',
+          resumo:   resumo?.slice(0, 150),
+        })
+
+        // MARA IA avisa Dr. Mauro no WhatsApp
+        maraAvisarDrMauro({
+          nome:     dadosTriagem.nome,
+          telefone: dadosTriagem.telefone,
+          numero,
+          area:     dadosTriagem.area    ?? 'outros',
+          urgencia: dadosTriagem.urgencia ?? 'medium',
+          resumo:   resumo?.slice(0, 150),
+        })
+
+        console.log(`[Dr. Ben] Triagem completa — lead no CRM + MARA IA avisando Dr. Mauro sobre ${dadosTriagem.nome}`)
+      }
+
+      // ── Enviar resposta via Evolution API ─────────────────
+      await enviarMensagem(numero, cleanReply)
 
       return res.status(200).json({ ok: true, respondido: true })
     }
 
     // ── QR Code atualizado ────────────────────────────────
     if (evento === 'qrcode.updated' || evento === 'QRCODE_UPDATED') {
-      const qrcode = body?.data?.qrcode?.base64 ?? body?.qrcode ?? ''
       console.log('[Evolution] QR Code gerado')
-      return res.status(200).json({ ok: true, qrcode })
+      return res.status(200).json({ ok: true })
     }
 
     // ── Status da conexão ─────────────────────────────────
