@@ -3,7 +3,8 @@
 // Vercel Function: /api/zapsign
 // ============================================================
 
-const ZAPSIGN_TOKEN = '426e787a-3446-4341-bbd2-2b88e544ad39'
+// ⚠️ Token via variável de ambiente — Vercel → Settings → Environment Variables → ZAPSIGN_TOKEN
+const ZAPSIGN_TOKEN = process.env.ZAPSIGN_TOKEN || ''
 const ZAPSIGN_BASE   = 'https://api.zapsign.com.br/api/v1'
 
 export default async function handler(req, res) {
