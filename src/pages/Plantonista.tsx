@@ -33,45 +33,23 @@ const plantonistasMock: Plantonista[] = [
     id: 'p1',
     nome: 'Dr. Mauro Monção',
     cargo: 'Advogado Titular',
-    telefone: '(86) 99999-0001',
-    whatsapp: '5586999990001',
+    telefone: '(86) 99948-4761',
+    whatsapp: '5586999484761',
     ativo: true,
     online: true,
     atendimentosHoje: 3,
     avatar: 'MM',
   },
-  {
-    id: 'p2',
-    nome: 'Dra. Ana Secretária',
-    cargo: 'Assistente Jurídica',
-    telefone: '(86) 99999-0002',
-    whatsapp: '5586999990002',
-    ativo: true,
-    online: false,
-    atendimentosHoje: 1,
-    avatar: 'AS',
-  },
-  {
-    id: 'p3',
-    nome: 'Carlos Estagiário',
-    cargo: 'Estagiário',
-    telefone: '(86) 99999-0003',
-    whatsapp: '5586999990003',
-    ativo: false,
-    online: false,
-    atendimentosHoje: 0,
-    avatar: 'CE',
-  },
 ]
 
 const escalaMock: EscalaDia[] = [
-  { diaSemana: 'Sábado',      data: '01/03',   plantonistaId: 'p1', turno: '08h–18h', hoje: false },
-  { diaSemana: 'Domingo',     data: '02/03',   plantonistaId: 'p2', turno: '09h–13h', hoje: false },
   { diaSemana: 'Segunda',     data: '03/03',   plantonistaId: 'p1', turno: '08h–18h', hoje: false },
   { diaSemana: 'Terça',       data: '04/03',   plantonistaId: 'p1', turno: '08h–18h', hoje: false },
-  { diaSemana: 'Quarta',      data: '05/03',   plantonistaId: 'p2', turno: '08h–18h', hoje: false },
+  { diaSemana: 'Quarta',      data: '05/03',   plantonistaId: 'p1', turno: '08h–18h', hoje: false },
   { diaSemana: 'Quinta',      data: '06/03',   plantonistaId: 'p1', turno: '08h–18h', hoje: false },
   { diaSemana: 'Sexta',       data: '07/03',   plantonistaId: 'p1', turno: '08h–18h', hoje: false },
+  { diaSemana: 'Sábado',      data: '08/03',   plantonistaId: 'p1', turno: '08h–13h', hoje: false },
+  { diaSemana: 'Domingo',     data: '09/03',   plantonistaId: 'p1', turno: 'Plantão',  hoje: false },
 ]
 
 // ─── Componente de Alerta Push (simulado) ────────────────────
@@ -276,9 +254,17 @@ export default function Plantonista() {
       <div className="card">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-gray-900">👥 Equipe</h2>
-          <button className="text-xs bg-navy-50 text-gold px-3 py-1 rounded-full hover:bg-navy-100">
-            + Adicionar Membro
-          </button>
+        </div>
+        {/* Info WhatsApp Plantonista */}
+        <div className="mb-4 flex items-center gap-3 p-4 rounded-xl bg-green-50 border border-green-200">
+          <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+            <MessageCircle className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p className="font-semibold text-green-800 text-sm">Alertas WhatsApp ativos</p>
+            <p className="text-green-600 text-xs">Mensagens urgentes enviadas para <strong>(86) 99948-4761</strong></p>
+          </div>
+          <span className="ml-auto bg-green-500 text-white text-xs px-3 py-1 rounded-full font-bold">✅ ATIVO</span>
         </div>
         <div className="space-y-3">
           {plantonistasMock.map(p => (
