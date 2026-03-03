@@ -4,46 +4,162 @@
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "rewrites": [
-    { "source": "/api/zapsign", "destination": "/api/zapsign.js" },
-    { "source": "/api/zapsign/:path*", "destination": "/api/zapsign.js" },
-    { "source": "/api/asaas", "destination": "/api/asaas.js" },
-    { "source": "/api/asaas/:path*", "destination": "/api/asaas.js" },
-    { "source": "/api/meta-ads", "destination": "/api/meta-ads.js" },
-    { "source": "/api/meta-ads/:path*", "destination": "/api/meta-ads.js" },
-    { "source": "/api/google-ads", "destination": "/api/google-ads.js" },
-    { "source": "/api/google-ads/:path*", "destination": "/api/google-ads.js" },
-    { "source": "/api/bridge", "destination": "/api/bridge.js" },
-    { "source": "/api/bridge/:path*", "destination": "/api/bridge.js" },
-    { "source": "/api/secretaria", "destination": "/api/secretaria.js" },
-    { "source": "/api/secretaria/:path*", "destination": "/api/secretaria.js" },
-    { "source": "/api/mara-config", "destination": "/api/mara-config.js" },
-    { "source": "/api/mara-config/:path*", "destination": "/api/mara-config.js" },
-    { "source": "/api/flow/whatsapp",        "destination": "/api/flow/whatsapp.js" },
-    { "source": "/api/whatsapp-evolution",   "destination": "/api/whatsapp-evolution.js" },
-    { "source": "/api/whatsapp-proxy",       "destination": "/api/whatsapp-proxy.js" },
-    { "source": "/api/whatsapp-keepalive",   "destination": "/api/whatsapp-keepalive.js" },
-    { "source": "/api/agents/run", "destination": "/api/agents/run.js" },
-    { "source": "/api/voice", "destination": "/api/voice.js" },
-    { "source": "/api/memory", "destination": "/api/memory.js" },
-    { "source": "/api/search", "destination": "/api/search.js" },
-    { "source": "/api/email", "destination": "/api/email.js" },
-    { "source": "/api/:path*", "destination": "/api/index.js" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/api/zapsign",
+      "destination": "/api/zapsign.js"
+    },
+    {
+      "source": "/api/zapsign/:path*",
+      "destination": "/api/zapsign.js"
+    },
+    {
+      "source": "/api/asaas",
+      "destination": "/api/asaas.js"
+    },
+    {
+      "source": "/api/asaas/:path*",
+      "destination": "/api/asaas.js"
+    },
+    {
+      "source": "/api/meta-ads",
+      "destination": "/api/meta-ads.js"
+    },
+    {
+      "source": "/api/meta-ads/:path*",
+      "destination": "/api/meta-ads.js"
+    },
+    {
+      "source": "/api/google-ads",
+      "destination": "/api/google-ads.js"
+    },
+    {
+      "source": "/api/google-ads/:path*",
+      "destination": "/api/google-ads.js"
+    },
+    {
+      "source": "/api/bridge",
+      "destination": "/api/bridge.js"
+    },
+    {
+      "source": "/api/bridge/:path*",
+      "destination": "/api/bridge.js"
+    },
+    {
+      "source": "/api/secretaria",
+      "destination": "/api/secretaria.js"
+    },
+    {
+      "source": "/api/secretaria/:path*",
+      "destination": "/api/secretaria.js"
+    },
+    {
+      "source": "/api/mara-config",
+      "destination": "/api/mara-config.js"
+    },
+    {
+      "source": "/api/mara-config/:path*",
+      "destination": "/api/mara-config.js"
+    },
+    {
+      "source": "/api/flow/whatsapp",
+      "destination": "/api/flow/whatsapp.js"
+    },
+    {
+      "source": "/api/whatsapp-evolution",
+      "destination": "/api/whatsapp-evolution.js"
+    },
+    {
+      "source": "/api/whatsapp-proxy",
+      "destination": "/api/whatsapp-proxy.js"
+    },
+    {
+      "source": "/api/whatsapp-keepalive",
+      "destination": "/api/whatsapp-keepalive.js"
+    },
+    {
+      "source": "/api/agents/run",
+      "destination": "/api/agents/run.js"
+    },
+    {
+      "source": "/api/voice",
+      "destination": "/api/voice.js"
+    },
+    {
+      "source": "/api/memory",
+      "destination": "/api/memory.js"
+    },
+    {
+      "source": "/api/search",
+      "destination": "/api/search.js"
+    },
+    {
+      "source": "/api/email",
+      "destination": "/api/email.js"
+    },
+    {
+      "source": "/api/cron/lex-conteudo",
+      "destination": "/api/cron/lex-conteudo.js"
+    },
+    {
+      "source": "/api/cron/lex-campanhas",
+      "destination": "/api/cron/lex-campanhas.js"
+    },
+    {
+      "source": "/api/cron/lex-relatorio",
+      "destination": "/api/cron/lex-relatorio.js"
+    },
+    {
+      "source": "/api/cron/lex-monitor",
+      "destination": "/api/cron/lex-monitor.js"
+    },
+    {
+      "source": "/api/cron/agenda-alertas",
+      "destination": "/api/cron/agenda-alertas.js"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
       "source": "/assets/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     }
   ],
   "crons": [
-    { "path": "/api/cron/lex-conteudo", "schedule": "0 7 * * *" },
-    { "path": "/api/cron/lex-campanhas", "schedule": "0 8,18 * * *" },
-    { "path": "/api/cron/lex-relatorio", "schedule": "0 9 * * 1" },
-    { "path": "/api/cron/lex-monitor", "schedule": "0 */2 * * *" },
-    { "path": "/api/cron/agenda-alertas", "schedule": "*/15 * * * *" },
-    { "path": "/api/whatsapp-keepalive", "schedule": "*/5 * * * *" }
+    {
+      "path": "/api/cron/lex-conteudo",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/lex-campanhas",
+      "schedule": "0 8,18 * * *"
+    },
+    {
+      "path": "/api/cron/lex-relatorio",
+      "schedule": "0 9 * * 1"
+    },
+    {
+      "path": "/api/cron/lex-monitor",
+      "schedule": "0 */2 * * *"
+    },
+    {
+      "path": "/api/cron/agenda-alertas",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/whatsapp-keepalive",
+      "schedule": "*/5 * * * *"
+    }
   ]
 }
