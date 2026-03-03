@@ -1,9 +1,9 @@
 // ============================================================
 // BEN GROWTH CENTER — Meta Ads Integration
-// Ad Account: act_474763217204147 (Dr Mauro Monção)
+// Ad Account: act_4244231065854550 (Dr Mauro Monção)
 // ============================================================
 
-export const META_AD_ACCOUNT_ID = 'act_474763217204147'
+export const META_AD_ACCOUNT_ID = 'act_4244231065854550'
 
 // ─── Tipos ───────────────────────────────────────────────────
 export interface MetaCampanha {
