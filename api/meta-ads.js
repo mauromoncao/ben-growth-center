@@ -1,10 +1,11 @@
 // ============================================================
 // BEN GROWTH CENTER — Meta Ads Serverless Proxy
-// Ad Account: act_4244231065854550 (Dr Mauro Monção)
 // Pixel: 1249768107002017
+// Ad Account: lido de META_AD_ACCOUNT_ID (env var Vercel)
 // ============================================================
 
-const AD_ACCOUNT_ID = 'act_4244231065854550' // Dr Mauro Monção (conta principal)
+// Prioridade: env var > fallback para a conta correta
+const AD_ACCOUNT_ID = process.env.META_AD_ACCOUNT_ID || 'act_474763217204147'
 const META_VERSION  = 'v19.0'
 const BASE_URL      = `https://graph.facebook.com/${META_VERSION}`
 
