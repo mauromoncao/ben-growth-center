@@ -65,6 +65,10 @@
       "destination": "/api/flow/whatsapp.js"
     },
     {
+      "source": "/api/diagnostico",
+      "destination": "/api/diagnostico.js"
+    },
+    {
       "source": "/api/leads",
       "destination": "/api/leads.js"
     },
