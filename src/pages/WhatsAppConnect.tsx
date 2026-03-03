@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Wifi, WifiOff, RefreshCw, Smartphone, MessageSquare, Users, AlertTriangle, CheckCircle, Loader } from 'lucide-react'
 
-const SUPABASE_URL = 'https://xjjxnzoapqswagqbvdto.supabase.co'
-const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY ?? ''
+const SUPABASE_URL  = 'https://xjjxnzoapqswagqbvdto.supabase.co'
+const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY
+  ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhqanhuem9hcHFzd2FncWJ2ZHRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NzcyODQsImV4cCI6MjA4ODA1MzI4NH0.e6s1y85msoV3pmMvUmEh-veqvjKLr7PLAqHrjvjEauI'
 
 // URL das Edge Functions
 const FN_QRCODE = `${SUPABASE_URL}/functions/v1/whatsapp-qrcode`
