@@ -32,10 +32,8 @@ interface ConfigMara {
     ativoFimDeSemana: boolean
   }
   // Regras de repasse
-  repasseScore: number
-  repassePalavras: string[]
-  repasseValorMinimo: number
-  repasseSempre: string[]
+  mensagensParaTriagem: number   // após quantas msgs o Dr. Ben faz triagem e notifica
+  repassePalavras: string[]      // palavras que adiantam a triagem (opcional)
   // Limites
   maxMensagensSesSao: number
   tempoEspera: number
@@ -80,10 +78,8 @@ REGRAS:
     domingo: 'Fechado',
     ativoFimDeSemana: true,
   },
-  repasseScore: 70,
-  repassePalavras: ['urgente', 'execução fiscal', 'penhora', 'multa', 'prazo fatal', 'amanhã', 'hoje'],
-  repasseValorMinimo: 3000,
-  repasseSempre: ['tributario'],
+  mensagensParaTriagem: 3,
+  repassePalavras: [],
   maxMensagensSesSao: 10,
   tempoEspera: 30,
   ativo: true,
@@ -459,48 +455,36 @@ export default function MaraIA() {
       </Secao>
 
       {/* ── Regras de Repasse ───────────────────────────────── */}
-      <Secao titulo="Regras de Repasse ao Plantonista" icone={<Zap size={16} className="text-[#D4A017]" />}>
+      <Secao titulo="Triagem & Repasse ao Plantonista" icone={<Zap size={16} className="text-[#D4A017]" />}>
         <div className="mt-4 space-y-5">
 
-          {/* Score mínimo */}
-          <div>
+          {/* Número de mensagens para triagem */}
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
             <div className="flex items-center justify-between mb-1">
-              <label className="text-sm font-semibold text-gray-700">Score mínimo para repasse</label>
-              <span className="text-[#0f2044] font-bold text-lg">{config.repasseScore}</span>
+              <div>
+                <label className="text-sm font-semibold text-gray-700">Mensagens até a triagem</label>
+                <p className="text-xs text-gray-500 mt-0.5">Após este número de mensagens do cliente, o Dr. Ben faz a triagem e notifica você automaticamente</p>
+              </div>
+              <span className="text-[#0f2044] font-bold text-2xl w-12 text-center">{config.mensagensParaTriagem}</span>
             </div>
             <input
-              type="range" min={50} max={95} step={5}
-              value={config.repasseScore}
-              onChange={e => set('repasseScore', Number(e.target.value))}
+              type="range" min={1} max={6} step={1}
+              value={config.mensagensParaTriagem}
+              onChange={e => set('mensagensParaTriagem', Number(e.target.value))}
               className="w-full accent-[#0f2044]"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
-              <span>50 (mais leads passam)</span>
-              <span>95 (somente leads excelentes)</span>
+              <span>1 msg (notifica cedo)</span>
+              <span>6 msgs (mais contexto)</span>
             </div>
           </div>
 
-          {/* Valor mínimo */}
+          {/* Palavras-chave opcionais */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Valor mínimo estimado do caso para repasse
+              Palavras-chave que adiantam a triagem (opcional)
             </label>
-            <div className="flex items-center gap-2">
-              <span className="text-gray-500 text-sm">R$</span>
-              <input
-                type="number" min={0} step={500}
-                value={config.repasseValorMinimo}
-                onChange={e => set('repasseValorMinimo', Number(e.target.value))}
-                className="w-40 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]"
-              />
-            </div>
-          </div>
-
-          {/* Palavras-chave */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Palavras-chave que acionam repasse imediato
-            </label>
+            <p className="text-xs text-gray-400 mb-2">Se o cliente digitar uma dessas palavras, a triagem acontece na 1ª mensagem, antes de atingir o número configurado acima.</p>
             <div className="flex flex-wrap gap-2 mb-3">
               {config.repassePalavras.map((p, i) => (
                 <span key={i} className="flex items-center gap-1 bg-red-50 border border-red-200 text-red-700 text-xs px-3 py-1 rounded-full">

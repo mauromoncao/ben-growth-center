@@ -67,7 +67,7 @@ async function enviarMensagem(numero, texto) {
   }
 }
 
-// ── Consultar Dr. Ben IA (Gemini) ───────────────────────────
+// ── Consultar Dr. Ben IA (Gemini) — retorna resposta + triagem ──
 async function consultarDrBen(historico, novaMensagem) {
   const config = await getMaraConfig()
 
@@ -78,7 +78,7 @@ Ao final, sempre ofereça agendar uma consulta com o Dr. Mauro.`
 
   const saudacao = config?.saudacao || 'Olá! Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção Advogados. Como posso te ajudar hoje?'
 
-  if (!GEMINI_KEY) return saudacao
+  if (!GEMINI_KEY) return { resposta: saudacao, triagem: null }
 
   const prompt = `${promptBase}
 
@@ -101,17 +101,77 @@ Dr. Ben:`
       }
     )
     const data = await res.json()
-    return data?.candidates?.[0]?.content?.parts?.[0]?.text ?? 'Desculpe, não consegui processar sua mensagem. Tente novamente.'
+    const resposta = data?.candidates?.[0]?.content?.parts?.[0]?.text
+      ?? 'Desculpe, não consegui processar sua mensagem. Tente novamente.'
+    return { resposta, triagem: null }
   } catch (e) {
     console.error('[DrBen] Erro Gemini:', e.message)
-    return 'Olá! Sou o Dr. Ben. Tive um problema técnico. Por favor, aguarde um momento.'
+    return { resposta: 'Olá! Sou o Dr. Ben. Tive um problema técnico. Por favor, aguarde um momento.', triagem: null }
   }
 }
 
-// ── Notificar plantonista ────────────────────────────────────
+// ── Triagem do Dr. Ben — classifica o lead após coletar dados ──
+async function fazerTriagem(historico) {
+  if (!GEMINI_KEY) return null
+
+  const promptTriagem = `Você é o Dr. Ben, assistente jurídico. Analise esta conversa e faça a triagem do lead.
+
+Conversa:
+${historico}
+
+Responda APENAS um JSON válido, sem markdown:
+{
+  "nome": "nome do cliente ou null",
+  "area": "tributario|previdenciario|bancario|trabalhista|civil|outro",
+  "resumo": "resumo do problema em 1 frase",
+  "urgencia": "alta|media|baixa",
+  "prontoParaAtendimento": true,
+  "observacao": "detalhes relevantes para o advogado"
+}`
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: promptTriagem }] }],
+          generationConfig: { maxOutputTokens: 300, temperature: 0.1 },
+        }),
+      }
+    )
+    const data = await res.json()
+    const texto = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
+    const jsonMatch = texto.match(/\{[\s\S]*\}/)
+    if (jsonMatch) return JSON.parse(jsonMatch[0])
+  } catch (e) {
+    console.error('[DrBen] Erro triagem:', e.message)
+  }
+  return null
+}
+
+// ── Notificar plantonista após triagem completa ──────────────
 async function notificarPlantonista(dados) {
   if (!EVOLUTION_URL || !EVOLUTION_KEY) return
-  const msg = `🚨 *LEAD URGENTE — Dr. Ben*\n\n👤 *Nome:* ${dados.nome ?? 'Não informado'}\n📱 *Número:* ${dados.numero}\n💬 *Mensagem:* ${dados.ultima_mensagem}\n\n_Atender em até 30 minutos!_`
+
+  const urgenciaEmoji = { alta: '🔴', media: '🟡', baixa: '🟢' }[dados.urgencia] ?? '🟡'
+  const areaLabel = {
+    tributario: 'Tributário', previdenciario: 'Previdenciário',
+    bancario: 'Bancário', trabalhista: 'Trabalhista',
+    civil: 'Cível', outro: 'Outro'
+  }[dados.area] ?? dados.area
+
+  const msg =
+    `📋 *NOVO LEAD — Dr. Ben finalizou triagem*\n\n` +
+    `👤 *Cliente:* ${dados.nome ?? 'Não informado'}\n` +
+    `📱 *Número:* +${dados.numero}\n` +
+    `⚖️ *Área:* ${areaLabel}\n` +
+    `${urgenciaEmoji} *Urgência:* ${(dados.urgencia ?? 'media').toUpperCase()}\n` +
+    `💬 *Resumo:* ${dados.resumo ?? dados.ultima_mensagem}\n` +
+    (dados.observacao ? `📝 *Obs:* ${dados.observacao}\n` : '') +
+    `\n_Entre em contato para continuar o atendimento._`
+
   await enviarMensagem(PLANTONISTA, msg)
 }
 
@@ -156,37 +216,51 @@ export default async function handler(req, res) {
 
       // Recuperar/criar sessão
       if (!sessoes.has(numero)) {
-        sessoes.set(numero, { historico: [], nome: null, etapa: 'inicio' })
+        sessoes.set(numero, { historico: [], nome: null, etapa: 'inicio', triagemFeita: false })
       }
       const sessao = sessoes.get(numero)
 
       // Construir histórico formatado
       const historicoTexto = sessao.historico
-        .slice(-6) // últimas 6 mensagens
+        .slice(-6)
         .map(m => `${m.role === 'user' ? 'Cliente' : 'Dr. Ben'}: ${m.text}`)
         .join('\n')
 
-      // Consultar Dr. Ben IA
-      const resposta = await consultarDrBen(historicoTexto, texto)
+      // Consultar Dr. Ben IA — obtém resposta para o cliente
+      const { resposta } = await consultarDrBen(historicoTexto, texto)
 
       // Salvar na sessão
       sessao.historico.push({ role: 'user', text: texto })
       sessao.historico.push({ role: 'bot', text: resposta })
 
-      // Detectar lead urgente — usa palavras-chave da config MARA IA
-      const maraConf = await getMaraConfig()
-      const palavrasUrgencia = maraConf?.repassePalavras ?? ['multa','auto de infração','execução fiscal','penhora','urgente','prazo','amanhã']
-      const regexUrgencia = new RegExp(palavrasUrgencia.join('|'), 'i')
-      const urgente = regexUrgencia.test(texto)
-      if (urgente && sessao.historico.length <= 4) {
-        await notificarPlantonista({
-          numero,
-          nome: sessao.nome,
-          ultima_mensagem: texto,
-        })
+      // ── Triagem automática após 3ª mensagem do cliente ──────
+      // Conta apenas mensagens do cliente (role: 'user')
+      const totalMsgCliente = sessao.historico.filter(m => m.role === 'user').length
+
+      if (totalMsgCliente >= 3 && !sessao.triagemFeita) {
+        sessao.triagemFeita = true // Marcar para não notificar duas vezes
+
+        // Rodar triagem em paralelo sem bloquear a resposta ao cliente
+        const historicoCompleto = sessao.historico
+          .map(m => `${m.role === 'user' ? 'Cliente' : 'Dr. Ben'}: ${m.text}`)
+          .join('\n')
+
+        fazerTriagem(historicoCompleto).then(triagem => {
+          notificarPlantonista({
+            numero,
+            nome: triagem?.nome ?? sessao.nome,
+            area: triagem?.area ?? 'outro',
+            urgencia: triagem?.urgencia ?? 'media',
+            resumo: triagem?.resumo ?? texto,
+            observacao: triagem?.observacao ?? null,
+            ultima_mensagem: texto,
+          }).catch(e => console.error('[Plantonista] Erro notificação:', e))
+        }).catch(e => console.error('[Triagem] Erro:', e))
+
+        console.log(`[Dr. Ben] Triagem iniciada para ${numero} após ${totalMsgCliente} mensagens`)
       }
 
-      // Enviar resposta
+      // Enviar resposta ao cliente
       await enviarMensagem(numero, resposta)
 
       return res.status(200).json({ ok: true, respondido: true })
