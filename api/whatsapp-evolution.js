@@ -14,6 +14,27 @@ const EVOLUTION_KEY    = process.env.EVOLUTION_API_KEY   ?? 'BenEvolution2026'
 const EVOLUTION_INSTANCE = process.env.EVOLUTION_INSTANCE ?? 'drben'
 const PLANTONISTA = process.env.PLANTONISTA_WHATSAPP ?? '5586999484761'
 
+// ── Config MARA IA (carregada dinamicamente) ────────────────
+let _maraConfig = null
+async function getMaraConfig() {
+  // Cache de 5 minutos
+  if (_maraConfig && _maraConfig._cachedAt && (Date.now() - _maraConfig._cachedAt < 300000)) {
+    return _maraConfig
+  }
+  try {
+    const base = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : 'https://ben-growth-center.vercel.app'
+    const r = await fetch(`${base}/api/mara-config`)
+    if (r.ok) {
+      const d = await r.json()
+      _maraConfig = { ...d.config, _cachedAt: Date.now() }
+      return _maraConfig
+    }
+  } catch {}
+  return null
+}
+
 // ── Sessões em memória (Supabase em produção) ───────────────
 const sessoes = new Map()
 
@@ -48,12 +69,18 @@ async function enviarMensagem(numero, texto) {
 
 // ── Consultar Dr. Ben IA (Gemini) ───────────────────────────
 async function consultarDrBen(historico, novaMensagem) {
-  if (!GEMINI_KEY) return 'Olá! Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção Advogados. Como posso te ajudar hoje?'
+  const config = await getMaraConfig()
 
-  const prompt = `Você é o Dr. Ben, assistente jurídico inteligente do escritório Mauro Monção Advogados.
+  const promptBase = config?.promptBase || `Você é o Dr. Ben, assistente jurídico inteligente do escritório Mauro Monção Advogados.
 Especialidades: Direito Tributário, Previdenciário e Bancário.
 Seja cordial, profissional e objetivo. Responda em português.
-Ao final, sempre ofereça agendar uma consulta com o Dr. Mauro.
+Ao final, sempre ofereça agendar uma consulta com o Dr. Mauro.`
+
+  const saudacao = config?.saudacao || 'Olá! Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção Advogados. Como posso te ajudar hoje?'
+
+  if (!GEMINI_KEY) return saudacao
+
+  const prompt = `${promptBase}
 
 Histórico da conversa:
 ${historico}
@@ -146,8 +173,11 @@ export default async function handler(req, res) {
       sessao.historico.push({ role: 'user', text: texto })
       sessao.historico.push({ role: 'bot', text: resposta })
 
-      // Detectar lead urgente (palavras-chave)
-      const urgente = /multa|auto de infração|execução fiscal|penhora|urgente|prazo|amanhã/i.test(texto)
+      // Detectar lead urgente — usa palavras-chave da config MARA IA
+      const maraConf = await getMaraConfig()
+      const palavrasUrgencia = maraConf?.repassePalavras ?? ['multa','auto de infração','execução fiscal','penhora','urgente','prazo','amanhã']
+      const regexUrgencia = new RegExp(palavrasUrgencia.join('|'), 'i')
+      const urgente = regexUrgencia.test(texto)
       if (urgente && sessao.historico.length <= 4) {
         await notificarPlantonista({
           numero,

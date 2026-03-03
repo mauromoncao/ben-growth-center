@@ -16,6 +16,8 @@
     { "source": "/api/bridge/:path*", "destination": "/api/bridge.js" },
     { "source": "/api/secretaria", "destination": "/api/secretaria.js" },
     { "source": "/api/secretaria/:path*", "destination": "/api/secretaria.js" },
+    { "source": "/api/mara-config", "destination": "/api/mara-config.js" },
+    { "source": "/api/mara-config/:path*", "destination": "/api/mara-config.js" },
     { "source": "/api/flow/whatsapp",        "destination": "/api/flow/whatsapp.js" },
     { "source": "/api/whatsapp-evolution",   "destination": "/api/whatsapp-evolution.js" },
     { "source": "/api/whatsapp-proxy",       "destination": "/api/whatsapp-proxy.js" },

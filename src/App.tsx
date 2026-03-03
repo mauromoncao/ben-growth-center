@@ -31,6 +31,7 @@ import Financeiro      from './pages/Financeiro'
 import MetaAds         from './pages/MetaAds'
 import GoogleAds       from './pages/GoogleAds'
 import WhatsAppConnect from './pages/WhatsAppConnect'
+import MaraIA         from './pages/MaraIA'
 
 // ─── Rota privada ─────────────────────────────────────────────
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -63,7 +64,8 @@ const navGroups = [
   {
     label: 'MARA IA',
     items: [
-      { to: '/plantonista',   icon: Headphones,    label: 'MARA IA' },
+      { to: '/mara-ia',       icon: Bot,           label: 'MARA IA' },
+      { to: '/plantonista',   icon: Headphones,    label: 'Plantonista' },
       { to: '/whatsapp',      icon: MessageSquare, label: 'WhatsApp Dr. Ben' },
     ],
   },
@@ -104,7 +106,8 @@ const breadcrumbMap: Record<string, { section: string; page: string }> = {
   '/integracao-juris':{ section: 'BEN HUB',       page: 'Integração Juris' },
   '/crm':             { section: 'CRM & LEADS',   page: 'CRM' },
   '/leads':           { section: 'CRM & LEADS',   page: 'Leads' },
-  '/plantonista':     { section: 'MARA IA',        page: 'MARA IA' },
+  '/mara-ia':         { section: 'MARA IA',        page: 'MARA IA — Configuração' },
+  '/plantonista':     { section: 'MARA IA',        page: 'Plantonista' },
   '/whatsapp':         { section: 'MARA IA',        page: 'WhatsApp Dr. Ben' },
   '/campanhas':       { section: 'MARKETING',      page: 'Campanhas' },
   '/conteudo':        { section: 'MARKETING',      page: 'Conteúdo' },
@@ -353,6 +356,7 @@ function AppRoutes() {
                 <Route path="/dashboard"          element={<Dashboard />} />
                 <Route path="/crm"                element={<CRM />} />
                 <Route path="/leads"              element={<Leads />} />
+                <Route path="/mara-ia"            element={<MaraIA />} />
                 <Route path="/plantonista"         element={<Plantonista />} />
                 <Route path="/whatsapp"             element={<WhatsAppConnect />} />
                 <Route path="/dr-ben"             element={<DrBenIntegracao />} />
