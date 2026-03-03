@@ -226,7 +226,66 @@ export default async function handler(req, res) {
 
       if (!numero || !texto) return res.status(200).json({ ok: true })
 
-      console.log(`[Dr. Ben] Mensagem de ${numero}: "${texto}"`)
+      // ── Detectar se é o Dr. Mauro (dono) ─────────────────
+      // Normalizar: remover +, espaços, traços
+      const numeroNorm     = numero.replace(/\D/g, '')
+      const mauroNorm      = DR_MAURO_WHATSAPP.replace(/\D/g, '')
+      const ehDrMauro      = mauroNorm && numeroNorm.endsWith(mauroNorm.slice(-10))
+
+      // Comandos especiais do Dr. Mauro
+      if (ehDrMauro) {
+        const cmd = texto.trim().toLowerCase()
+
+        // /reset — zerar sessão de teste
+        if (cmd === '/reset' || cmd === 'reset') {
+          sessoes.delete(numero)
+          await enviarMensagem(numero, '✅ *Sessão resetada!*\nAgora sou um cliente novo para você. Pode mandar mensagem normalmente.')
+          return res.status(200).json({ ok: true, acao: 'reset' })
+        }
+
+        // /status — ver estado do sistema
+        if (cmd === '/status' || cmd === 'status') {
+          const sessao = sessoes.get(numero)
+          const msg = [
+            '📊 *Status Dr. Ben*',
+            `• Sessões ativas: ${sessoes.size}`,
+            `• Sua sessão: ${sessao ? `${sessao.historico.length} msgs` : 'nenhuma'}`,
+            `• Triagem feita: ${sessao?.triagemFeita ? '✅' : '❌'}`,
+            `• Gemini: ${GEMINI_KEY ? '✅' : '❌'}`,
+            `• Evolution: ${EVOLUTION_URL ? '✅' : '❌'}`,
+            '',
+            '_Comandos: /reset | /status | /teste_',
+          ].join('\n')
+          await enviarMensagem(numero, msg)
+          return res.status(200).json({ ok: true, acao: 'status' })
+        }
+
+        // /teste — forçar modo cliente (Dr. Mauro interage como se fosse cliente)
+        if (cmd === '/teste' || cmd === 'teste') {
+          sessoes.delete(numero)
+          await enviarMensagem(numero, '🧪 *Modo teste ativado!*\nVou te atender como se fosse um cliente novo.\nMande sua próxima mensagem normalmente.')
+          return res.status(200).json({ ok: true, acao: 'modo_teste' })
+        }
+
+        // Se já tem sessão ativa = está testando → atende normalmente
+        // Se não tem sessão = primeira mensagem → avisar sobre comandos
+        if (!sessoes.has(numero)) {
+          await enviarMensagem(numero, [
+            '👋 *Olá, Dr. Mauro!*',
+            '',
+            'Comandos disponíveis:',
+            '• */teste* — interagir como cliente',
+            '• */reset* — zerar sessão atual',
+            '• */status* — ver estado do sistema',
+            '',
+            '_Ou envie /teste para começar._',
+          ].join('\n'))
+          return res.status(200).json({ ok: true, acao: 'menu_dono' })
+        }
+        // Tem sessão ativa → continua como cliente (modo teste)
+      }
+
+      console.log(`[Dr. Ben] Mensagem de ${numero}${ehDrMauro ? ' (Dr. Mauro/teste)' : ''}: "${texto}"`)
 
       // Criar/recuperar sessão do cliente
       if (!sessoes.has(numero)) {
