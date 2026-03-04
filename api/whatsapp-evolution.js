@@ -361,11 +361,14 @@ export default async function handler(req, res) {
       if (ehDrMauro) {
         const cmd = texto.trim().toLowerCase()
 
-        // /reset — zerar sessão de teste
+        // /reset — zerar sessão E ativar modo teste automaticamente
         if (cmd === '/reset' || cmd === 'reset') {
           global.__drbenSessoes.delete(numero)
           global.__drbenTriagem.delete(numero)
-          await enviarMensagem(numero, '✅ *Sessão resetada!*\nAgora sou um cliente novo para você. Pode mandar mensagem normalmente.')
+          // Criar sessão vazia para entrar em modo teste na próxima mensagem
+          global.__drbenSessoes.set(numero, [])
+          global.__drbenTriagem.set(numero, { nome: null, telefone: null, area: null, urgencia: null, notificado: false })
+          await enviarMensagem(numero, '✅ *Sessão resetada!*\n\nAgora você está em *modo cliente*. Mande qualquer mensagem e o Dr. Ben vai te atender normalmente.')
           return res.status(200).json({ ok: true, acao: 'reset' })
         }
 
@@ -376,22 +379,22 @@ export default async function handler(req, res) {
             '📊 *Status Dr. Ben*',
             `• Sessões ativas: ${global.__drbenSessoes.size}`,
             `• Sua sessão: ${sessao ? `${sessao.length} msgs no histórico` : 'nenhuma'}`,
-            `• Gemini: ${GEMINI_KEY ? '✅ gemini-2.5-flash' : '❌ sem chave'}`,
+            `• IA: ${OPENAI_KEY ? '✅ gpt-4o-mini (OpenAI)' : '❌ sem chave'}`,
             `• Evolution: ${EVOLUTION_URL ? '✅ ' + EVOLUTION_URL : '❌ não configurado'}`,
-            `• Prompt: ✅ Oficial 7 etapas (drben-oficial sync)`,
+            `• Prompt: ✅ Oficial 7 etapas`,
             '',
-            '_Comandos: /reset | /status | /teste_',
+            '_Comandos: /reset | /status | /sair_',
           ].join('\n')
           await enviarMensagem(numero, msg)
           return res.status(200).json({ ok: true, acao: 'status' })
         }
 
-        // /teste — forçar modo cliente
-        if (cmd === '/teste' || cmd === 'teste') {
+        // /sair — sair do modo cliente e voltar ao menu
+        if (cmd === '/sair' || cmd === 'sair') {
           global.__drbenSessoes.delete(numero)
           global.__drbenTriagem.delete(numero)
-          await enviarMensagem(numero, '🧪 *Modo teste ativado!*\nVou te atender como se fosse um cliente novo.\nMande sua próxima mensagem normalmente.')
-          return res.status(200).json({ ok: true, acao: 'modo_teste' })
+          await enviarMensagem(numero, '👋 *Saiu do modo cliente.*\n\nComandos disponíveis:\n• */reset* — entrar em modo cliente\n• */status* — ver estado do sistema')
+          return res.status(200).json({ ok: true, acao: 'saiu' })
         }
 
         // Sem sessão ativa = primeira mensagem do Dr. Mauro → menu
@@ -400,15 +403,15 @@ export default async function handler(req, res) {
             '👋 *Olá, Dr. Mauro!*',
             '',
             'Comandos disponíveis:',
-            '• */teste* — interagir como cliente',
-            '• */reset* — zerar sessão atual',
+            '• */reset* — entrar em modo cliente (testar Dr. Ben)',
             '• */status* — ver estado do sistema',
+            '• */sair* — sair do modo cliente',
             '',
-            '_Ou envie /teste para iniciar uma conversa de teste._',
+            '_Envie /reset para testar o Dr. Ben como cliente._',
           ].join('\n'))
           return res.status(200).json({ ok: true, acao: 'menu_dono' })
         }
-        // Tem sessão ativa → modo teste: continua como cliente
+        // Tem sessão ativa → modo cliente: continua como cliente normal
       }
 
       console.log(`[Dr. Ben] Mensagem de ${numero}${ehDrMauro ? ' (Dr. Mauro/teste)' : ''}: "${texto}"`)
