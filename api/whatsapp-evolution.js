@@ -142,6 +142,7 @@ async function enviarMensagem(numero, texto) {
   }
   try {
     // Evolution v1.8.x usa { textMessage: { text: "..." } }
+    // Aceita tanto número puro quanto JID completo (xxx@s.whatsapp.net)
     const res = await fetch(
       `${EVOLUTION_URL}/message/sendText/${EVOLUTION_INSTANCE}`,
       {
@@ -340,6 +341,9 @@ export default async function handler(req, res) {
         return res.status(200).json({ ok: true })
       }
 
+      // Manter o remoteJid original para envio — a Evolution sabe rotear pelo JID
+      // (usar só dígitos causa bug: 5585991430969 vira 558591430969 e não entrega)
+      const jidOriginal = remoteJid  // ex: 5585991430969@s.whatsapp.net
       const numero = remoteJid.replace('@s.whatsapp.net', '').replace(/[^0-9]/g, '')
       const pushName = msgData?.pushName ?? msgData?.notifyName ?? ''
       const texto  = msgData?.message?.conversation
@@ -369,7 +373,7 @@ export default async function handler(req, res) {
           // Criar sessão vazia para entrar em modo teste na próxima mensagem
           global.__drbenSessoes.set(numero, [])
           global.__drbenTriagem.set(numero, { nome: null, telefone: null, area: null, urgencia: null, notificado: false })
-          await enviarMensagem(numero, '✅ *Sessão resetada!*\n\nAgora você está em *modo cliente*. Mande qualquer mensagem e o Dr. Ben vai te atender normalmente.')
+          await enviarMensagem(jidOriginal, '✅ *Sessão resetada!*\n\nAgora você está em *modo cliente*. Mande qualquer mensagem e o Dr. Ben vai te atender normalmente.')
           return res.status(200).json({ ok: true, acao: 'reset' })
         }
 
@@ -386,7 +390,7 @@ export default async function handler(req, res) {
             '',
             '_Comandos: /reset | /status | /sair_',
           ].join('\n')
-          await enviarMensagem(numero, msg)
+          await enviarMensagem(jidOriginal, msg)
           return res.status(200).json({ ok: true, acao: 'status' })
         }
 
@@ -394,13 +398,13 @@ export default async function handler(req, res) {
         if (cmd === '/sair' || cmd === 'sair') {
           global.__drbenSessoes.delete(numero)
           global.__drbenTriagem.delete(numero)
-          await enviarMensagem(numero, '👋 *Saiu do modo cliente.*\n\nComandos disponíveis:\n• */reset* — entrar em modo cliente\n• */status* — ver estado do sistema')
+          await enviarMensagem(jidOriginal, '👋 *Saiu do modo cliente.*\n\nComandos disponíveis:\n• */reset* — entrar em modo cliente\n• */status* — ver estado do sistema')
           return res.status(200).json({ ok: true, acao: 'saiu' })
         }
 
         // Sem sessão ativa = primeira mensagem do Dr. Mauro → menu
         if (!global.__drbenSessoes.has(numero)) {
-          await enviarMensagem(numero, [
+          await enviarMensagem(jidOriginal, [
             '👋 *Olá, Dr. Mauro!*',
             '',
             'Comandos disponíveis:',
@@ -503,8 +507,10 @@ export default async function handler(req, res) {
         console.log(`[Dr. Ben] Triagem completa — lead no CRM + MARA IA avisando Dr. Mauro sobre ${dadosTriagem.nome}`)
       }
 
-      // ── Enviar resposta via Evolution API ─────────────────
-      await enviarMensagem(numero, cleanReply)
+      // ── Enviar resposta via Evolution API — usar JID original ─
+      // Passa o jidOriginal (ex: 5585991430969@s.whatsapp.net) para evitar
+      // truncagem do número pelo Baileys (bug com celulares BR de 9 dígitos)
+      await enviarMensagem(jidOriginal, cleanReply)
 
       return res.status(200).json({ ok: true, respondido: true })
     }
