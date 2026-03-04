@@ -182,10 +182,36 @@ function extrairMarcadores(texto) {
 
 // ── DR. BEN — chama Gemini com system_instruction + contents[] ─
 // Formato IDÊNTICO ao drben-oficial/api/chat.js
-async function consultarDrBen(history, novaMensagem) {
-  const fallback = 'Desculpe, estou com uma instabilidade técnica no momento. Por favor, fale diretamente com nossa equipe pelo WhatsApp: (86) 99482-0054'
+// Modelos em ordem de prioridade: tenta o mais avançado, cai para alternativas se 429
+const GEMINI_MODELS = [
+  'gemini-2.5-flash',   // principal
+  'gemini-2.0-flash',   // fallback 1 — mais rápido, menos quota
+  'gemini-1.5-flash',   // fallback 2 — estável, quota separada
+]
 
-  if (!GEMINI_KEY) return fallback
+async function chamarGeminiModelo(modelo, contents) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${GEMINI_KEY}`
+  const payload = {
+    system_instruction: { parts: [{ text: DR_BEN_SYSTEM_PROMPT }] },
+    contents,
+    generationConfig: { maxOutputTokens: 8192, temperature: 0.7 },
+  }
+  const response = await fetch(url, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload),
+    signal:  AbortSignal.timeout(25000),
+  })
+  return response
+}
+
+async function consultarDrBen(history, novaMensagem) {
+  const fallback = '⚖️ Olá! Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção Advogados. Estou com uma pequena instabilidade técnica agora. Por favor, entre em contato diretamente com nossa equipe: **(86) 99482-0054** — respondemos em instantes!'
+
+  if (!GEMINI_KEY) {
+    console.error('[Dr. Ben] GEMINI_API_KEY ausente!')
+    return fallback
+  }
 
   // Adicionar a nova mensagem do cliente ao histórico para esta chamada
   const contents = [
@@ -193,34 +219,42 @@ async function consultarDrBen(history, novaMensagem) {
     { role: 'user', parts: [{ text: novaMensagem }] },
   ]
 
-  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`
+  // Tentar modelos em cascata: 2.5-flash → 2.0-flash → 1.5-flash
+  for (const modelo of GEMINI_MODELS) {
+    try {
+      const response = await chamarGeminiModelo(modelo, contents)
 
-  const payload = {
-    system_instruction: { parts: [{ text: DR_BEN_SYSTEM_PROMPT }] },
-    contents,
-    generationConfig: { maxOutputTokens: 8192, temperature: 0.7 },
-  }
+      if (response.status === 429) {
+        const errText = await response.text()
+        console.warn(`[Dr. Ben] ${modelo} quota esgotada (429) — tentando próximo modelo...`)
+        console.warn('[Dr. Ben] Detalhe:', errText.slice(0, 150))
+        continue // tenta o próximo modelo
+      }
 
-  try {
-    const response = await fetch(geminiUrl, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(payload),
-    })
+      if (!response.ok) {
+        const errText = await response.text()
+        console.error(`[Dr. Ben] ${modelo} erro ${response.status}:`, errText.slice(0, 200))
+        continue // tenta o próximo modelo
+      }
 
-    if (!response.ok) {
-      const errText = await response.text()
-      console.error('[Dr. Ben] Gemini erro:', response.status, errText.slice(0, 200))
-      return fallback
+      const data = await response.json()
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
+      if (text) {
+        if (modelo !== 'gemini-2.5-flash') {
+          console.log(`[Dr. Ben] Respondido via fallback: ${modelo}`)
+        }
+        return text
+      }
+      console.warn(`[Dr. Ben] ${modelo} retornou resposta vazia`)
+    } catch (err) {
+      console.error(`[Dr. Ben] ${modelo} fetch error:`, err.message)
+      // se timeout ou erro de rede, tenta próximo
     }
-
-    const data = await response.json()
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
-    return text ?? fallback
-  } catch (err) {
-    console.error('[Dr. Ben] fetch error:', err.message)
-    return fallback
   }
+
+  // Todos os modelos falharam
+  console.error('[Dr. Ben] TODOS os modelos Gemini falharam — enviando fallback humano')
+  return fallback
 }
 
 // ── MARA IA — Avisa Dr. Mauro via WhatsApp (igual ao drben-oficial) ─
