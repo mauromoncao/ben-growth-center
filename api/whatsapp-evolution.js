@@ -188,12 +188,13 @@ async function consultarDrBen(history, novaMensagem) {
     return fallback
   }
 
-  // Converter histórico Gemini (role: model) → OpenAI (role: assistant)
+  // Histórico em formato OpenAI: { role: 'user'|'assistant', content: string }
+  // Compatível também com entradas antigas Gemini que usavam parts[]
   const messages = [
     { role: 'system', content: DR_BEN_SYSTEM_PROMPT },
     ...history.slice(-20).map(m => ({
-      role:    m.role === 'model' ? 'assistant' : 'user',
-      content: m.parts?.[0]?.text ?? '',
+      role:    m.role === 'model' ? 'assistant' : (m.role ?? 'user'),
+      content: m.content ?? m.parts?.[0]?.text ?? '',
     })),
     { role: 'user', content: novaMensagem },
   ]
@@ -295,7 +296,7 @@ export default async function handler(req, res) {
       status:  'ok',
       service: 'Dr. Ben (Assistente Jurídico) + MARA IA (Assistente Pessoal)',
       prompt:  'Prompt oficial 7 etapas — drben-oficial sync',
-      model:   'gemini-2.5-flash',
+      model:   'gpt-4o-mini',
     })
   }
 
@@ -443,9 +444,9 @@ export default async function handler(req, res) {
       // ── Dr. Ben responde (gemini-2.5-flash + system_instruction) ─
       const aiText = await consultarDrBen(history, texto)
 
-      // Salvar no histórico no formato correto do Gemini (contents[])
-      history.push({ role: 'user',  parts: [{ text: texto   }] })
-      history.push({ role: 'model', parts: [{ text: aiText  }] })
+      // Salvar no histórico em formato OpenAI
+      history.push({ role: 'user',      content: texto  })
+      history.push({ role: 'assistant', content: aiText })
 
       // ── Extrair marcadores da resposta (igual ao drben-oficial) ─
       const marcadores = extrairMarcadores(aiText)
@@ -474,7 +475,7 @@ export default async function handler(req, res) {
         // Resumo = ~3ª mensagem do cliente (problema jurídico)
         const mensagensCliente = history
           .filter(m => m.role === 'user')
-          .map(m => m.parts[0].text)
+          .map(m => m.content ?? m.parts?.[0]?.text ?? '')
         const resumo = mensagensCliente.length > 1
           ? mensagensCliente[Math.min(2, mensagensCliente.length - 1)]
           : mensagensCliente[0]
