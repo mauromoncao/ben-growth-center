@@ -6,15 +6,14 @@
 // MARA IA   = Assistente Pessoal  — avisa o DR. MAURO quando
 //             Dr. Ben coleta o contato do cliente
 //
-// PROMPT: idêntico ao drben-oficial/api/chat.js
-// MODEL:  gemini-2.5-flash (igual ao site/widget)
-// FORMAT: system_instruction + contents[] (igual ao site/widget)
+// MODEL:  gpt-4o-mini (OpenAI) — migrado do Gemini em 2026-03-04
+// FORMAT: OpenAI Chat Completions API
 // ============================================================
 
 export const config = { maxDuration: 30 }
 
 // ── Variáveis de ambiente ────────────────────────────────────
-const GEMINI_KEY         = process.env.GEMINI_API_KEY
+const OPENAI_KEY         = process.env.OPENAI_API_KEY
 const EVOLUTION_URL      = process.env.EVOLUTION_API_URL   ?? ''
 const EVOLUTION_KEY      = process.env.EVOLUTION_API_KEY   ?? ''
 const EVOLUTION_INSTANCE = process.env.EVOLUTION_INSTANCE  ?? 'drben'
@@ -180,81 +179,59 @@ function extrairMarcadores(texto) {
   return resultado
 }
 
-// ── DR. BEN — chama Gemini com system_instruction + contents[] ─
-// Formato IDÊNTICO ao drben-oficial/api/chat.js
-// Modelos em ordem de prioridade: tenta o mais avançado, cai para alternativas se 429
-const GEMINI_MODELS = [
-  'gemini-2.5-flash',   // principal
-  'gemini-2.0-flash',   // fallback 1 — mais rápido, menos quota
-  'gemini-1.5-flash',   // fallback 2 — estável, quota separada
-]
-
-async function chamarGeminiModelo(modelo, contents) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${GEMINI_KEY}`
-  const payload = {
-    system_instruction: { parts: [{ text: DR_BEN_SYSTEM_PROMPT }] },
-    contents,
-    generationConfig: { maxOutputTokens: 8192, temperature: 0.7 },
-  }
-  const response = await fetch(url, {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(payload),
-    signal:  AbortSignal.timeout(25000),
-  })
-  return response
-}
-
+// ── DR. BEN — chama OpenAI GPT-4o-mini ─────────────────────
 async function consultarDrBen(history, novaMensagem) {
-  const fallback = '⚖️ Olá! Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção Advogados. Estou com uma pequena instabilidade técnica agora. Por favor, entre em contato diretamente com nossa equipe: **(86) 99482-0054** — respondemos em instantes!'
+  const fallback = '⚖️ Olá! Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção Advogados. Estou com uma pequena instabilidade técnica agora. Por favor, entre em contato diretamente com nossa equipe: *(86) 99482-0054* — respondemos em instantes!'
 
-  if (!GEMINI_KEY) {
-    console.error('[Dr. Ben] GEMINI_API_KEY ausente!')
+  if (!OPENAI_KEY) {
+    console.error('[Dr. Ben] OPENAI_API_KEY ausente!')
     return fallback
   }
 
-  // Adicionar a nova mensagem do cliente ao histórico para esta chamada
-  const contents = [
-    ...history.slice(-20),
-    { role: 'user', parts: [{ text: novaMensagem }] },
+  // Converter histórico Gemini (role: model) → OpenAI (role: assistant)
+  const messages = [
+    { role: 'system', content: DR_BEN_SYSTEM_PROMPT },
+    ...history.slice(-20).map(m => ({
+      role:    m.role === 'model' ? 'assistant' : 'user',
+      content: m.parts?.[0]?.text ?? '',
+    })),
+    { role: 'user', content: novaMensagem },
   ]
 
-  // Tentar modelos em cascata: 2.5-flash → 2.0-flash → 1.5-flash
-  for (const modelo of GEMINI_MODELS) {
-    try {
-      const response = await chamarGeminiModelo(modelo, contents)
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${OPENAI_KEY}`,
+      },
+      body: JSON.stringify({
+        model:       'gpt-4o-mini',
+        messages,
+        max_tokens:  1024,
+        temperature: 0.7,
+      }),
+      signal: AbortSignal.timeout(25000),
+    })
 
-      if (response.status === 429) {
-        const errText = await response.text()
-        console.warn(`[Dr. Ben] ${modelo} quota esgotada (429) — tentando próximo modelo...`)
-        console.warn('[Dr. Ben] Detalhe:', errText.slice(0, 150))
-        continue // tenta o próximo modelo
-      }
-
-      if (!response.ok) {
-        const errText = await response.text()
-        console.error(`[Dr. Ben] ${modelo} erro ${response.status}:`, errText.slice(0, 200))
-        continue // tenta o próximo modelo
-      }
-
-      const data = await response.json()
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
-      if (text) {
-        if (modelo !== 'gemini-2.5-flash') {
-          console.log(`[Dr. Ben] Respondido via fallback: ${modelo}`)
-        }
-        return text
-      }
-      console.warn(`[Dr. Ben] ${modelo} retornou resposta vazia`)
-    } catch (err) {
-      console.error(`[Dr. Ben] ${modelo} fetch error:`, err.message)
-      // se timeout ou erro de rede, tenta próximo
+    if (!response.ok) {
+      const errText = await response.text()
+      console.error('[Dr. Ben] OpenAI erro:', response.status, errText.slice(0, 200))
+      return fallback
     }
-  }
 
-  // Todos os modelos falharam
-  console.error('[Dr. Ben] TODOS os modelos Gemini falharam — enviando fallback humano')
-  return fallback
+    const data = await response.json()
+    const text = data?.choices?.[0]?.message?.content
+    if (text) {
+      console.log(`[Dr. Ben] Respondido via gpt-4o-mini (${data?.usage?.total_tokens ?? '?'} tokens)`)
+      return text
+    }
+    console.warn('[Dr. Ben] OpenAI retornou resposta vazia')
+    return fallback
+  } catch (err) {
+    console.error('[Dr. Ben] OpenAI fetch error:', err.message)
+    return fallback
+  }
 }
 
 // ── MARA IA — Avisa Dr. Mauro via WhatsApp (igual ao drben-oficial) ─
