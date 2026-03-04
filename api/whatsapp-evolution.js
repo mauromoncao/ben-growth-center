@@ -30,13 +30,16 @@ function getBaseUrl() {
 const VPS_LEADS_URL = process.env.VPS_LEADS_URL || 'http://181.215.135.202:3001'
 
 // ── Registrar mensagem no CRM (VPS SQLite → fallback Vercel) ─
-async function crmRegistrarMensagem(numero, role, texto) {
+async function crmRegistrarMensagem(numero, role, texto, nomeWhatsApp) {
+  const payload = { numero, role, texto }
+  // Se tiver nome do WhatsApp (pushName), incluir para atualizar o lead
+  if (nomeWhatsApp) payload.nomeWhatsApp = nomeWhatsApp
   // Tentar VPS diretamente (mais rápido, persistente)
   try {
     await fetch(`${VPS_LEADS_URL}/leads/mensagem`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ numero, role, texto }),
+      body: JSON.stringify(payload),
       signal: AbortSignal.timeout(3000),
     })
     return
@@ -46,7 +49,7 @@ async function crmRegistrarMensagem(numero, role, texto) {
     await fetch(`${getBaseUrl()}/api/leads?action=mensagem`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ numero, role, texto }),
+      body: JSON.stringify(payload),
     })
   } catch (e) {
     console.error('[CRM] Erro ao registrar mensagem:', e.message)
@@ -315,7 +318,18 @@ export default async function handler(req, res) {
       // Ignorar mensagens enviadas pelo próprio bot
       if (fromMe) return res.status(200).json({ ok: true })
 
-      const numero = (msgData?.key?.remoteJid ?? msgData?.from ?? '').replace('@s.whatsapp.net', '')
+      const remoteJid = msgData?.key?.remoteJid ?? msgData?.from ?? ''
+      
+      // ── Filtrar IDs internos do WhatsApp (@lid, @g.us grupos) ───
+      // @lid = identificador interno do device, não é telefone real
+      // @g.us = mensagens de grupo (ignorar por enquanto)
+      if (remoteJid.includes('@lid') || remoteJid.includes('@g.us')) {
+        console.log('[Webhook] Ignorando ID interno do WhatsApp:', remoteJid.slice(0, 30))
+        return res.status(200).json({ ok: true })
+      }
+
+      const numero = remoteJid.replace('@s.whatsapp.net', '').replace(/[^0-9]/g, '')
+      const pushName = msgData?.pushName ?? msgData?.notifyName ?? ''
       const texto  = msgData?.message?.conversation
                   ?? msgData?.message?.extendedTextMessage?.text
                   ?? msgData?.message?.imageMessage?.caption
@@ -323,8 +337,8 @@ export default async function handler(req, res) {
                   ?? msgData?.text
                   ?? ''
 
-      if (!numero || !texto) {
-        console.log('[Webhook] Mensagem sem número ou texto — ignorando. msgData:', JSON.stringify(msgData).slice(0, 150))
+      if (!numero || numero.length < 8 || !texto) {
+        console.log('[Webhook] Mensagem sem número válido ou texto — ignorando. jid:', remoteJid.slice(0, 30))
         return res.status(200).json({ ok: true })
       }
 
@@ -394,19 +408,23 @@ export default async function handler(req, res) {
       }
       if (!global.__drbenTriagem.has(numero)) {
         global.__drbenTriagem.set(numero, {
-          nome:      null,
+          // Usar pushName do WhatsApp como nome inicial (antes da triagem completar)
+          nome:      pushName || null,
           telefone:  null,
           area:      null,
           urgencia:  null,
           notificado: false,
         })
+      } else if (pushName && !global.__drbenTriagem.get(numero).nome) {
+        // Atualizar nome se ainda não tiver (pushName disponível)
+        global.__drbenTriagem.get(numero).nome = pushName
       }
 
       const history      = global.__drbenSessoes.get(numero)
       const dadosTriagem = global.__drbenTriagem.get(numero)
 
-      // ── Registrar mensagem do cliente no CRM ─────────────
-      crmRegistrarMensagem(numero, 'lead', texto)
+      // ── Registrar mensagem do cliente no CRM com nome do WhatsApp ──
+      crmRegistrarMensagem(numero, 'lead', texto, pushName || dadosTriagem.nome)
 
       // ── Dr. Ben responde (gemini-2.5-flash + system_instruction) ─
       const aiText = await consultarDrBen(history, texto)

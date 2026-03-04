@@ -230,7 +230,7 @@ app.post('/leads', (req, res) => {
 
 // ── POST /leads/mensagem — registrar mensagem na conversa ─
 app.post('/leads/mensagem', (req, res) => {
-  const { leadId, numero, role, texto } = req.body || {}
+  const { leadId, numero, role, texto, nomeWhatsApp } = req.body || {}
 
   let lead = null
   if (leadId) {
@@ -241,12 +241,13 @@ app.post('/leads/mensagem', (req, res) => {
   }
 
   if (!lead) {
-    // Lead não encontrado — criar automaticamente
+    // Lead não encontrado — criar automaticamente com nome do WhatsApp se disponível
     const id = gerarId()
+    const nomeInicial = nomeWhatsApp || 'Novo Lead'
     db.prepare(`
       INSERT INTO leads (id, nome, numero, telefone, criado_em, ultima_interacao)
       VALUES (?, ?, ?, ?, ?, ?)
-    `).run(id, 'Novo Lead', numero || '', numero || '', agora(), agora())
+    `).run(id, nomeInicial, numero || '', numero || '', agora(), agora())
 
     db.prepare('INSERT INTO mensagens (lead_id, role, texto, hora, criado_em) VALUES (?, ?, ?, ?, ?)')
       .run(id, role || 'lead', texto, horaFormatada(), agora())
@@ -259,7 +260,13 @@ app.post('/leads/mensagem', (req, res) => {
   db.prepare('INSERT INTO mensagens (lead_id, role, texto, hora, criado_em) VALUES (?, ?, ?, ?, ?)')
     .run(lead.id, role || 'lead', texto, horaFormatada(), agora())
 
-  db.prepare('UPDATE leads SET ultima_interacao = ? WHERE id = ?').run(agora(), lead.id)
+  // Atualizar nome se vier do WhatsApp e o atual for genérico
+  if (nomeWhatsApp && (!lead.nome || lead.nome === 'Novo Lead')) {
+    db.prepare('UPDATE leads SET nome = ?, ultima_interacao = ? WHERE id = ?')
+      .run(nomeWhatsApp, agora(), lead.id)
+  } else {
+    db.prepare('UPDATE leads SET ultima_interacao = ? WHERE id = ?').run(agora(), lead.id)
+  }
 
   const updated = montarLead(db.prepare('SELECT * FROM leads WHERE id = ?').get(lead.id))
   res.json({ ok: true, lead: updated })
@@ -299,6 +306,44 @@ app.patch('/leads/:id', (req, res) => {
   db.prepare(`UPDATE leads SET ${updates.join(', ')} WHERE id = ?`).run(...params)
   const updated = montarLead(db.prepare('SELECT * FROM leads WHERE id = ?').get(id))
   res.json({ ok: true, lead: updated })
+})
+
+// ── DELETE /leads/:id — remover lead ────────────────────
+app.delete('/leads/:id', (req, res) => {
+  const { id } = req.params
+  const row = db.prepare('SELECT id FROM leads WHERE id = ?').get(id)
+  if (!row) return res.status(404).json({ ok: false, error: 'Lead não encontrado' })
+
+  db.prepare('DELETE FROM mensagens WHERE lead_id = ?').run(id)
+  db.prepare('DELETE FROM leads WHERE id = ?').run(id)
+  res.json({ ok: true, action: 'deleted', id })
+})
+
+// ── DELETE /leads/limpar/invalidos — remover @lid e testes ─
+app.delete('/leads/limpar/invalidos', (req, res) => {
+  // Remover leads com @lid (IDs internos do WhatsApp)
+  const lidLeads = db.prepare("SELECT id FROM leads WHERE numero LIKE '%@lid%' OR telefone LIKE '%@lid%'").all()
+  
+  // Remover leads de teste (números fictícios de 13+ dígitos ou padrões de teste)
+  const testeLeads = db.prepare(`
+    SELECT id FROM leads WHERE 
+    numero IN ('5511888886666','5511666664444','5511777776666','5500000000000',
+               '5511999990000','5511988880000','5586988887777','5511666665555')
+    OR numero LIKE '%131314447605772%'
+    OR numero LIKE '%65266507608298%'
+  `).all()
+
+  const todosParaRemover = [...lidLeads, ...testeLeads]
+  let removidos = 0
+
+  for (const { id } of todosParaRemover) {
+    db.prepare('DELETE FROM mensagens WHERE lead_id = ?').run(id)
+    db.prepare('DELETE FROM leads WHERE id = ?').run(id)
+    removidos++
+  }
+
+  const total = db.prepare('SELECT COUNT(*) as n FROM leads').get().n
+  res.json({ ok: true, removidos, total_restante: total })
 })
 
 // ── Iniciar servidor ─────────────────────────────────────
