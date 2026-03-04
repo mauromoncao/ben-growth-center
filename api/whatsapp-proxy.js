@@ -15,6 +15,21 @@ export default async function handler(req, res) {
   const { action } = req.query
 
   try {
+    if (action === 'send') {
+      // Enviar mensagem de teste
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+      const numero = body?.numero || ''
+      const texto  = body?.texto  || 'Teste Dr. Ben ✅'
+      if (!numero) return res.status(400).json({ error: 'numero obrigatório' })
+      const r = await fetch(`${EVOLUTION_URL}/message/sendText/${INSTANCE}`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', apikey: EVOLUTION_KEY },
+        body: JSON.stringify({ number: numero, textMessage: { text: texto } }),
+      })
+      const data = await r.json()
+      return res.json({ ok: r.ok, status: r.status, resposta: data })
+    }
+
     if (action === 'status') {
       // Buscar estado da conexão
       const r = await fetch(`${EVOLUTION_URL}/instance/connectionState/${INSTANCE}`, {
@@ -58,7 +73,7 @@ export default async function handler(req, res) {
       return res.json({ state: 'disconnected' })
     }
 
-    return res.status(400).json({ error: 'Ação inválida. Use: status, qrcode, connect, disconnect' })
+    return res.status(400).json({ error: 'Ação inválida. Use: status, qrcode, connect, disconnect, send' })
 
   } catch (e) {
     console.error('WhatsApp Proxy Error:', e)
