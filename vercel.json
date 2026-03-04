@@ -81,6 +81,10 @@
       "destination": "/api/whatsapp-evolution.js"
     },
     {
+      "source": "/api/whatsapp-meta",
+      "destination": "/api/whatsapp-meta.js"
+    },
+    {
       "source": "/api/perfil-drben",
       "destination": "/api/perfil-drben.js"
     },
