@@ -80,18 +80,9 @@
       "source": "/api/whatsapp-zapi",
       "destination": "/api/whatsapp-zapi.js"
     },
-
-    {
-      "source": "/api/whatsapp-evolution",
-      "destination": "/api/whatsapp-evolution.js"
-    },
     {
       "source": "/api/perfil-drben",
       "destination": "/api/perfil-drben.js"
-    },
-    {
-      "source": "/api/whatsapp-proxy",
-      "destination": "/api/whatsapp-proxy.js"
     },
     {
       "source": "/api/whatsapp-keepalive",
