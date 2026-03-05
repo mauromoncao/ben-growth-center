@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Wifi, WifiOff, RefreshCw, Smartphone, MessageSquare, Users, AlertTriangle, CheckCircle, Loader } from 'lucide-react'
+import { Wifi, WifiOff, RefreshCw, Smartphone, MessageSquare, Users, CheckCircle, Loader, Zap } from 'lucide-react'
 
-// Proxy Vercel → Evolution API no VPS Hostinger (resolve CORS https→http)
+// Status via Evolution proxy (instância conectada via QR Code)
 const PROXY = '/api/whatsapp-proxy'
 
 export default function WhatsAppConnect() {
@@ -17,9 +17,9 @@ export default function WhatsAppConnect() {
       const res  = await fetch(`${PROXY}?action=status`)
       const data = await res.json()
       const state = data?.state ?? data?.status ?? ''
-      if (state === 'open')                             setStatus('open')
+      if (state === 'open')                                   setStatus('open')
       else if (state === 'connecting' || state === 'qrcode') setStatus('connecting')
-      else                                              setStatus('disconnected')
+      else                                                    setStatus('disconnected')
       setLastUpdate(new Date().toLocaleTimeString('pt-BR'))
     } catch (e) {
       console.error('Erro ao buscar status:', e)
@@ -35,10 +35,9 @@ export default function WhatsAppConnect() {
       const res  = await fetch(`${PROXY}?action=connect`)
       const data = await res.json()
       if (data?.qrcode) setQrcode(data.qrcode)
-      // Buscar QR Code após conectar
       setTimeout(async () => {
-        const r2   = await fetch(`${PROXY}?action=qrcode`)
-        const d2   = await r2.json()
+        const r2  = await fetch(`${PROXY}?action=qrcode`)
+        const d2  = await r2.json()
         if (d2?.qrcode) setQrcode(d2.qrcode)
       }, 2000)
     } catch (e) {
@@ -101,7 +100,7 @@ export default function WhatsAppConnect() {
         <div>
           <h1 className="text-2xl font-bold text-[#0f2044]">Dr. Ben — Assistente Jurídico</h1>
           <p className="text-gray-500 text-sm mt-1">
-            Conecte o número <strong>(86) 9482-0054</strong> — Dr. Ben atende os clientes 24/7
+            Número ativo: <strong>(86) 9482-0054</strong> — Dr. Ben atende clientes 24/7 via WhatsApp
           </p>
         </div>
         <div className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-semibold ${statusColor}`}>
@@ -120,7 +119,7 @@ export default function WhatsAppConnect() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-[#0f2044] flex items-center gap-2">
               <Smartphone size={20} className="text-[#D4A017]" />
-              Conectar WhatsApp
+              Conexão WhatsApp
             </h2>
             {lastUpdate && (
               <span className="text-xs text-gray-400">Atualizado: {lastUpdate}</span>
@@ -134,12 +133,16 @@ export default function WhatsAppConnect() {
               <div>
                 <p className="text-xl font-bold text-green-600">WhatsApp Conectado!</p>
                 <p className="text-gray-500 text-sm mt-1">
-                  Dr. Ben está online e respondendo clientes
+                  Dr. Ben está online e respondendo clientes automaticamente
                 </p>
+              </div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">
+                <Zap size={14} />
+                GPT-4o-mini ativo — triagem jurídica em 7 etapas
               </div>
               <button
                 onClick={desconectar}
-                className="px-6 py-2 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 transition text-sm font-medium"
+                className="block mx-auto px-6 py-2 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 transition text-sm font-medium"
               >
                 Desconectar
               </button>
@@ -159,7 +162,7 @@ export default function WhatsAppConnect() {
               <div className="space-y-2">
                 <p className="font-bold text-[#0f2044]">Escaneie com o WhatsApp</p>
                 <ol className="text-sm text-gray-500 text-left space-y-1 max-w-xs mx-auto">
-                  <li>1. Abra o WhatsApp no celular</li>
+                  <li>1. Abra o WhatsApp no celular com (86) 9482-0054</li>
                   <li>2. Toque em ⋮ → Aparelhos conectados</li>
                   <li>3. Toque em "Conectar um aparelho"</li>
                   <li>4. Aponte a câmera para o QR Code</li>
@@ -182,7 +185,7 @@ export default function WhatsAppConnect() {
               <div>
                 <p className="text-lg font-bold text-gray-600">WhatsApp Desconectado</p>
                 <p className="text-gray-400 text-sm mt-1">
-                  Clique abaixo para gerar o QR Code
+                  Clique abaixo para reconectar
                 </p>
               </div>
               <button
@@ -192,7 +195,7 @@ export default function WhatsAppConnect() {
               >
                 {loading
                   ? <><Loader size={18} className="animate-spin" /> Gerando QR Code...</>
-                  : <><Smartphone size={18} /> Conectar WhatsApp</>
+                  : <><Smartphone size={18} /> Reconectar WhatsApp</>
                 }
               </button>
             </div>
@@ -207,7 +210,7 @@ export default function WhatsAppConnect() {
           )}
         </div>
 
-        {/* ── Card Instruções ────────────────────────────────── */}
+        {/* ── Card Como funciona ─────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
           <h2 className="text-lg font-bold text-[#0f2044] flex items-center gap-2">
             <MessageSquare size={20} className="text-[#D4A017]" />
@@ -216,35 +219,34 @@ export default function WhatsAppConnect() {
 
           <div className="space-y-3">
             {[
-              { icon: '📱', title: 'Escaneie o QR Code', desc: 'Use o número (86) 9482-0054 para conectar' },
-              { icon: '⚖️', title: 'Dr. Ben responde', desc: 'Assistente jurídico atende clientes automaticamente 24/7' },
-              { icon: '📋', title: 'Triagem completa', desc: 'Dr. Ben coleta dados, área e urgência do caso' },
-              { icon: '🤖', title: 'MARA IA avisa', desc: 'Você recebe o resumo no (86) 99948-4761 após a triagem' },
+              { icon: '📱', title: 'Cliente manda mensagem', desc: 'Qualquer pessoa envia WhatsApp para (86) 9482-0054' },
+              { icon: '⚖️', title: 'Dr. Ben responde', desc: 'IA jurídica com GPT-4o-mini atende automaticamente 24/7' },
+              { icon: '📋', title: 'Triagem em 7 etapas', desc: 'Dr. Ben coleta nome, telefone, área jurídica e urgência' },
+              { icon: '🤖', title: 'MARA IA avisa Dr. Mauro', desc: 'Você recebe o resumo do lead no (86) 99948-4761' },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50">
                 <span className="text-2xl">{item.icon}</span>
                 <div>
-              <p className="font-semibold text-[#0f2044] text-sm">{item.title}</p>
+                  <p className="font-semibold text-[#0f2044] text-sm">{item.title}</p>
                   <p className="text-gray-500 text-xs">{item.desc}</p>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Info VPS */}
+          {/* Info sistema */}
           <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-50 border border-blue-200">
-            <Wifi size={16} className="text-blue-600 mt-0.5 shrink-0" />
+            <Zap size={16} className="text-blue-600 mt-0.5 shrink-0" />
             <p className="text-xs text-blue-700">
-              Evolution API rodando no <strong>VPS Hostinger</strong> (São Paulo) — 24/7 ativo.
+              Evolution API + GPT-4o-mini rodando na <strong>VPS Hostinger</strong> — 24/7 ativo.
             </p>
           </div>
 
           {/* Aviso */}
           <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200">
-            <AlertTriangle size={16} className="text-amber-600 mt-0.5 shrink-0" />
+            <Wifi size={16} className="text-amber-600 mt-0.5 shrink-0" />
             <p className="text-xs text-amber-700">
-              Após escanear, o WhatsApp no celular ficará como <strong>"Aparelho conectado"</strong>.
-              O número passa a funcionar via servidor — Dr. Ben responde automaticamente.
+              O celular com (86) 9482-0054 precisa estar com WhatsApp conectado como <strong>"Aparelho conectado"</strong> para Dr. Ben funcionar.
             </p>
           </div>
         </div>

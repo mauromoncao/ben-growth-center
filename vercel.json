@@ -80,33 +80,14 @@
       "source": "/api/whatsapp-zapi",
       "destination": "/api/whatsapp-zapi.js"
     },
-    {
-      "source": "/api/whatsapp-twilio",
-      "destination": "/api/whatsapp-twilio.js"
-    },
-    {
-      "source": "/api/meta-setup",
-      "destination": "/api/meta-setup.js"
-    },
-    {
-      "source": "/api/evolution-webhook-fix",
-      "destination": "/api/evolution-webhook-fix.js"
-    },
+
     {
       "source": "/api/whatsapp-evolution",
       "destination": "/api/whatsapp-evolution.js"
     },
     {
-      "source": "/api/whatsapp-meta",
-      "destination": "/api/whatsapp-meta.js"
-    },
-    {
       "source": "/api/perfil-drben",
       "destination": "/api/perfil-drben.js"
-    },
-    {
-      "source": "/api/diagnostico",
-      "destination": "/api/diagnostico.js"
     },
     {
       "source": "/api/whatsapp-proxy",
