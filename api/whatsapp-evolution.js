@@ -141,18 +141,49 @@ async function enviarMensagem(numero, texto) {
     return
   }
   try {
-    // Evolution v1.8.x usa { textMessage: { text: "..." } }
-    // Aceita tanto número puro quanto JID completo (xxx@s.whatsapp.net)
+    // ── Normalizar número brasileiro ──────────────────────────────
+    // Evolution v1.8.x às vezes remove o 9º dígito de celulares BR
+    // Solução: sempre passar o JID completo com @s.whatsapp.net
+    // que preserva o número original sem truncagem
+    let destino = numero
+    if (!destino.includes('@')) {
+      // É número puro — converter para JID completo
+      const digits = destino.replace(/\D/g, '')
+      destino = `${digits}@s.whatsapp.net`
+    }
+    // Se já é JID completo, usar diretamente (preserva o 9 do meio)
+    console.log('[Evolution] Enviando para JID:', destino)
+
     const res = await fetch(
       `${EVOLUTION_URL}/message/sendText/${EVOLUTION_INSTANCE}`,
       {
         method:  'POST',
         headers: { 'Content-Type': 'application/json', 'apikey': EVOLUTION_KEY },
-        body:    JSON.stringify({ number: numero, textMessage: { text: texto } }),
+        body:    JSON.stringify({ number: destino, textMessage: { text: texto } }),
       }
     )
     const data = await res.json()
-    console.log('[Evolution] Mensagem enviada:', JSON.stringify(data).slice(0, 100))
+    console.log('[Evolution] Resposta:', JSON.stringify(data).slice(0, 150))
+
+    // Se retornou exists:false, tentar com número sem o 9 extra (fallback)
+    const exists = data?.response?.message?.[0]?.exists
+    if (exists === false) {
+      const semNove = destino.replace(/^55(\d{2})9(\d{8}@)/, '55$1$2')
+      if (semNove !== destino) {
+        console.log('[Evolution] JID não encontrado — tentando sem 9 extra:', semNove)
+        const res2 = await fetch(
+          `${EVOLUTION_URL}/message/sendText/${EVOLUTION_INSTANCE}`,
+          {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': EVOLUTION_KEY },
+            body:    JSON.stringify({ number: semNove, textMessage: { text: texto } }),
+          }
+        )
+        const data2 = await res2.json()
+        console.log('[Evolution] Fallback resposta:', JSON.stringify(data2).slice(0, 150))
+        return data2
+      }
+    }
     return data
   } catch (e) {
     console.error('[Evolution] Erro ao enviar:', e.message)
