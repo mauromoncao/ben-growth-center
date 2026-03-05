@@ -80,8 +80,13 @@ async function crmRegistrarMensagem(numero, role, texto, nomeWhatsApp) {
 }
 
 // ── Criar lead no CRM ────────────────────────────────────────
-async function crmCriarLead({ nome, telefone, numero, area, urgencia, resumo }) {
-  const payload = { nome, telefone, numero, area, urgencia, resumo, canal: 'whatsapp-zapi' }
+async function crmCriarLead({ nome, telefone, numero, area, urgencia, resumo, primeiroContato }) {
+  const payload = {
+    nome, telefone, numero, area, urgencia, resumo,
+    canal: 'whatsapp-zapi',
+    primeiro_contato: primeiroContato || new Date().toISOString(),
+    whatsapp_link: `https://wa.me/${numero}`,
+  }
   try {
     await fetch(`${VPS_LEADS_URL}/leads`, {
       method: 'POST',
@@ -213,7 +218,7 @@ async function consultarDrBen(history, novaMensagem) {
 }
 
 // ── MARA IA — avisa Dr. Mauro ────────────────────────────────
-async function maraAvisarDrMauro({ nome, telefone, numero, area, urgencia, resumo }) {
+async function maraAvisarDrMauro({ nome, telefone, numero, area, urgencia, resumo, pushName }) {
   if (!DR_MAURO_WHATSAPP) return
 
   const urgenciaEmoji = { low: '🟢', medium: '🟡', high: '🔴', critical: '🚨' }[urgencia] ?? '🟡'
@@ -230,23 +235,33 @@ async function maraAvisarDrMauro({ nome, telefone, numero, area, urgencia, resum
     timeZone: 'America/Fortaleza', hour: '2-digit', minute: '2-digit',
   })
 
-  const foneContato  = telefone ?? numero
-  const whatsappLink = foneContato ? `https://wa.me/55${foneContato.replace(/\D/g, '')}` : null
+  // Montar número limpo para link direto
+  const numLimpo = numero.replace(/\D/g, '')
+  const whatsappLink = `https://wa.me/${numLimpo}`
 
-  const msg =
-    `🤖 *MARA IA — Novo lead qualificado!*\n` +
-    `_Dr. Ben concluiu a triagem às ${hora}_\n\n` +
-    `👤 *Cliente:* ${nome ?? 'Não informado'}\n` +
-    `📱 *WhatsApp:* ${telefone ?? ('via +' + numero)}\n` +
-    `${areaLabel}\n` +
-    `${urgenciaEmoji} *Urgência:* ${urgenciaLabel}\n` +
-    (resumo ? `💬 *Resumo:* ${resumo}\n` : '') +
-    (whatsappLink ? `\n👉 ${whatsappLink}` : '') +
-    `\n\n_Toque no link para iniciar o atendimento._`
+  // Nome de exibição — preferir nome coletado, fallback pushName
+  const nomeExibir   = nome ?? pushName ?? 'Não informado'
+  const foneExibir   = telefone ?? `+${numLimpo}`
+
+  const msg = [
+    `🤖 *MARA IA — Novo Lead Qualificado!*`,
+    `_Triagem concluída às ${hora}_`,
+    ``,
+    `👤 *Nome:* ${nomeExibir}`,
+    `📱 *WhatsApp:* ${foneExibir}`,
+    `🔢 *Número:* +${numLimpo}`,
+    `📂 *Área:* ${areaLabel}`,
+    `${urgenciaEmoji} *Urgência:* ${urgenciaLabel}`,
+    resumo ? `💬 *Resumo:* ${resumo}` : '',
+    ``,
+    `👉 *Atender agora:* ${whatsappLink}`,
+    ``,
+    `_Toque no link para abrir a conversa no WhatsApp._`,
+  ].filter(l => l !== null && l !== undefined).join('\n')
 
   const mauroNum = DR_MAURO_WHATSAPP.replace(/\D/g, '')
   await enviarMensagem(mauroNum, msg)
-  console.log(`[MARA IA] Dr. Mauro avisado sobre lead de ${numero}`)
+  console.log(`[MARA IA] Dr. Mauro avisado — ${nomeExibir} (${foneExibir})`)
 }
 
 // ── Handler principal ────────────────────────────────────────
@@ -383,16 +398,35 @@ export default async function handler(req, res) {
     if (!global.__drbenSessoesZapi.has(numero)) {
       global.__drbenSessoesZapi.set(numero, [])
     }
+
+    // ── Formatar número WhatsApp do cliente ───────────────
+    // numero = ex: 5585991430969 → formatar como (85) 99143-0969
+    function formatarTelefone(n) {
+      const d = n.replace(/\D/g, '')
+      // DDI 55 + DDD 2 dígitos + 9 dígitos
+      if (d.length === 13) return `(${d.slice(2,4)}) ${d.slice(4,9)}-${d.slice(9)}`
+      // DDI 55 + DDD 2 dígitos + 8 dígitos
+      if (d.length === 12) return `(${d.slice(2,4)}) ${d.slice(4,8)}-${d.slice(8)}`
+      return d
+    }
+    const telefoneWhatsApp = numero.startsWith('55') ? formatarTelefone(numero) : numero
+
     if (!global.__drbenTriagemZapi.has(numero)) {
       global.__drbenTriagemZapi.set(numero, {
-        nome:      pushName || null,
-        telefone:  null,
-        area:      null,
-        urgencia:  null,
-        notificado: false,
+        nome:            pushName || null,
+        telefone:        telefoneWhatsApp, // ← número WhatsApp já é o telefone!
+        numeroWhatsApp:  numero,           // número puro para envio
+        primeiroContato: new Date().toISOString(),
+        area:            null,
+        urgencia:        null,
+        notificado:      false,
       })
-    } else if (pushName && !global.__drbenTriagemZapi.get(numero).nome) {
-      global.__drbenTriagemZapi.get(numero).nome = pushName
+    } else {
+      const t = global.__drbenTriagemZapi.get(numero)
+      // Atualizar nome se veio do pushName e ainda não temos
+      if (pushName && !t.nome) t.nome = pushName
+      // Garantir telefone sempre preenchido
+      if (!t.telefone) t.telefone = telefoneWhatsApp
     }
 
     const history      = global.__drbenSessoesZapi.get(numero)
@@ -427,28 +461,35 @@ export default async function handler(req, res) {
     // Registrar resposta no CRM
     crmRegistrarMensagem(numero, 'dr_ben', cleanReply)
 
-    // MARA IA avisa Dr. Mauro quando triagem completa
+    // ── Criar lead no CRM assim que tiver nome (telefone já temos desde o início) ──
     if (dadosTriagem.nome && dadosTriagem.telefone && !dadosTriagem.notificado) {
       dadosTriagem.notificado = true
 
+      // Resumo = mensagens do cliente concatenadas
       const mensagensCliente = history.filter(m => m.role === 'user').map(m => m.content ?? '')
-      const resumo = mensagensCliente.length > 1
-        ? mensagensCliente[Math.min(2, mensagensCliente.length - 1)]
-        : mensagensCliente[0]
+      const resumo = mensagensCliente.slice(0, 3).join(' | ')?.slice(0, 200)
 
       crmCriarLead({
-        nome: dadosTriagem.nome, telefone: dadosTriagem.telefone, numero,
-        area: dadosTriagem.area ?? 'outros', urgencia: dadosTriagem.urgencia ?? 'medium',
-        resumo: resumo?.slice(0, 150),
+        nome:            dadosTriagem.nome,
+        telefone:        dadosTriagem.telefone,
+        numero,
+        area:            dadosTriagem.area     ?? 'outros',
+        urgencia:        dadosTriagem.urgencia ?? 'medium',
+        resumo,
+        primeiroContato: dadosTriagem.primeiroContato,
       })
 
       maraAvisarDrMauro({
-        nome: dadosTriagem.nome, telefone: dadosTriagem.telefone, numero,
-        area: dadosTriagem.area ?? 'outros', urgencia: dadosTriagem.urgencia ?? 'medium',
-        resumo: resumo?.slice(0, 150),
+        nome:     dadosTriagem.nome,
+        telefone: dadosTriagem.telefone,
+        numero,
+        area:     dadosTriagem.area     ?? 'outros',
+        urgencia: dadosTriagem.urgencia ?? 'medium',
+        resumo,
+        pushName,
       })
 
-      console.log(`[Dr. Ben] Triagem completa — ${dadosTriagem.nome} — MARA IA avisando Dr. Mauro`)
+      console.log(`[Dr. Ben] Lead criado — ${dadosTriagem.nome} (${dadosTriagem.telefone}) — MARA avisou Dr. Mauro`)
     }
 
     // Enviar resposta via Z-API
