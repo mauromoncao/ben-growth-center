@@ -77,6 +77,10 @@
       "destination": "/api/leads.js"
     },
     {
+      "source": "/api/whatsapp-zapi",
+      "destination": "/api/whatsapp-zapi.js"
+    },
+    {
       "source": "/api/whatsapp-twilio",
       "destination": "/api/whatsapp-twilio.js"
     },
