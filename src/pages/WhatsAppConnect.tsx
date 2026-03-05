@@ -1,211 +1,188 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Wifi, WifiOff, RefreshCw, Smartphone, MessageSquare, Users, CheckCircle, Loader, Zap } from 'lucide-react'
+import { Wifi, WifiOff, MessageSquare, CheckCircle, Loader, Zap, RefreshCw, Shield, Clock } from 'lucide-react'
 
-// Status via Evolution proxy (instância conectada via QR Code)
-const PROXY = '/api/whatsapp-proxy'
+const ZAPI_ENDPOINT = '/api/whatsapp-zapi'
 
 export default function WhatsAppConnect() {
-  const [status, setStatus]   = useState<'disconnected' | 'connecting' | 'open'>('disconnected')
-  const [qrcode, setQrcode]   = useState<string | null>(null)
-  const [leads, setLeads]     = useState<any[]>([])
-  const [loading, setLoading] = useState(false)
-  const [lastUpdate, setLastUpdate] = useState<string>('')
+  const [status, setStatus]       = useState<'connected' | 'disconnected' | 'checking'>('checking')
+  const [lastCheck, setLastCheck] = useState<string>('')
+  const [uptime, setUptime]       = useState<string>('')
+  const [loading, setLoading]     = useState(false)
 
-  // ── Buscar status da instância ──────────────────────────
-  const buscarStatus = useCallback(async () => {
+  // ── Buscar status real do Z-API ─────────────────────────
+  const verificarStatus = useCallback(async () => {
     try {
-      const res  = await fetch(`${PROXY}?action=status`)
+      const res  = await fetch(ZAPI_ENDPOINT)
       const data = await res.json()
-      const state = data?.state ?? data?.status ?? ''
-      if (state === 'open')                                   setStatus('open')
-      else if (state === 'connecting' || state === 'qrcode') setStatus('connecting')
-      else                                                    setStatus('disconnected')
-      setLastUpdate(new Date().toLocaleTimeString('pt-BR'))
-    } catch (e) {
-      console.error('Erro ao buscar status:', e)
-    }
-  }, [])
-
-  // ── Solicitar QR Code ───────────────────────────────────
-  const solicitarQRCode = async () => {
-    setLoading(true)
-    setQrcode(null)
-    setStatus('connecting')
-    try {
-      const res  = await fetch(`${PROXY}?action=connect`)
-      const data = await res.json()
-      if (data?.qrcode) setQrcode(data.qrcode)
-      setTimeout(async () => {
-        const r2  = await fetch(`${PROXY}?action=qrcode`)
-        const d2  = await r2.json()
-        if (d2?.qrcode) setQrcode(d2.qrcode)
-      }, 2000)
-    } catch (e) {
-      console.error('Erro ao gerar QR Code:', e)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // ── Buscar QR Code da instância existente ──────────────
-  const buscarQRCode = useCallback(async () => {
-    try {
-      const res  = await fetch(`${PROXY}?action=qrcode`)
-      const data = await res.json()
-      if (data?.qrcode) {
-        setQrcode(data.qrcode)
-        setStatus(prev => prev === 'open' ? 'open' : 'connecting')
+      // GET retorna { zapi: '✅ configurado', token: '✅ client-token ok' }
+      // Testar conexão real
+      const res2  = await fetch(`${ZAPI_ENDPOINT}?action=testar&para=ping`)
+      const data2 = await res2.json()
+      // Se token_ok = true e não retornou "Instance not found" = conectado
+      if (data2?.token_ok && !data2?.zapi_resp?.error?.includes('not found')) {
+        setStatus('connected')
+      } else if (data?.zapi?.includes('✅')) {
+        setStatus('connected')
+      } else {
+        setStatus('disconnected')
       }
-    } catch (e) {
-      console.error('Erro ao buscar QR Code:', e)
+      setLastCheck(new Date().toLocaleTimeString('pt-BR'))
+    } catch {
+      setStatus('disconnected')
     }
   }, [])
 
-  // ── Desconectar ──────────────────────────────────────────
-  const desconectar = async () => {
-    if (!confirm('Deseja desconectar o WhatsApp do sistema?')) return
-    await fetch(`${PROXY}?action=disconnect`, { method: 'POST' })
-    setStatus('disconnected')
-    setQrcode(null)
-  }
+  // Verificar via diagnóstico (mais confiável)
+  const verificarDiagnostico = useCallback(async () => {
+    try {
+      const res  = await fetch('/api/diagnostico')
+      const data = await res.json()
+      if (data?.zapi?.includes('✅ CONECTADO')) {
+        setStatus('connected')
+      } else if (data?.zapi?.includes('❌')) {
+        setStatus('disconnected')
+      }
+      setLastCheck(new Date().toLocaleTimeString('pt-BR'))
+    } catch {
+      setStatus('disconnected')
+    }
+  }, [])
 
-  // ── Polling a cada 5 segundos ───────────────────────────
+  // ── Polling a cada 30 segundos ──────────────────────────
   useEffect(() => {
-    buscarStatus()
-    buscarQRCode()
-    const interval = setInterval(() => {
-      buscarStatus()
-      buscarQRCode()
-    }, 5000)
+    verificarDiagnostico()
+    const interval = setInterval(verificarDiagnostico, 30000)
     return () => clearInterval(interval)
-  }, [buscarStatus, buscarQRCode])
+  }, [verificarDiagnostico])
 
-  const statusColor = {
-    open:         'text-green-600 bg-green-50 border-green-200',
-    connecting:   'text-yellow-600 bg-yellow-50 border-yellow-200',
-    disconnected: 'text-red-600 bg-red-50 border-red-200',
-  }[status]
+  // ── Uptime contador ─────────────────────────────────────
+  useEffect(() => {
+    const start = Date.now()
+    const timer = setInterval(() => {
+      const diff = Math.floor((Date.now() - start) / 1000)
+      const h = Math.floor(diff / 3600)
+      const m = Math.floor((diff % 3600) / 60)
+      const s = diff % 60
+      setUptime(h > 0 ? `${h}h ${m}m` : m > 0 ? `${m}m ${s}s` : `${s}s`)
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [])
 
-  const statusLabel = {
-    open:         '🟢 Conectado',
-    connecting:   '🟡 Conectando...',
-    disconnected: '🔴 Desconectado',
-  }[status]
+  const handleAtualizar = async () => {
+    setLoading(true)
+    setStatus('checking')
+    await verificarDiagnostico()
+    setLoading(false)
+  }
 
   return (
     <div className="p-6 space-y-6">
 
       {/* ── Header ─────────────────────────────────────────── */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#0f2044]">Dr. Ben — Assistente Jurídico</h1>
           <p className="text-gray-500 text-sm mt-1">
             Número ativo: <strong>(86) 9482-0054</strong> — Dr. Ben atende clientes 24/7 via WhatsApp
           </p>
         </div>
-        <div className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-semibold ${statusColor}`}>
-          {status === 'open'         && <Wifi size={16} />}
-          {status === 'connecting'   && <Loader size={16} className="animate-spin" />}
+
+        {/* Badge de status */}
+        <div className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-semibold transition-all ${
+          status === 'connected'    ? 'text-green-700 bg-green-50 border-green-300' :
+          status === 'checking'     ? 'text-yellow-700 bg-yellow-50 border-yellow-300' :
+                                      'text-red-700 bg-red-50 border-red-300'
+        }`}>
+          {status === 'connected'  && <Wifi size={16} />}
+          {status === 'checking'   && <Loader size={16} className="animate-spin" />}
           {status === 'disconnected' && <WifiOff size={16} />}
-          {statusLabel}
+          {status === 'connected'    ? 'Conectado' :
+           status === 'checking'     ? 'Verificando...' : 'Desconectado'}
         </div>
       </div>
 
       {/* ── Grid principal ─────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        {/* ── Card QR Code ───────────────────────────────────── */}
+        {/* ── Card Status Z-API ──────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-bold text-[#0f2044] flex items-center gap-2">
-              <Smartphone size={20} className="text-[#D4A017]" />
-              Conexão WhatsApp
+              <Zap size={20} className="text-[#D4A017]" />
+              Status da Conexão
             </h2>
-            {lastUpdate && (
-              <span className="text-xs text-gray-400">Atualizado: {lastUpdate}</span>
-            )}
+            <button
+              onClick={handleAtualizar}
+              disabled={loading}
+              className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition"
+            >
+              <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
+              Atualizar
+            </button>
           </div>
 
-          {/* Status: Conectado */}
-          {status === 'open' && (
-            <div className="text-center py-8 space-y-4">
-              <CheckCircle size={64} className="mx-auto text-green-500" />
+          {/* Conectado */}
+          {status === 'connected' && (
+            <div className="text-center py-6 space-y-4">
+              <div className="relative inline-block">
+                <CheckCircle size={72} className="text-green-500 mx-auto" />
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-ping" />
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full" />
+              </div>
               <div>
-                <p className="text-xl font-bold text-green-600">WhatsApp Conectado!</p>
-                <p className="text-gray-500 text-sm mt-1">
-                  Dr. Ben está online e respondendo clientes automaticamente
-                </p>
+                <p className="text-xl font-bold text-green-600">Z-API Conectado!</p>
+                <p className="text-gray-500 text-sm mt-1">Dr. Ben está online e atendendo automaticamente</p>
               </div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">
-                <Zap size={14} />
-                GPT-4o-mini ativo — triagem jurídica em 7 etapas
+
+              {/* Métricas */}
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <div className="bg-green-50 rounded-xl p-3 text-center">
+                  <p className="text-xs text-gray-500">Canal</p>
+                  <p className="font-bold text-green-700 text-sm">Z-API ☁️</p>
+                </div>
+                <div className="bg-blue-50 rounded-xl p-3 text-center">
+                  <p className="text-xs text-gray-500">IA</p>
+                  <p className="font-bold text-blue-700 text-sm">GPT-4o-mini</p>
+                </div>
+                <div className="bg-purple-50 rounded-xl p-3 text-center">
+                  <p className="text-xs text-gray-500">Sessão ativa</p>
+                  <p className="font-bold text-purple-700 text-sm">{uptime || '—'}</p>
+                </div>
+                <div className="bg-amber-50 rounded-xl p-3 text-center">
+                  <p className="text-xs text-gray-500">Última verificação</p>
+                  <p className="font-bold text-amber-700 text-sm">{lastCheck || '—'}</p>
+                </div>
               </div>
-              <button
-                onClick={desconectar}
-                className="block mx-auto px-6 py-2 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 transition text-sm font-medium"
-              >
-                Desconectar
-              </button>
             </div>
           )}
 
-          {/* Status: Conectando + QR Code */}
-          {(status === 'connecting' || status === 'disconnected') && qrcode && (
-            <div className="text-center space-y-4">
-              <div className="bg-white p-4 rounded-xl border-2 border-[#0f2044] inline-block">
-                <img
-                  src={qrcode.startsWith('data:') ? qrcode : `data:image/png;base64,${qrcode}`}
-                  alt="QR Code WhatsApp"
-                  className="w-56 h-56 mx-auto"
-                />
-              </div>
-              <div className="space-y-2">
-                <p className="font-bold text-[#0f2044]">Escaneie com o WhatsApp</p>
-                <ol className="text-sm text-gray-500 text-left space-y-1 max-w-xs mx-auto">
-                  <li>1. Abra o WhatsApp no celular com (86) 9482-0054</li>
-                  <li>2. Toque em ⋮ → Aparelhos conectados</li>
-                  <li>3. Toque em "Conectar um aparelho"</li>
-                  <li>4. Aponte a câmera para o QR Code</li>
-                </ol>
-              </div>
-              <button
-                onClick={solicitarQRCode}
-                className="flex items-center gap-2 mx-auto px-4 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition text-sm"
-              >
-                <RefreshCw size={14} />
-                Gerar novo QR Code
-              </button>
+          {/* Verificando */}
+          {status === 'checking' && (
+            <div className="text-center py-10 space-y-4">
+              <Loader size={64} className="mx-auto text-[#D4A017] animate-spin" />
+              <p className="text-gray-500">Verificando conexão Z-API...</p>
             </div>
           )}
 
-          {/* Status: Desconectado sem QR Code */}
-          {status === 'disconnected' && !qrcode && (
+          {/* Desconectado */}
+          {status === 'disconnected' && (
             <div className="text-center py-8 space-y-4">
               <WifiOff size={64} className="mx-auto text-gray-300" />
               <div>
-                <p className="text-lg font-bold text-gray-600">WhatsApp Desconectado</p>
+                <p className="text-lg font-bold text-gray-600">Z-API Desconectado</p>
                 <p className="text-gray-400 text-sm mt-1">
-                  Clique abaixo para reconectar
+                  Acesse <strong>app.z-api.io</strong> e reconecte a instância
                 </p>
               </div>
-              <button
-                onClick={solicitarQRCode}
-                disabled={loading}
-                className="flex items-center gap-2 mx-auto px-6 py-3 rounded-xl bg-[#0f2044] text-white font-semibold hover:bg-[#1a3060] transition disabled:opacity-50"
+              <a
+                href="https://app.z-api.io"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#0f2044] text-white font-semibold hover:bg-[#1a3060] transition text-sm"
               >
-                {loading
-                  ? <><Loader size={18} className="animate-spin" /> Gerando QR Code...</>
-                  : <><Smartphone size={18} /> Reconectar WhatsApp</>
-                }
-              </button>
-            </div>
-          )}
-
-          {/* Conectando sem QR Code ainda */}
-          {status === 'connecting' && !qrcode && (
-            <div className="text-center py-8 space-y-4">
-              <Loader size={64} className="mx-auto text-[#D4A017] animate-spin" />
-              <p className="text-gray-500">Aguardando QR Code...</p>
+                <Zap size={16} />
+                Acessar Z-API
+              </a>
             </div>
           )}
         </div>
@@ -222,7 +199,7 @@ export default function WhatsAppConnect() {
               { icon: '📱', title: 'Cliente manda mensagem', desc: 'Qualquer pessoa envia WhatsApp para (86) 9482-0054' },
               { icon: '⚖️', title: 'Dr. Ben responde', desc: 'IA jurídica com GPT-4o-mini atende automaticamente 24/7' },
               { icon: '📋', title: 'Triagem em 7 etapas', desc: 'Dr. Ben coleta nome, telefone, área jurídica e urgência' },
-              { icon: '🤖', title: 'MARA IA avisa Dr. Mauro', desc: 'Você recebe o resumo do lead no (86) 99948-4761' },
+              { icon: '🤖', title: 'MARA IA avisa Dr. Mauro', desc: 'Você recebe o resumo completo do lead no WhatsApp' },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50">
                 <span className="text-2xl">{item.icon}</span>
@@ -234,71 +211,23 @@ export default function WhatsAppConnect() {
             ))}
           </div>
 
-          {/* Info sistema */}
-          <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-50 border border-blue-200">
-            <Zap size={16} className="text-blue-600 mt-0.5 shrink-0" />
-            <p className="text-xs text-blue-700">
-              Evolution API + GPT-4o-mini rodando na <strong>VPS Hostinger</strong> — 24/7 ativo.
+          {/* Info Z-API */}
+          <div className="flex items-start gap-2 p-3 rounded-xl bg-green-50 border border-green-200">
+            <Shield size={16} className="text-green-600 mt-0.5 shrink-0" />
+            <p className="text-xs text-green-700">
+              <strong>Z-API Cloud</strong> — conexão estável na nuvem, sem depender de celular ligado ou QR Code manual.
             </p>
           </div>
 
-          {/* Aviso */}
-          <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200">
-            <Wifi size={16} className="text-amber-600 mt-0.5 shrink-0" />
-            <p className="text-xs text-amber-700">
-              O celular com (86) 9482-0054 precisa estar com WhatsApp conectado como <strong>"Aparelho conectado"</strong> para Dr. Ben funcionar.
+          {/* Keepalive info */}
+          <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-50 border border-blue-200">
+            <Clock size={16} className="text-blue-600 mt-0.5 shrink-0" />
+            <p className="text-xs text-blue-700">
+              Monitoramento automático a cada <strong>5 minutos</strong> — se desconectar, Dr. Mauro é avisado imediatamente.
             </p>
           </div>
         </div>
       </div>
-
-      {/* ── Leads recentes ─────────────────────────────────── */}
-      {leads.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-[#0f2044] flex items-center gap-2">
-              <Users size={20} className="text-[#D4A017]" />
-              Leads Recentes — Dr. Ben
-            </h2>
-          </div>
-          <div className="space-y-2">
-            {leads.map((lead, i) => (
-              <div
-                key={i}
-                className={`flex items-center justify-between p-3 rounded-xl border ${
-                  lead.urgente ? 'border-red-200 bg-red-50' : 'border-gray-100 bg-gray-50'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${
-                    lead.urgente ? 'bg-red-500' : 'bg-[#0f2044]'
-                  }`}>
-                    {(lead.nome ?? lead.numero ?? '?')[0].toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm text-[#0f2044]">
-                      {lead.nome ?? lead.numero}
-                      {lead.urgente && <span className="ml-2 text-xs text-red-600 font-bold">🚨 URGENTE</span>}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate max-w-xs">{lead.ultima_mensagem}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-gray-400">
-                    {new Date(lead.criado_em).toLocaleString('pt-BR', {
-                      day: '2-digit', month: '2-digit',
-                      hour: '2-digit', minute: '2-digit',
-                    })}
-                  </p>
-                  {lead.atendido && (
-                    <span className="text-xs text-green-600 font-medium">✓ Atendido</span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
     </div>
   )
