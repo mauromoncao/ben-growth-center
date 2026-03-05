@@ -256,13 +256,43 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   if (req.method === 'OPTIONS') return res.status(200).end()
 
-  // GET — health check
+  // GET — health check e teste de envio
   if (req.method === 'GET') {
+    const { action, para } = req.query
+
+    // Ação de teste: GET /api/whatsapp-zapi?action=testar&para=5585991430969
+    if (action === 'testar' && para) {
+      try {
+        const headers = { 'Content-Type': 'application/json' }
+        if (ZAPI_CLIENT_TOKEN) headers['Client-Token'] = ZAPI_CLIENT_TOKEN
+
+        const res2 = await fetch(`${ZAPI_BASE}/send-text`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            phone:   para,
+            message: '✅ *Dr. Ben está online!*\n\nZ-API funcionando corretamente. Pode me mandar uma mensagem! 🤖⚖️',
+          }),
+          signal: AbortSignal.timeout(10000),
+        })
+        const data = await res2.json()
+        return res.status(200).json({
+          ok:        res2.ok,
+          zapi_resp: data,
+          token_ok:  !!ZAPI_CLIENT_TOKEN,
+          instance:  ZAPI_INSTANCE_ID ? ZAPI_INSTANCE_ID.slice(0, 8) + '...' : '❌',
+        })
+      } catch (e) {
+        return res.status(200).json({ ok: false, erro: e.message })
+      }
+    }
+
     return res.status(200).json({
       status:  'ok',
       service: 'Dr. Ben via Z-API WhatsApp',
       model:   'gpt-4o-mini',
       zapi:    ZAPI_INSTANCE_ID ? '✅ configurado' : '❌ faltando',
+      token:   ZAPI_CLIENT_TOKEN ? '✅ client-token ok' : '❌ client-token ausente',
     })
   }
 
