@@ -2,18 +2,21 @@
 // BEN GROWTH CENTER — MARA IA Config API
 // Rota: GET /api/mara-config  → retorna configuração ativa
 //       POST /api/mara-config → salva nova configuração
+//
+// MARA IA = Assistente Pessoal do Dr. Mauro
+// Dr. Ben = Assistente Jurídico dos Clientes
+// MODEL: gpt-4o-mini (OpenAI) via Z-API WhatsApp
 // ============================================================
 
 export const config = { maxDuration: 10 }
 
 // Armazenamento em memória (persiste entre requests no mesmo container)
-// Em produção, substituir por Supabase/KV store
 let configAtiva = null
 
 const CONFIG_PADRAO = {
   nome: 'Dr. Ben',
-  saudacao: 'Olá! Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção Advogados. Como posso te ajudar hoje?',
-  despedida: 'Foi um prazer atendê-lo! Se precisar de mais informações, estou aqui. Tenha um ótimo dia! ⚖️',
+  saudacao: 'Olá! 👋 Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção Advogados. Como posso te ajudar hoje?',
+  despedida: 'Foi um prazer atendê-lo! Se precisar de mais informações, estou à disposição. Tenha um ótimo dia! ⚖️',
   tom: 'cordial',
   promptBase: `Você é o Dr. Ben, assistente jurídico digital do escritório Mauro Monção Advogados Associados (OAB/PI · CE · MA), com sede em Parnaíba-PI.
 
@@ -58,12 +61,14 @@ Encerre gentilmente.
 - Seja cordial, profissional e objetivo
 - Mensagens curtas (máx. 3 parágrafos por resposta)`,
   areas: {
-    tributario: true,
+    tributario:     true,
     previdenciario: true,
-    bancario: true,
-    trabalhista: false,
-    civil: false,
-    empresarial: false,
+    bancario:       true,
+    trabalhista:    true,
+    civil:          false,
+    empresarial:    false,
+    imobiliario:    false,
+    familia:        false,
   },
   horario: {
     segunda: '08:00–18:00',
@@ -75,8 +80,8 @@ Encerre gentilmente.
     domingo: 'Fechado',
     ativoFimDeSemana: true,
   },
-  repasseScore: 70,
-  repassePalavras: ['urgente', 'execução fiscal', 'penhora', 'multa', 'prazo fatal', 'amanhã', 'hoje'],
+  mensagensParaTriagem: 3,
+  repassePalavras: ['urgente', 'penhora', 'execução fiscal', 'prazo fatal', 'multa', 'bloqueio judicial'],
   repasseValorMinimo: 3000,
   repasseSempre: ['tributario'],
   maxMensagensSesSao: 10,
@@ -84,6 +89,23 @@ Encerre gentilmente.
   ativo: true,
   modoManutencao: false,
   mensagemManutencao: 'Estamos em manutenção no momento. Retornaremos em breve. Para urgências, ligue: (86) 99948-4761.',
+  // Capacidades avançadas
+  notificacaoSonora: true,
+  alertaUrgente: true,
+  resumoAutomatico: true,
+  idioma: 'pt-BR',
+  // Canal ativo
+  canal: 'whatsapp-zapi',
+  modelo_ia: 'gpt-4o-mini',
+  escritorio: {
+    nome: 'Mauro Monção Advogados Associados',
+    oab: 'OAB/PI · CE · MA',
+    cidade: 'Parnaíba-PI',
+    telefone: '(86) 99948-4761',
+    whatsapp_atendimento: '(86) 9482-0054',
+    advogado_responsavel: 'Dr. Mauro Monção',
+    plantonista: '+5586999484761',
+  },
 }
 
 export default async function handler(req, res) {
@@ -98,6 +120,8 @@ export default async function handler(req, res) {
       success: true,
       config: configAtiva ?? CONFIG_PADRAO,
       fonte: configAtiva ? 'salva' : 'padrao',
+      canal: 'whatsapp-zapi',
+      modelo_ia: 'gpt-4o-mini',
       timestamp: new Date().toISOString(),
     })
   }
@@ -107,25 +131,32 @@ export default async function handler(req, res) {
     try {
       const novaConfig = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
 
-      // Validações básicas
       if (!novaConfig || typeof novaConfig !== 'object') {
         return res.status(400).json({ success: false, error: 'Configuração inválida' })
       }
 
-      // Mesclar com padrão para garantir campos completos
-      configAtiva = { ...CONFIG_PADRAO, ...novaConfig, updatedAt: new Date().toISOString() }
+      configAtiva = {
+        ...CONFIG_PADRAO,
+        ...novaConfig,
+        canal: 'whatsapp-zapi',
+        modelo_ia: 'gpt-4o-mini',
+        updatedAt: new Date().toISOString(),
+      }
 
       console.log('[MARA Config] Configuração atualizada:', {
         nome: configAtiva.nome,
         ativo: configAtiva.ativo,
         tom: configAtiva.tom,
         areas: configAtiva.areas,
+        canal: configAtiva.canal,
       })
 
       return res.status(200).json({
         success: true,
         config: configAtiva,
-        message: 'Configuração da MARA IA salva com sucesso!',
+        message: 'MARA IA configurada com sucesso! Dr. Ben está pronto.',
+        canal: 'whatsapp-zapi',
+        modelo_ia: 'gpt-4o-mini',
         timestamp: new Date().toISOString(),
       })
     } catch (e) {
@@ -136,5 +167,5 @@ export default async function handler(req, res) {
   return res.status(405).json({ error: 'Método não permitido' })
 }
 
-// Exportar para uso no webhook whatsapp-evolution
+// Exportar para uso no webhook whatsapp-zapi
 export { configAtiva, CONFIG_PADRAO }
