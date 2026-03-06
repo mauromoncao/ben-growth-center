@@ -1271,56 +1271,363 @@ export default function MaraIA() {
         </div>
       </Secao>
 
-      {/* ── Variáveis de Ambiente ────────────────────────────── */}
-      <Secao titulo="Variáveis de Ambiente (Vercel)" icone={<Lock size={16} className="text-[#D4A017]" />} defaultOpen={false}>
-        <div className="mt-4 space-y-3">
-          <p className="text-sm text-gray-500">
-            Configure em <strong>vercel.com → Project → Settings → Environment Variables</strong>
-          </p>
+      {/* ── Setup da Instância MARA Z-API ───────────────────── */}
+      <Secao titulo="Setup — Instância MARA Z-API" icone={<Zap size={16} className="text-[#D4A017]" />} badge="Novo" defaultOpen={true}>
+        <div className="mt-4 space-y-5">
 
-          <div className="p-4 bg-purple-50 border border-purple-200 rounded-xl">
-            <p className="text-sm font-bold text-purple-800 mb-2">🎙️ ElevenLabs TTS — Vozes Configuradas</p>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs">
-                <code className="font-mono text-purple-900 bg-purple-100 px-2 py-0.5 rounded">ELEVENLABS_API_KEY</code>
-                <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">✅ Configurada</span>
-                <span className="text-purple-700">Chave API ElevenLabs (TTS ativo)</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs">
-                <code className="font-mono text-purple-900 bg-purple-100 px-2 py-0.5 rounded">VOICE_DR_BEN</code>
-                <span className="text-purple-700 font-mono">{VOICE_DR_BEN}</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs">
-                <code className="font-mono text-purple-900 bg-purple-100 px-2 py-0.5 rounded">VOICE_MARA</code>
-                <span className="text-purple-700 font-mono">{VOICE_MARA}</span>
-              </div>
+          {/* Credenciais da nova instância */}
+          <div>
+            <p className="text-xs font-bold text-[#0f2044] uppercase tracking-wide mb-3 flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-[#0f2044] text-white flex items-center justify-center text-xs">1</span>
+              Credenciais da Nova Instância MARA
+            </p>
+            <div className="overflow-x-auto rounded-xl border border-gray-200">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-[#0f2044] text-white">
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Campo</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Valor</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {[
+                    { campo: 'Instance ID',   valor: '3EFBA328D48CC11FFCB66237BF5854B6', status: 'ok' },
+                    { campo: 'Token',         valor: 'EAC44AD0F0FF58FCD5A23C3B',         status: 'ok' },
+                    { campo: 'Client Token',  valor: '(mesmo do Dr. Ben — ZAPI_CLIENT_TOKEN)', status: 'reuso' },
+                    { campo: 'Número',        valor: '(86) 9948-4761 — Pessoal Dr. Mauro', status: 'ok' },
+                    { campo: 'Webhook URL',   valor: 'ben-growth-center.vercel.app/api/whatsapp-mara', status: 'ok' },
+                  ].map((row, i) => (
+                    <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td className="px-4 py-3 font-semibold text-[#0f2044] text-xs">{row.campo}</td>
+                      <td className="px-4 py-3 font-mono text-xs text-gray-700 break-all">{row.valor}</td>
+                      <td className="px-4 py-3">
+                        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                          row.status === 'ok'    ? 'bg-green-100 text-green-700' :
+                          row.status === 'reuso' ? 'bg-blue-100 text-blue-700' :
+                          'bg-amber-100 text-amber-700'
+                        }`}>
+                          {row.status === 'ok' ? '✅ Definido' : row.status === 'reuso' ? '🔄 Reutilizar' : '⚠️ Pendente'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
 
-          {[
-            { key: 'OPENAI_API_KEY',       status: 'configurado', desc: 'GPT-4o-mini — motor principal do Dr. Ben e MARA IA' },
-            { key: 'ZAPI_INSTANCE_ID',      status: 'configurado', desc: 'ID da instância Z-API Dr. Ben' },
-            { key: 'ZAPI_TOKEN',            status: 'configurado', desc: 'Token de autenticação Z-API Dr. Ben' },
-            { key: 'ZAPI_CLIENT_TOKEN',     status: 'configurado', desc: 'Client-Token de segurança da conta Z-API' },
-            { key: 'PLANTONISTA_WHATSAPP',  status: 'configurado', desc: 'Número do Dr. Mauro para alertas MARA IA' },
-            { key: 'VPS_LEADS_URL',         status: 'configurado', desc: 'URL do CRM no VPS' },
-            { key: 'ELEVENLABS_API_KEY',    status: 'configurado', desc: 'ElevenLabs TTS — Dr. Ben + MARA IA' },
-            { key: 'MARA_ZAPI_INSTANCE_ID', status: 'novo',        desc: 'ID instância MARA — número (85) 99143-0969' },
-            { key: 'MARA_ZAPI_TOKEN',       status: 'novo',        desc: 'Token instância MARA Z-API' },
-            { key: 'MARA_ZAPI_CLIENT_TOKEN',status: 'novo',        desc: 'Client-Token conta Z-API da MARA' },
-          ].map(v => (
-            <div key={v.key} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
-              <code className="text-xs font-mono text-[#0f2044] w-52 shrink-0">{v.key}</code>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
-                v.status === 'configurado' ? 'bg-green-100 text-green-700' :
-                v.status === 'novo'        ? 'bg-amber-100 text-amber-700' :
-                'bg-red-100 text-red-600'
-              }`}>
-                {v.status === 'configurado' ? '✅ OK' : v.status === 'novo' ? '🆕 Novo' : '⚠️ Falta'}
-              </span>
-              <p className="text-xs text-gray-500">{v.desc}</p>
+          {/* Passo a passo */}
+          <div>
+            <p className="text-xs font-bold text-[#0f2044] uppercase tracking-wide mb-3 flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-[#0f2044] text-white flex items-center justify-center text-xs">2</span>
+              Passos para Ativar (em ordem)
+            </p>
+            <div className="overflow-x-auto rounded-xl border border-gray-200">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-[#D4A017] text-white">
+                    <th className="px-4 py-3 text-left text-xs font-semibold w-10">Passo</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Ação</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Onde</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold w-24">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {[
+                    {
+                      passo: '1',
+                      acao: 'Adicionar MARA_ZAPI_INSTANCE_ID e MARA_ZAPI_TOKEN no Vercel',
+                      onde: 'vercel.com → ben-growth-center → Settings → Env Variables',
+                      status: 'pendente',
+                    },
+                    {
+                      passo: '2',
+                      acao: 'Aguardar redeploy automático do Vercel (~1 min)',
+                      onde: 'Vercel → Deployments → aguardar ✅',
+                      status: 'pendente',
+                    },
+                    {
+                      passo: '3',
+                      acao: 'Configurar Webhook automático via endpoint',
+                      onde: '/api/mara-setup?action=webhook',
+                      status: 'pendente',
+                    },
+                    {
+                      passo: '4',
+                      acao: 'Verificar status da instância conectada',
+                      onde: '/api/mara-setup?action=status',
+                      status: 'pendente',
+                    },
+                    {
+                      passo: '5',
+                      acao: 'Enviar mensagem de teste para Dr. Mauro',
+                      onde: '/api/mara-setup?action=testar',
+                      status: 'pendente',
+                    },
+                  ].map((row, i) => (
+                    <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td className="px-4 py-3 text-center">
+                        <span className="w-7 h-7 rounded-full bg-[#0f2044] text-white text-xs font-bold flex items-center justify-center mx-auto">
+                          {row.passo}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-gray-800">{row.acao}</td>
+                      <td className="px-4 py-3 text-xs text-gray-500 font-mono">{row.onde}</td>
+                      <td className="px-4 py-3">
+                        <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 font-semibold">
+                          ⏳ Pendente
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
+          </div>
+
+          {/* Links rápidos de setup */}
+          <div>
+            <p className="text-xs font-bold text-[#0f2044] uppercase tracking-wide mb-3 flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-[#0f2044] text-white flex items-center justify-center text-xs">3</span>
+              Links Rápidos de Configuração
+            </p>
+            <div className="overflow-x-auto rounded-xl border border-gray-200">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-[#0f2044] text-white">
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Ação</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">URL</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold w-20">Abrir</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {[
+                    { acao: '📡 Verificar Status',           url: '/api/mara-setup?action=status' },
+                    { acao: '🔗 Configurar Webhook',         url: '/api/mara-setup?action=webhook' },
+                    { acao: '✉️ Enviar Teste ao Dr. Mauro',  url: '/api/mara-setup?action=testar' },
+                    { acao: '📷 Ver QR Code (se precisar)',  url: '/api/mara-setup?action=qrcode' },
+                    { acao: '🔌 Desconectar Instância',      url: '/api/mara-setup?action=desconectar' },
+                  ].map((row, i) => (
+                    <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td className="px-4 py-3 text-xs font-semibold text-[#0f2044]">{row.acao}</td>
+                      <td className="px-4 py-3 font-mono text-xs text-gray-600">
+                        https://ben-growth-center.vercel.app{row.url}
+                      </td>
+                      <td className="px-4 py-3">
+                        <a
+                          href={`https://ben-growth-center.vercel.app${row.url}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-xs text-[#D4A017] font-semibold hover:underline"
+                        >
+                          Abrir <ExternalLink size={12} />
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Comandos do WhatsApp */}
+          <div>
+            <p className="text-xs font-bold text-[#0f2044] uppercase tracking-wide mb-3 flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-[#25D366] text-white flex items-center justify-center text-xs">W</span>
+              Comandos MARA via WhatsApp
+            </p>
+            <div className="overflow-x-auto rounded-xl border border-gray-200">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-[#25D366] text-white">
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Comando</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">O que faz</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Efeito</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {[
+                    { cmd: '/ausente',  desc: 'MARA assume o número do Dr. Mauro',          efeito: 'Troca perfil WhatsApp → MARA responde por você' },
+                    { cmd: '/presente', desc: 'Restaura perfil original do Dr. Mauro',       efeito: 'Perfil restaurado + resumo das conversas recebidas' },
+                    { cmd: '/leads',    desc: 'Lista leads captados hoje',                    efeito: 'Mostra nome, telefone e área de cada lead' },
+                    { cmd: '/urgentes', desc: 'Lista casos marcados como urgentes/críticos',  efeito: 'Filtra leads com urgência high ou critical' },
+                    { cmd: '/resumo',   desc: 'Relatório executivo do dia',                   efeito: 'Total leads, urgentes, status dos sistemas' },
+                    { cmd: '/status',   desc: 'Status de todos os sistemas',                  efeito: 'OpenAI, Z-API, CRM, Vercel' },
+                    { cmd: '/agenda',   desc: 'Compromissos do dia',                          efeito: 'Integração com calendário (em configuração)' },
+                    { cmd: '/ajuda',    desc: 'Lista todos os comandos disponíveis',          efeito: 'Exibe este menu pelo WhatsApp' },
+                  ].map((row, i) => (
+                    <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td className="px-4 py-3">
+                        <code className="text-xs font-mono bg-gray-100 text-[#0f2044] px-2 py-1 rounded font-bold">{row.cmd}</code>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-gray-700">{row.desc}</td>
+                      <td className="px-4 py-3 text-xs text-gray-500 italic">{row.efeito}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Modo Ausente — Como funciona */}
+          <div>
+            <p className="text-xs font-bold text-[#0f2044] uppercase tracking-wide mb-3 flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs">⚡</span>
+              Modo Ausente — Fluxo de Troca de Perfil
+            </p>
+            <div className="overflow-x-auto rounded-xl border border-gray-200">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-orange-500 text-white">
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Evento</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Nome no WhatsApp</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Quem responde</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  <tr className="bg-white">
+                    <td className="px-4 py-3 text-xs font-semibold text-green-700">🟢 Modo PRESENTE</td>
+                    <td className="px-4 py-3 text-xs text-gray-800">Dr. Mauro Monção</td>
+                    <td className="px-4 py-3 text-xs text-gray-600">Advogado | OAB/PI · CE · MA</td>
+                    <td className="px-4 py-3 text-xs font-semibold text-[#0f2044]">Você (Dr. Mauro)</td>
+                  </tr>
+                  <tr className="bg-gray-50">
+                    <td className="px-4 py-3 text-xs font-semibold text-red-600">🔴 Modo AUSENTE</td>
+                    <td className="px-4 py-3 text-xs text-gray-800">MARA — Assistente Dr. Mauro</td>
+                    <td className="px-4 py-3 text-xs text-gray-600">🤖 Respondendo por ele</td>
+                    <td className="px-4 py-3 text-xs font-semibold text-purple-700">MARA IA (automático)</td>
+                  </tr>
+                  <tr className="bg-white">
+                    <td className="px-4 py-3 text-xs font-semibold text-blue-700">🔄 Ao retornar</td>
+                    <td className="px-4 py-3 text-xs text-gray-800">Dr. Mauro Monção</td>
+                    <td className="px-4 py-3 text-xs text-gray-600">Restaurado automaticamente</td>
+                    <td className="px-4 py-3 text-xs text-gray-600">Resumo de conversas enviado para você</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </Secao>
+
+      {/* ── Variáveis de Ambiente ────────────────────────────── */}
+      <Secao titulo="Variáveis de Ambiente (Vercel)" icone={<Lock size={16} className="text-[#D4A017]" />} defaultOpen={false}>
+        <div className="mt-4 space-y-4">
+          <p className="text-xs text-gray-500 flex items-center gap-2">
+            <ExternalLink size={12} />
+            Configure em{' '}
+            <a href="https://vercel.com" target="_blank" rel="noopener noreferrer"
+               className="text-[#D4A017] font-semibold hover:underline">
+              vercel.com → ben-growth-center → Settings → Environment Variables
+            </a>
+          </p>
+
+          {/* Tabela Dr. Ben */}
+          <div>
+            <p className="text-xs font-bold text-gray-600 mb-2">🤖 Dr. Ben — Instância Principal</p>
+            <div className="overflow-x-auto rounded-xl border border-gray-200">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-[#0f2044] text-white">
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Variável</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Descrição</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold w-24">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {[
+                    { key: 'OPENAI_API_KEY',      desc: 'GPT-4o-mini — motor principal do Dr. Ben e MARA IA',  status: 'ok' },
+                    { key: 'ZAPI_INSTANCE_ID',     desc: 'ID da instância Z-API Dr. Ben — (86) 9482-0054',      status: 'ok' },
+                    { key: 'ZAPI_TOKEN',           desc: 'Token de autenticação Z-API Dr. Ben',                  status: 'ok' },
+                    { key: 'ZAPI_CLIENT_TOKEN',    desc: 'Client-Token de segurança — mesmo para todas as contas', status: 'ok' },
+                    { key: 'PLANTONISTA_WHATSAPP', desc: 'Número Dr. Mauro para alertas (+5586999484761)',       status: 'ok' },
+                    { key: 'VPS_LEADS_URL',        desc: 'URL do CRM/VPS (http://181.215.135.202:3001)',        status: 'ok' },
+                    { key: 'ELEVENLABS_API_KEY',   desc: 'ElevenLabs TTS — voz Dr. Ben + MARA',                 status: 'ok' },
+                  ].map((v, i) => (
+                    <tr key={v.key} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td className="px-4 py-3"><code className="text-xs font-mono text-[#0f2044]">{v.key}</code></td>
+                      <td className="px-4 py-3 text-xs text-gray-600">{v.desc}</td>
+                      <td className="px-4 py-3">
+                        <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 font-semibold">✅ OK</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Tabela MARA — nova instância */}
+          <div>
+            <p className="text-xs font-bold text-gray-600 mb-2">🌟 MARA IA — Nova Instância Dedicada</p>
+            <div className="overflow-x-auto rounded-xl border border-amber-200">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-amber-500 text-white">
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Variável</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Valor a Configurar</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold w-24">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-amber-100">
+                  {[
+                    { key: 'MARA_ZAPI_INSTANCE_ID',  val: '3EFBA328D48CC11FFCB66237BF5854B6', status: 'novo' },
+                    { key: 'MARA_ZAPI_TOKEN',         val: 'EAC44AD0F0FF58FCD5A23C3B',         status: 'novo' },
+                    { key: 'MARA_ZAPI_CLIENT_TOKEN',  val: '(mesmo do ZAPI_CLIENT_TOKEN)',       status: 'reuso' },
+                  ].map((v, i) => (
+                    <tr key={v.key} className={i % 2 === 0 ? 'bg-white' : 'bg-amber-50'}>
+                      <td className="px-4 py-3"><code className="text-xs font-mono text-amber-800 font-bold">{v.key}</code></td>
+                      <td className="px-4 py-3 font-mono text-xs text-gray-700 break-all">{v.val}</td>
+                      <td className="px-4 py-3">
+                        <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                          v.status === 'novo'   ? 'bg-amber-100 text-amber-700' :
+                          v.status === 'reuso'  ? 'bg-blue-100 text-blue-700' :
+                          'bg-green-100 text-green-700'
+                        }`}>
+                          {v.status === 'novo' ? '🆕 ADICIONAR' : v.status === 'reuso' ? '🔄 Reutilizar' : '✅ OK'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-amber-700 mt-2 p-2 bg-amber-50 rounded-lg border border-amber-200">
+              ⚠️ <strong>Atenção:</strong> As variáveis marcadas com "🆕 ADICIONAR" precisam ser criadas no Vercel. Após salvar, aguarde ~1 min o redeploy e clique em "🔗 Configurar Webhook" acima.
+            </p>
+          </div>
+
+          {/* Tabela ElevenLabs */}
+          <div>
+            <p className="text-xs font-bold text-gray-600 mb-2">🎙️ ElevenLabs TTS — Voice IDs</p>
+            <div className="overflow-x-auto rounded-xl border border-purple-200">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-purple-600 text-white">
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Voz</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Voice ID</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Uso</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-purple-100">
+                  <tr className="bg-white">
+                    <td className="px-4 py-3 text-xs font-semibold text-purple-800">Dr. Ben</td>
+                    <td className="px-4 py-3 font-mono text-xs text-gray-700">{VOICE_DR_BEN}</td>
+                    <td className="px-4 py-3 text-xs text-gray-600">Respostas de voz para clientes</td>
+                  </tr>
+                  <tr className="bg-purple-50">
+                    <td className="px-4 py-3 text-xs font-semibold text-purple-800">MARA IA</td>
+                    <td className="px-4 py-3 font-mono text-xs text-gray-700">{VOICE_MARA}</td>
+                    <td className="px-4 py-3 text-xs text-gray-600">Respostas de voz para Dr. Mauro</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
         </div>
       </Secao>
 
