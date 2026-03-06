@@ -1,21 +1,33 @@
 // ============================================================
 // BEN GROWTH CENTER — Webhook Z-API WhatsApp
 // Rota: POST /api/whatsapp-zapi  → mensagens recebidas
+//       GET  /api/whatsapp-zapi  → health check
 //
-// DR. BEN  = Assistente Jurídico — atende CLIENTES via WhatsApp
-// MARA IA  = Assistente Pessoal  — avisa DR. MAURO após triagem
+// DR. BEN  = Assistente Jurídico — atende CLIENTES
+// MARA IA  = Secretária Executiva — atende DR. MAURO
+//
+// INTELIGÊNCIA: detecta quem está falando e redireciona
+// VOZES: ElevenLabs TTS integrado (Dr. Ben + MARA IA)
+// MODO AUSENTE: MARA responde por Dr. Mauro quando ativado
 //
 // MODEL: gpt-4o-mini (OpenAI)
+// CANAL: Z-API Cloud
 // ============================================================
 
 export const config = { maxDuration: 30 }
 
+// ── Credenciais ──────────────────────────────────────────────
 const OPENAI_KEY        = process.env.OPENAI_API_KEY       || ''
 const ZAPI_INSTANCE_ID  = process.env.ZAPI_INSTANCE_ID     || ''
 const ZAPI_TOKEN        = process.env.ZAPI_TOKEN           || ''
 const ZAPI_CLIENT_TOKEN = process.env.ZAPI_CLIENT_TOKEN    || ''
 const DR_MAURO_WHATSAPP = process.env.PLANTONISTA_WHATSAPP || ''
 const VPS_LEADS_URL     = process.env.VPS_LEADS_URL        || 'http://181.215.135.202:3001'
+const ELEVENLABS_KEY    = process.env.ELEVENLABS_API_KEY   || ''
+
+// ── Voice IDs ElevenLabs ─────────────────────────────────────
+const VOICE_DR_BEN = 'ETf5cmpNIbpSiXmBaR2m'   // Voz do Dr. Ben
+const VOICE_MARA   = 'EST9Ui6982FZPSi7gCHi'   // Voz da MARA IA
 
 const ZAPI_BASE = `https://api.z-api.io/instances/${ZAPI_INSTANCE_ID}/token/${ZAPI_TOKEN}`
 
@@ -24,91 +36,26 @@ function getBaseUrl() {
   return 'https://ben-growth-center.vercel.app'
 }
 
-// ── Enviar mensagem via Z-API ────────────────────────────────
-async function enviarMensagem(numero, texto) {
-  if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN) {
-    console.error('[Z-API] Credenciais não configuradas')
-    return
-  }
-  try {
-    const headers = { 'Content-Type': 'application/json' }
-    if (ZAPI_CLIENT_TOKEN) headers['Client-Token'] = ZAPI_CLIENT_TOKEN
-
-    const res = await fetch(`${ZAPI_BASE}/send-text`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        phone:   numero,
-        message: texto,
-      }),
-      signal: AbortSignal.timeout(10000),
-    })
-    const data = await res.json()
-    if (res.ok) {
-      console.log('[Z-API] Mensagem enviada para', numero, '— zaapId:', data?.zaapId)
-    } else {
-      console.error('[Z-API] Erro ao enviar:', JSON.stringify(data).slice(0, 200))
-    }
-    return data
-  } catch (e) {
-    console.error('[Z-API] fetch error:', e.message)
-  }
+// ============================================================
+// ESTADO GLOBAL — MODO AUSENTE + PREFERÊNCIAS DE ÁUDIO
+// ============================================================
+if (!global.__drbenSessoesZapi)     global.__drbenSessoesZapi     = new Map()
+if (!global.__drbenTriagemZapi)     global.__drbenTriagemZapi     = new Map()
+if (!global.__maraHistorico)        global.__maraHistorico        = new Map()
+if (!global.__audioPreferencias)    global.__audioPreferencias    = new Map()
+// Modo Ausente: { ativo, motivo, retorno, mensagem }
+if (!global.__modoAusente) global.__modoAusente = {
+  ativo:    false,
+  motivo:   'ferias',
+  retorno:  null,
+  mensagem: null,
 }
 
-// ── Registrar mensagem no CRM ────────────────────────────────
-async function crmRegistrarMensagem(numero, role, texto, nomeWhatsApp) {
-  const payload = { numero, role, texto }
-  if (nomeWhatsApp) payload.nomeWhatsApp = nomeWhatsApp
-  try {
-    await fetch(`${VPS_LEADS_URL}/leads/mensagem`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(3000),
-    })
-    return
-  } catch {}
-  try {
-    await fetch(`${getBaseUrl()}/api/leads?action=mensagem`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-  } catch (e) {
-    console.error('[CRM] Erro registrar mensagem:', e.message)
-  }
-}
+// ============================================================
+// PROMPTS
+// ============================================================
 
-// ── Criar lead no CRM ────────────────────────────────────────
-async function crmCriarLead({ nome, telefone, numero, area, urgencia, resumo, primeiroContato }) {
-  const payload = {
-    nome, telefone, numero, area, urgencia, resumo,
-    canal: 'whatsapp-zapi',
-    primeiro_contato: primeiroContato || new Date().toISOString(),
-    whatsapp_link: `https://wa.me/${numero}`,
-  }
-  try {
-    await fetch(`${VPS_LEADS_URL}/leads`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(3000),
-    })
-    console.log(`[CRM] Lead salvo: ${nome} — ${telefone || numero}`)
-    return
-  } catch {}
-  try {
-    await fetch(`${getBaseUrl()}/api/leads`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-  } catch (e) {
-    console.error('[CRM] Erro criar lead:', e.message)
-  }
-}
-
-// ── PROMPT OFICIAL Dr. Ben — 7 etapas ───────────────────────
+// ── Dr. Ben — Assistente Jurídico ───────────────────────────
 const DR_BEN_SYSTEM_PROMPT = `Você é o Dr. Ben, assistente jurídico digital do escritório Mauro Monção Advogados Associados (OAB/PI · CE · MA), com sede em Parnaíba-PI.
 
 Sua missão é realizar a triagem inicial do visitante, entender o problema jurídico e encaminhar para o advogado especialista correto. Você NÃO emite pareceres, NÃO representa o cliente e NÃO promete resultados.
@@ -138,10 +85,16 @@ Classifique internamente: low | medium | high | critical.
 **ETAPA 6 – COLETA DE CONTATO**
 Diga: "Para encaminharmos seu caso ao advogado especialista, preciso do seu nome e WhatsApp."
 Colete nome e telefone (WhatsApp).
+Na ETAPA 6, após coletar nome e telefone, inclua ao final: [CONTACT:{"name":"...","phone":"..."}]
 
 **ETAPA 7 – ENCAMINHAMENTO**
 Confirme o recebimento, agradeça e informe que a equipe jurídica entrará em contato em breve.
 Encerre gentilmente.
+
+Na 3ª mensagem do cliente (após apresentação inicial), pergunte educadamente:
+"Para tornar nosso atendimento mais personalizado, posso enviar minhas próximas respostas em áudio. Prefere assim? 😊"
+Se o cliente responder sim/quero/pode/claro → envie áudios nas próximas respostas.
+Se responder não/texto/prefiro texto → continue em texto. Nunca pergunte novamente.
 
 ## REGRAS ABSOLUTAS:
 - NUNCA solicite CPF, CNPJ, RG, número de processo ou arquivos
@@ -151,21 +104,421 @@ Encerre gentilmente.
 - Responda SEMPRE em português brasileiro
 - Seja cordial, profissional e objetivo
 - Mensagens curtas (máx. 3 parágrafos por resposta)
-- Quando coletar nome e telefone, inclua no final: [CONTACT:{"name":"...","phone":"..."}]
-- Quando identificar a área jurídica, inclua: [AREA:tributario|previdenciario|bancario|imobiliario|familia|publico|trabalhista|consumidor|outros]
-- Quando avaliar urgência, inclua: [URGENCY:low|medium|high|critical]`
+- Quando identificar área: [AREA:tributario|previdenciario|bancario|imobiliario|familia|publico|trabalhista|consumidor|outros]
+- Quando avaliar urgência: [URGENCY:low|medium|high|critical]`
 
-// ── Sessões em memória ───────────────────────────────────────
-if (!global.__drbenSessoesZapi) global.__drbenSessoesZapi = new Map()
-if (!global.__drbenTriagemZapi) global.__drbenTriagemZapi = new Map()
+// ── MARA IA — Secretária Executiva ──────────────────────────
+const MARA_SYSTEM_PROMPT = `Você é MARA, a Secretária Executiva Pessoal e Assistente de Inteligência Artificial do Dr. Mauro Monção, advogado sênior do escritório Mauro Monção Advogados Associados (OAB/PI · CE · MA).
 
-// ── Extrair marcadores ───────────────────────────────────────
+## IDENTIDADE
+- **Nome:** MARA — Secretária Executiva IA
+- **Idade aparente:** 22 anos
+- **Nacionalidade:** Brasileira
+- **Personalidade:** Elegante, inteligente, proativa, discreta e extremamente eficiente
+- **Formação:** Administração com especialização em Gestão Jurídica — FGV São Paulo
+- **Experiência:** 4 anos como secretária executiva de escritórios jurídicos de alto padrão
+
+## TOM DE VOZ — ADAPTATIVO INTELIGENTE
+Leia o humor e contexto de cada mensagem do Dr. Mauro e adapte automaticamente:
+
+**Mensagens formais/profissionais** → Tom executivo, preciso, direto ao ponto
+**Mensagens descontraídas/informais** → Tom próximo, levemente descontraído, caloroso
+**Mensagens urgentes/estressantes** → Tom calmo, resolutivo, focado em soluções
+**Mensagens pessoais/reflexivas** → Tom humano, empático, discreto
+
+## COMANDOS QUE VOCÊ RECONHECE
+- **/leads** → resumo dos leads de hoje
+- **/urgentes** → apenas casos críticos
+- **/resumo** → relatório executivo completo
+- **/status** → status de todos os sistemas
+- **/ausente [motivo] [data retorno]** → ativar modo ausente
+- **/presente** → desativar modo ausente
+- **/ajuda** → lista todos os comandos
+
+## SOBRE O MODO AUSENTE
+Quando Dr. Mauro ativar o modo ausente, você assume o WhatsApp dele e responde por ele.
+Exemplos de ativação:
+- "/ausente ferias 15/03" → ativa modo férias até 15/03
+- "/ausente doente" → ativa modo doente sem data
+- "/ausente audiencia 14h" → ativa modo audiência até 14h
+- "/presente" → desativa e você para de responder
+
+## REGRAS ABSOLUTAS
+- Você atende EXCLUSIVAMENTE o Dr. Mauro neste modo
+- Mantenha discrição absoluta sobre assuntos do escritório
+- Nunca emita opiniões jurídicas
+- Sempre confirme ações importantes antes de executar
+- Responda SEMPRE em português brasileiro
+- Mensagens curtas e objetivas (máx. 4 linhas)
+- Na primeira conversa do dia, pergunte: "Dr. Mauro, prefere que eu envie resumos em áudio? Fica mais prático! 🎙️"
+
+## SAUDAÇÕES POR PERÍODO
+- Manhã 06h–12h: "Bom dia, Dr. Mauro! ☀️"
+- Tarde 12h–18h: "Boa tarde, Dr. Mauro! 🌤️"
+- Noite 18h–23h: "Boa noite, Dr. Mauro! 🌙"
+- Madrugada: "Dr. Mauro, é tarde... cuide-se! 🌙"`
+
+// ── MARA Modo Ausente — responde pelo Dr. Mauro ─────────────
+function buildModoAusentePrompt(motivo, retorno) {
+  const motivos = {
+    ferias:    { titulo: 'férias', desc: `O Dr. Mauro está em período de descanso${retorno ? ` e retorna dia ${retorno}` : ''}. Pode anotar seu recado para que ele retorne assim que possível?` },
+    doente:    { titulo: 'indisposto', desc: `O Dr. Mauro está indisposto hoje${retorno ? ` e retorna ${retorno}` : ' e retorna em breve'}. Posso anotar seu recado?` },
+    audiencia: { titulo: 'em audiência', desc: `O Dr. Mauro está em audiência no momento${retorno ? ` e retorna por volta das ${retorno}` : ' e retorna em breve'}. Posso ajudar?` },
+    viagem:    { titulo: 'em viagem', desc: `O Dr. Mauro está em viagem${retorno ? ` e retorna dia ${retorno}` : ''}. Para assuntos urgentes, ligue para o escritório: (86) 9482-0054.` },
+    reuniao:   { titulo: 'em reunião', desc: `O Dr. Mauro está em reunião${retorno ? ` e estará disponível às ${retorno}` : ' e retorna em breve'}. Posso anotar seu recado?` },
+  }
+  const m = motivos[motivo] || motivos.ferias
+  return `Você é a secretária do Dr. Mauro Monção. Responda de forma cordial e profissional.
+${m.desc}
+Se a pessoa mencionar palavras urgentes como "urgente", "penhora", "prazo", "execução fiscal" — informe que vai notificar o Dr. Mauro imediatamente.
+Responda em português brasileiro. Seja breve e educada. Máx. 3 linhas.`
+}
+
+// ============================================================
+// ELEVENLABS — GERAÇÃO DE ÁUDIO
+// ============================================================
+async function gerarAudio(texto, voiceId) {
+  if (!ELEVENLABS_KEY || !voiceId) return null
+  // Limitar texto para economizar créditos
+  const textoLimpo = texto.replace(/\*|_|~|`/g, '').slice(0, 500)
+  try {
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'xi-api-key':    ELEVENLABS_KEY,
+        'Accept':        'audio/mpeg',
+      },
+      body: JSON.stringify({
+        text: textoLimpo,
+        model_id: 'eleven_multilingual_v2',
+        voice_settings: { stability: 0.5, similarity_boost: 0.85, style: 0.2, use_speaker_boost: true },
+      }),
+      signal: AbortSignal.timeout(15000),
+    })
+    if (!res.ok) {
+      console.error('[ElevenLabs] Erro:', res.status)
+      return null
+    }
+    const buffer = await res.arrayBuffer()
+    const base64 = Buffer.from(buffer).toString('base64')
+    return base64
+  } catch (e) {
+    console.error('[ElevenLabs] fetch error:', e.message)
+    return null
+  }
+}
+
+// ── Enviar áudio via Z-API ───────────────────────────────────
+async function enviarAudio(numero, audioBase64) {
+  if (!audioBase64) return false
+  try {
+    const headers = { 'Content-Type': 'application/json' }
+    if (ZAPI_CLIENT_TOKEN) headers['Client-Token'] = ZAPI_CLIENT_TOKEN
+    const res = await fetch(`${ZAPI_BASE}/send-audio`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        phone: numero,
+        audio: `data:audio/mpeg;base64,${audioBase64}`,
+      }),
+      signal: AbortSignal.timeout(15000),
+    })
+    const data = await res.json()
+    if (res.ok) {
+      console.log(`[Z-API] 🔊 Áudio enviado para ${numero}`)
+      return true
+    }
+    console.error('[Z-API] Erro ao enviar áudio:', JSON.stringify(data).slice(0, 200))
+    return false
+  } catch (e) {
+    console.error('[Z-API] Erro áudio:', e.message)
+    return false
+  }
+}
+
+// ── Enviar resposta (texto ou áudio conforme preferência) ────
+async function enviarResposta(numero, texto, voiceId) {
+  const pref = global.__audioPreferencias.get(numero)
+  // Se preferência é áudio E temos ElevenLabs configurado
+  if (pref === 'audio' && ELEVENLABS_KEY && voiceId) {
+    const audio = await gerarAudio(texto, voiceId)
+    if (audio) {
+      await enviarAudio(numero, audio)
+      return 'audio'
+    }
+  }
+  // Fallback: texto
+  await enviarMensagem(numero, texto)
+  return 'texto'
+}
+
+// ============================================================
+// Z-API — ENVIAR MENSAGEM DE TEXTO
+// ============================================================
+async function enviarMensagem(numero, texto) {
+  if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN) {
+    console.error('[Z-API] Credenciais não configuradas')
+    return
+  }
+  try {
+    const headers = { 'Content-Type': 'application/json' }
+    if (ZAPI_CLIENT_TOKEN) headers['Client-Token'] = ZAPI_CLIENT_TOKEN
+    const res = await fetch(`${ZAPI_BASE}/send-text`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ phone: numero, message: texto }),
+      signal: AbortSignal.timeout(10000),
+    })
+    const data = await res.json()
+    if (res.ok) console.log('[Z-API] ✅ Msg enviada para', numero)
+    else console.error('[Z-API] ❌ Erro:', JSON.stringify(data).slice(0, 200))
+    return data
+  } catch (e) {
+    console.error('[Z-API] fetch error:', e.message)
+  }
+}
+
+// ============================================================
+// CRM
+// ============================================================
+async function crmRegistrarMensagem(numero, role, texto, nomeWhatsApp) {
+  const payload = { numero, role, texto }
+  if (nomeWhatsApp) payload.nomeWhatsApp = nomeWhatsApp
+  try {
+    await fetch(`${VPS_LEADS_URL}/leads/mensagem`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3000),
+    })
+  } catch {}
+}
+
+async function crmCriarLead({ nome, telefone, numero, area, urgencia, resumo, primeiroContato }) {
+  const payload = {
+    nome, telefone, numero, area, urgencia, resumo,
+    canal: 'whatsapp-zapi',
+    primeiro_contato: primeiroContato || new Date().toISOString(),
+    whatsapp_link: `https://wa.me/${numero}`,
+  }
+  try {
+    await fetch(`${VPS_LEADS_URL}/leads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3000),
+    })
+    console.log(`[CRM] ✅ Lead salvo: ${nome} — ${telefone || numero}`)
+  } catch (e) {
+    console.error('[CRM] Erro criar lead:', e.message)
+  }
+}
+
+// ============================================================
+// MARA IA — NOTIFICAÇÃO + COMANDOS + RESPOSTAS
+// ============================================================
+
+// Avisa Dr. Mauro sobre novo lead qualificado
+async function maraAvisarDrMauro({ nome, telefone, numero, area, urgencia, resumo, pushName }) {
+  if (!DR_MAURO_WHATSAPP) return
+  const urgEmoji = { low: '🟢', medium: '🟡', high: '🔴', critical: '🚨' }[urgencia] ?? '🟡'
+  const urgLabel = { low: 'BAIXA', medium: 'MÉDIA', high: 'ALTA', critical: 'CRÍTICA' }[urgencia] ?? 'MÉDIA'
+  const areaLabel = {
+    tributario: '🧾 Tributário', previdenciario: '👴 Previdenciário',
+    bancario: '🏦 Bancário', imobiliario: '🏠 Imobiliário',
+    familia: '👨‍👩‍👧 Família', publico: '⚖️ Advocacia Pública',
+    trabalhista: '👷 Trabalhista', consumidor: '🛒 Consumidor', outros: '📋 Outros',
+  }[area] ?? '📋 Outros'
+  const hora = new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Fortaleza', hour: '2-digit', minute: '2-digit' })
+  const numLimpo = numero.replace(/\D/g, '')
+  const nomeExibir = nome ?? pushName ?? 'Não informado'
+  const foneExibir = telefone ?? `+${numLimpo}`
+  const msg = [
+    `🤖 *MARA IA — Novo Lead Qualificado!*`,
+    `_Triagem concluída às ${hora}_`,
+    ``,
+    `👤 *Nome:* ${nomeExibir}`,
+    `📱 *WhatsApp:* ${foneExibir}`,
+    `📂 *Área:* ${areaLabel}`,
+    `${urgEmoji} *Urgência:* ${urgLabel}`,
+    resumo ? `💬 *Resumo:* ${resumo}` : '',
+    ``,
+    `👉 *Atender agora:* https://wa.me/${numLimpo}`,
+    `_— MARA IA 🌟_`,
+  ].filter(l => l !== null).join('\n')
+  const mauroNum = DR_MAURO_WHATSAPP.replace(/\D/g, '')
+  await enviarMensagem(mauroNum, msg)
+  console.log(`[MARA IA] ✅ Dr. Mauro avisado — ${nomeExibir}`)
+}
+
+// Processar comandos do Dr. Mauro
+async function processarComandoMara(texto, numero) {
+  const cmd = texto.trim().toLowerCase()
+
+  // /ausente [motivo] [retorno]
+  if (cmd.startsWith('/ausente') || cmd.startsWith('ausente')) {
+    const partes = texto.trim().split(' ')
+    const motivo  = partes[1] || 'ferias'
+    const retorno = partes.slice(2).join(' ') || null
+    global.__modoAusente = { ativo: true, motivo, retorno, mensagem: null }
+    const labels = { ferias: '🏖️ Férias', doente: '🤒 Doente', audiencia: '⚖️ Audiência', viagem: '✈️ Viagem', reuniao: '🤝 Reunião' }
+    const label = labels[motivo] || '😴 Ausente'
+    return `✅ *Modo Ausente ativado!*\n\n${label}${retorno ? ` — Retorno: ${retorno}` : ''}\n\nEstou respondendo por você agora, Dr. Mauro. Vou te alertar se chegar algo urgente. 🛡️\n\n_Use /presente para desativar._`
+  }
+
+  // /presente
+  if (cmd === '/presente' || cmd === 'presente') {
+    global.__modoAusente = { ativo: false, motivo: null, retorno: null, mensagem: null }
+    return `✅ *Modo Ausente desativado!*\n\nBem-vindo de volta, Dr. Mauro! 🎉\nVocê está respondendo normalmente agora.`
+  }
+
+  // /leads
+  if (cmd.includes('/leads') || cmd.includes('leads de hoje') || cmd.includes('quais leads')) {
+    try {
+      const res = await fetch(`${VPS_LEADS_URL}/leads`, { signal: AbortSignal.timeout(5000) })
+      const data = await res.json()
+      const leads = data?.leads || data || []
+      const hoje = new Date().toISOString().split('T')[0]
+      const leadsHoje = leads.filter(l => (l.createdAt || l.created_at || '').startsWith(hoje))
+      if (!leadsHoje.length) return `📋 *Leads de Hoje*\n\nNenhum lead ainda hoje. O Dr. Ben está de prontidão! 💪`
+      const urgEmoji = { critical: '🚨', high: '🔴', medium: '🟡', low: '🟢' }
+      const linhas = leadsHoje.slice(0, 8).map((l, i) => {
+        const urg = urgEmoji[l.urgencia] || '⚪'
+        return `${urg} *${i+1}. ${l.nome || 'Sem nome'}*\n   📞 ${l.telefone || l.numero || '—'} · ⚖️ ${l.area || 'Outros'}`
+      })
+      return `📋 *Leads de Hoje* (${leadsHoje.length})\n\n${linhas.join('\n\n')}\n\n_— MARA IA 🌟_`
+    } catch {
+      return `📋 *Leads*\n\nNão consegui acessar o CRM agora. Tente em instantes.`
+    }
+  }
+
+  // /urgentes
+  if (cmd.includes('/urgentes') || cmd.includes('casos urgentes') || cmd.includes('urgência')) {
+    try {
+      const res = await fetch(`${VPS_LEADS_URL}/leads`, { signal: AbortSignal.timeout(5000) })
+      const data = await res.json()
+      const leads = data?.leads || data || []
+      const urgentes = leads.filter(l => l.urgencia === 'high' || l.urgencia === 'critical')
+      if (!urgentes.length) return `🟢 *Nenhum caso urgente no momento.*\n\n_— MARA IA 🌟_`
+      const linhas = urgentes.slice(0, 5).map((l, i) =>
+        `🚨 *${i+1}. ${l.nome || 'Sem nome'}*\n   📞 ${l.telefone || l.numero || '—'}\n   ⚖️ ${l.area || 'Outros'} · 👉 https://wa.me/${(l.numero||'').replace(/\D/g,'')}`
+      )
+      return `🚨 *Casos Urgentes* (${urgentes.length})\n\n${linhas.join('\n\n')}\n\n_— MARA IA 🌟_`
+    } catch {
+      return `🚨 Não consegui acessar o CRM agora.`
+    }
+  }
+
+  // /resumo
+  if (cmd.includes('/resumo') || cmd.includes('resumo do dia') || cmd.includes('relatório')) {
+    try {
+      const res = await fetch(`${VPS_LEADS_URL}/leads`, { signal: AbortSignal.timeout(5000) })
+      const data = await res.json()
+      const leads = data?.leads || data || []
+      const hoje = new Date().toISOString().split('T')[0]
+      const leadsHoje = leads.filter(l => (l.createdAt || l.created_at || '').startsWith(hoje))
+      const urgentes = leads.filter(l => l.urgencia === 'high' || l.urgencia === 'critical')
+      const hora = new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Fortaleza', hour: '2-digit', minute: '2-digit' })
+      const ausente = global.__modoAusente.ativo ? `🔴 Modo ${global.__modoAusente.motivo}` : '🟢 Presente'
+      return `📊 *Relatório Executivo — ${hora}*\n\n👥 Leads hoje: *${leadsHoje.length}*\n🚨 Urgentes: *${urgentes.length}*\n📦 Total CRM: *${leads.length}*\n🤖 Dr. Ben: *Operacional*\n📱 Z-API: *Conectado*\n🛡️ Status: *${ausente}*\n\n_— MARA IA 🌟_`
+    } catch {
+      return `📊 Relatório indisponível no momento. CRM offline.`
+    }
+  }
+
+  // /status
+  if (cmd.includes('/status') || cmd.includes('status do sistema')) {
+    const ausente = global.__modoAusente.ativo
+      ? `🔴 Ausente — ${global.__modoAusente.motivo}${global.__modoAusente.retorno ? ` até ${global.__modoAusente.retorno}` : ''}`
+      : '🟢 Dr. Mauro presente'
+    return `⚙️ *Status dos Sistemas*\n\n🤖 OpenAI GPT-4o-mini: ✅ Online\n📱 Z-API WhatsApp: ✅ Conectado\n🔊 ElevenLabs TTS: ${ELEVENLABS_KEY ? '✅ Ativo' : '⚠️ Sem chave'}\n🗃️ CRM VPS: ✅ Online\n🛡️ ${ausente}\n\n_— MARA IA 🌟_`
+  }
+
+  // /ajuda
+  if (cmd.includes('/ajuda') || cmd.includes('comandos') || cmd.includes('o que você faz')) {
+    return `📖 *Comandos da MARA IA:*\n\n📋 */leads* — Leads de hoje\n🚨 */urgentes* — Casos críticos\n📊 */resumo* — Relatório do dia\n⚙️ */status* — Status dos sistemas\n🏖️ */ausente ferias 15/03* — Ativar modo ausente\n✅ */presente* — Desativar modo ausente\n\nOu fale naturalmente comigo! 😊\n\n_— MARA IA 🌟_`
+  }
+
+  return null // Não é comando — processar com GPT
+}
+
+// Gerar resposta da MARA com GPT + histórico
+async function gerarRespostaMara(numero, mensagem) {
+  if (!global.__maraHistorico.has(numero)) global.__maraHistorico.set(numero, [])
+  const hist = global.__maraHistorico.get(numero)
+  const messages = [
+    { role: 'system', content: MARA_SYSTEM_PROMPT },
+    ...hist.slice(-20),
+    { role: 'user', content: mensagem },
+  ]
+  try {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_KEY}` },
+      body: JSON.stringify({ model: 'gpt-4o-mini', messages, max_tokens: 400, temperature: 0.75 }),
+      signal: AbortSignal.timeout(20000),
+    })
+    const data = await res.json()
+    const resposta = data?.choices?.[0]?.message?.content
+    if (resposta) {
+      hist.push({ role: 'user', content: mensagem })
+      hist.push({ role: 'assistant', content: resposta })
+      if (hist.length > 30) hist.splice(0, hist.length - 30)
+      return resposta
+    }
+  } catch (e) {
+    console.error('[MARA GPT] erro:', e.message)
+  }
+  return 'Desculpe, Dr. Mauro — tive uma instabilidade. Pode repetir?'
+}
+
+// Gerar resposta no Modo Ausente (responde pelo Dr. Mauro)
+async function gerarRespostaModoAusente(mensagem, numero, pushName) {
+  const { motivo, retorno } = global.__modoAusente
+  const prompt = buildModoAusentePrompt(motivo, retorno)
+
+  // Detectar palavras urgentes
+  const palavrasUrgentes = ['urgente', 'penhora', 'execução', 'prazo fatal', 'bloqueio', 'hoje', 'agora']
+  const ehUrgente = palavrasUrgentes.some(p => mensagem.toLowerCase().includes(p))
+
+  if (ehUrgente) {
+    // Alertar Dr. Mauro mesmo ausente
+    const mauroNum = DR_MAURO_WHATSAPP.replace(/\D/g, '')
+    const hora = new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Fortaleza', hour: '2-digit', minute: '2-digit' })
+    await enviarMensagem(mauroNum,
+      `🚨 *ALERTA URGENTE — Modo Ausente*\n\n_Recebido às ${hora}_\n\n👤 *De:* ${pushName || numero}\n💬 *Mensagem:* "${mensagem.slice(0, 200)}"\n\n⚠️ Parece urgente mesmo em modo ${motivo}!`
+    )
+  }
+
+  try {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_KEY}` },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: prompt },
+          { role: 'user', content: mensagem },
+        ],
+        max_tokens: 200, temperature: 0.6,
+      }),
+      signal: AbortSignal.timeout(15000),
+    })
+    const data = await res.json()
+    return data?.choices?.[0]?.message?.content || 'O Dr. Mauro está indisponível no momento. Retorna em breve.'
+  } catch (e) {
+    return 'O Dr. Mauro está indisponível no momento. Retorna em breve.'
+  }
+}
+
+// ============================================================
+// DR. BEN — CONSULTA OpenAI
+// ============================================================
 function extrairMarcadores(texto) {
   const resultado = { contact: null, area: null, urgencia: null }
   const contactMatch = texto.match(/\[CONTACT:(\{[^}]+\})\]/)
-  if (contactMatch) {
-    try { resultado.contact = JSON.parse(contactMatch[1]) } catch {}
-  }
+  if (contactMatch) { try { resultado.contact = JSON.parse(contactMatch[1]) } catch {} }
   const areaMatch = texto.match(/\[AREA:([\w|]+)\]/)
   if (areaMatch) resultado.area = areaMatch[1].split('|')[0]
   const urgenciaMatch = texto.match(/\[URGENCY:(\w+)\]/)
@@ -173,43 +526,25 @@ function extrairMarcadores(texto) {
   return resultado
 }
 
-// ── Consultar Dr. Ben (OpenAI GPT-4o-mini) ───────────────────
 async function consultarDrBen(history, novaMensagem) {
   const fallback = '⚖️ Olá! Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção Advogados. Estou com uma instabilidade técnica. Por favor, entre em contato: *(86) 99482-0054*'
-
   if (!OPENAI_KEY) return fallback
-
   const messages = [
     { role: 'system', content: DR_BEN_SYSTEM_PROMPT },
-    ...history.slice(-20).map(m => ({
-      role:    m.role === 'model' ? 'assistant' : (m.role ?? 'user'),
-      content: m.content ?? '',
-    })),
+    ...history.slice(-20).map(m => ({ role: m.role === 'model' ? 'assistant' : (m.role ?? 'user'), content: m.content ?? '' })),
     { role: 'user', content: novaMensagem },
   ]
-
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${OPENAI_KEY}`,
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_KEY}` },
       body: JSON.stringify({ model: 'gpt-4o-mini', messages, max_tokens: 1024, temperature: 0.7 }),
       signal: AbortSignal.timeout(25000),
     })
-
-    if (!response.ok) {
-      console.error('[Dr. Ben] OpenAI erro:', response.status)
-      return fallback
-    }
-
+    if (!response.ok) return fallback
     const data = await response.json()
     const text = data?.choices?.[0]?.message?.content
-    if (text) {
-      console.log(`[Dr. Ben] gpt-4o-mini (${data?.usage?.total_tokens ?? '?'} tokens)`)
-      return text
-    }
+    if (text) { console.log(`[Dr. Ben] gpt-4o-mini (${data?.usage?.total_tokens ?? '?'} tokens)`); return text }
     return fallback
   } catch (err) {
     console.error('[Dr. Ben] OpenAI error:', err.message)
@@ -217,195 +552,173 @@ async function consultarDrBen(history, novaMensagem) {
   }
 }
 
-// ── MARA IA — avisa Dr. Mauro ────────────────────────────────
-async function maraAvisarDrMauro({ nome, telefone, numero, area, urgencia, resumo, pushName }) {
-  if (!DR_MAURO_WHATSAPP) return
-
-  const urgenciaEmoji = { low: '🟢', medium: '🟡', high: '🔴', critical: '🚨' }[urgencia] ?? '🟡'
-  const urgenciaLabel = { low: 'BAIXA', medium: 'MÉDIA', high: 'ALTA', critical: 'CRÍTICA' }[urgencia] ?? 'MÉDIA'
-  const areaLabel = {
-    tributario: '🧾 Tributário', previdenciario: '👴 Previdenciário',
-    bancario: '🏦 Bancário', imobiliario: '🏠 Imobiliário',
-    familia: '👨‍👩‍👧 Família', publico: '⚖️ Advocacia Pública',
-    trabalhista: '👷 Trabalhista', consumidor: '🛒 Consumidor',
-    outros: '📋 Outros',
-  }[area] ?? '📋 Outros'
-
-  const hora = new Date().toLocaleTimeString('pt-BR', {
-    timeZone: 'America/Fortaleza', hour: '2-digit', minute: '2-digit',
-  })
-
-  // Montar número limpo para link direto
-  const numLimpo = numero.replace(/\D/g, '')
-  const whatsappLink = `https://wa.me/${numLimpo}`
-
-  // Nome de exibição — preferir nome coletado, fallback pushName
-  const nomeExibir   = nome ?? pushName ?? 'Não informado'
-  const foneExibir   = telefone ?? `+${numLimpo}`
-
-  const msg = [
-    `🤖 *MARA IA — Novo Lead Qualificado!*`,
-    `_Triagem concluída às ${hora}_`,
-    ``,
-    `👤 *Nome:* ${nomeExibir}`,
-    `📱 *WhatsApp:* ${foneExibir}`,
-    `🔢 *Número:* +${numLimpo}`,
-    `📂 *Área:* ${areaLabel}`,
-    `${urgenciaEmoji} *Urgência:* ${urgenciaLabel}`,
-    resumo ? `💬 *Resumo:* ${resumo}` : '',
-    ``,
-    `👉 *Atender agora:* ${whatsappLink}`,
-    ``,
-    `_Toque no link para abrir a conversa no WhatsApp._`,
-  ].filter(l => l !== null && l !== undefined).join('\n')
-
-  const mauroNum = DR_MAURO_WHATSAPP.replace(/\D/g, '')
-  await enviarMensagem(mauroNum, msg)
-  console.log(`[MARA IA] Dr. Mauro avisado — ${nomeExibir} (${foneExibir})`)
+// Detectar preferência de áudio na resposta
+function detectarPreferenciaAudio(texto) {
+  const t = texto.toLowerCase()
+  const sim = ['sim', 'pode', 'quero', 'claro', 'ok', 'pode ser', 'com certeza', 'adorei', 'ótimo']
+  const nao = ['não', 'nao', 'prefiro texto', 'texto', 'sem áudio', 'sem audio']
+  if (sim.some(p => t.includes(p))) return 'audio'
+  if (nao.some(p => t.includes(p))) return 'texto'
+  return null
 }
 
-// ── Handler principal ────────────────────────────────────────
+// ============================================================
+// HANDLER PRINCIPAL
+// ============================================================
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   if (req.method === 'OPTIONS') return res.status(200).end()
 
-  // GET — health check e teste de envio
+  // ── GET — health check ───────────────────────────────────
   if (req.method === 'GET') {
     const { action, para } = req.query
 
-    // Ação de teste: GET /api/whatsapp-zapi?action=testar&para=5585991430969
     if (action === 'testar' && para) {
       try {
         const headers = { 'Content-Type': 'application/json' }
         if (ZAPI_CLIENT_TOKEN) headers['Client-Token'] = ZAPI_CLIENT_TOKEN
-
         const res2 = await fetch(`${ZAPI_BASE}/send-text`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            phone:   para,
-            message: '✅ *Dr. Ben está online!*\n\nZ-API funcionando corretamente. Pode me mandar uma mensagem! 🤖⚖️',
-          }),
+          method: 'POST', headers,
+          body: JSON.stringify({ phone: para, message: '✅ *Dr. Ben está online!*\n\nZ-API funcionando. Pode me mandar uma mensagem! 🤖⚖️' }),
           signal: AbortSignal.timeout(10000),
         })
         const data = await res2.json()
-        return res.status(200).json({
-          ok:        res2.ok,
-          zapi_resp: data,
-          token_ok:  !!ZAPI_CLIENT_TOKEN,
-          instance:  ZAPI_INSTANCE_ID ? ZAPI_INSTANCE_ID.slice(0, 8) + '...' : '❌',
-        })
+        return res.status(200).json({ ok: res2.ok, zapi_resp: data, token_ok: !!ZAPI_CLIENT_TOKEN })
       } catch (e) {
         return res.status(200).json({ ok: false, erro: e.message })
       }
     }
 
+    // Status do modo ausente
+    if (action === 'modo-ausente') {
+      return res.json({ ...global.__modoAusente })
+    }
+
+    // Ativar modo ausente via dashboard (sem WhatsApp)
+    if (action === 'ativar-ausente') {
+      const motivo  = req.query.motivo  || 'ferias'
+      const retorno = req.query.retorno || null
+      const labels  = { ferias: '🏖️ Férias', doente: '🤒 Indisposto', audiencia: '⚖️ Audiência', viagem: '✈️ Viagem', reuniao: '🤝 Reunião', fora_horario: '😴 Fora do horário' }
+      global.__modoAusente = { ativo: true, motivo, retorno, mensagem: null }
+      console.log(`[MARA] 🛡️ Modo Ausente ativado via dashboard: ${motivo}${retorno ? ` até ${retorno}` : ''}`)
+      return res.json({ ok: true, ativo: true, motivo, retorno, label: labels[motivo] || motivo })
+    }
+
+    // Desativar modo ausente via dashboard
+    if (action === 'desativar-ausente') {
+      global.__modoAusente = { ativo: false, motivo: null, retorno: null, mensagem: null }
+      console.log('[MARA] ✅ Modo Ausente desativado via dashboard')
+      return res.json({ ok: true, ativo: false })
+    }
+
     return res.status(200).json({
-      status:  'ok',
-      service: 'Dr. Ben via Z-API WhatsApp',
-      model:   'gpt-4o-mini',
-      zapi:    ZAPI_INSTANCE_ID ? '✅ configurado' : '❌ faltando',
-      token:   ZAPI_CLIENT_TOKEN ? '✅ client-token ok' : '❌ client-token ausente',
+      status:           'ok',
+      service:          'Dr. Ben + MARA IA via Z-API WhatsApp',
+      model:            'gpt-4o-mini',
+      elevenlabs:       ELEVENLABS_KEY ? '✅ ativo' : '⚠️ sem chave',
+      voice_drben:      VOICE_DR_BEN,
+      voice_mara:       VOICE_MARA,
+      modo_ausente:     global.__modoAusente.ativo,
+      zapi:             ZAPI_INSTANCE_ID ? '✅ configurado' : '❌ faltando',
+      token:            ZAPI_CLIENT_TOKEN ? '✅ ok' : '❌ ausente',
     })
   }
 
   if (req.method !== 'POST') return res.status(405).end()
 
+  // ── POST — Webhook ───────────────────────────────────────
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
     console.log('[Z-API Webhook] Payload:', JSON.stringify(body).slice(0, 300))
 
-    // Ignorar mensagens enviadas pelo próprio bot
     if (body?.fromMe === true) return res.status(200).json({ ok: true })
-
-    // Ignorar status/notificações que não são mensagens
     if (!body?.phone && !body?.from) return res.status(200).json({ ok: true })
 
-    // Extrair dados — Z-API envia phone ou from
     const numero   = (body?.phone || body?.from || '').replace(/[^0-9]/g, '')
     const texto    = body?.text?.message || body?.text || body?.message || ''
     const pushName = body?.senderName || body?.pushName || ''
 
-    // Ignorar grupos e broadcasts
-    if (numero.includes('@g') || numero.endsWith('@broadcast')) {
-      return res.status(200).json({ ok: true })
-    }
+    if (numero.includes('@g') || numero.endsWith('@broadcast')) return res.status(200).json({ ok: true })
+    if (!numero || numero.length < 8 || !texto) return res.status(200).json({ ok: true })
 
-    if (!numero || numero.length < 8 || !texto) {
-      console.log('[Z-API] Ignorando — sem número ou texto válido')
-      return res.status(200).json({ ok: true })
-    }
+    console.log(`[Webhook] Mensagem de ${pushName} (${numero}): "${texto.slice(0, 100)}"`)
 
-    console.log(`[Dr. Ben] Mensagem de ${numero} (${pushName}): "${texto}"`)
-
-    // ── Detectar se é Dr. Mauro ───────────────────────────
+    // ── Detectar se é o Dr. Mauro ────────────────────────
     const mauroNorm = DR_MAURO_WHATSAPP.replace(/\D/g, '')
     const ehDrMauro = mauroNorm && numero.endsWith(mauroNorm.slice(-10))
 
+    // ════════════════════════════════════════════════════
+    // FLUXO DR. MAURO → MARA IA
+    // ════════════════════════════════════════════════════
     if (ehDrMauro) {
-      const cmd = texto.trim().toLowerCase()
+      console.log(`[MARA IA] 💬 Dr. Mauro falando: "${texto.slice(0, 80)}"`)
 
-      if (cmd === '/reset' || cmd === 'reset') {
-        global.__drbenSessoesZapi.delete(numero)
-        global.__drbenTriagemZapi.delete(numero)
-        global.__drbenSessoesZapi.set(numero, [])
-        global.__drbenTriagemZapi.set(numero, { nome: null, telefone: null, area: null, urgencia: null, notificado: false })
-        await enviarMensagem(numero, '✅ *Sessão resetada!*\n\nAgora você está em *modo cliente*. Mande qualquer mensagem e o Dr. Ben vai te atender normalmente.')
-        return res.status(200).json({ ok: true, acao: 'reset' })
+      // Verificar preferência de áudio
+      const prefExistente = global.__audioPreferencias.get(numero)
+      if (!prefExistente) {
+        const prefDetectada = detectarPreferenciaAudio(texto)
+        if (prefDetectada) {
+          global.__audioPreferencias.set(numero, prefDetectada)
+          console.log(`[MARA] 🔊 Preferência do Dr. Mauro: ${prefDetectada}`)
+        }
       }
 
-      if (cmd === '/status' || cmd === 'status') {
-        const sessao = global.__drbenSessoesZapi.get(numero)
-        const msg = [
-          '📊 *Status Dr. Ben (Z-API)*',
-          `• Sessões ativas: ${global.__drbenSessoesZapi.size}`,
-          `• Sua sessão: ${sessao ? `${sessao.length} msgs` : 'nenhuma'}`,
-          `• IA: ${OPENAI_KEY ? '✅ gpt-4o-mini' : '❌ sem chave'}`,
-          `• WhatsApp: ✅ Z-API`,
-          `• Prompt: ✅ Oficial 7 etapas`,
-          '',
-          '_Comandos: /reset | /status | /sair_',
-        ].join('\n')
-        await enviarMensagem(numero, msg)
-        return res.status(200).json({ ok: true, acao: 'status' })
+      // Comandos especiais
+      const respostaComando = await processarComandoMara(texto, numero)
+      let respostaFinal
+
+      if (respostaComando) {
+        respostaFinal = respostaComando
+        const hist = global.__maraHistorico.get(numero) || []
+        hist.push({ role: 'user', content: texto })
+        hist.push({ role: 'assistant', content: respostaComando })
+        global.__maraHistorico.set(numero, hist)
+      } else {
+        // Resposta GPT com personalidade MARA
+        respostaFinal = await gerarRespostaMara(numero, texto)
       }
 
-      if (cmd === '/sair' || cmd === 'sair') {
-        global.__drbenSessoesZapi.delete(numero)
-        global.__drbenTriagemZapi.delete(numero)
-        await enviarMensagem(numero, '👋 *Saiu do modo cliente.*\n\n• */reset* — entrar como cliente\n• */status* — ver sistema')
-        return res.status(200).json({ ok: true, acao: 'saiu' })
-      }
+      // Enviar com voz MARA ou texto
+      await enviarResposta(numero, respostaFinal, VOICE_MARA)
 
-      if (!global.__drbenSessoesZapi.has(numero)) {
-        await enviarMensagem(numero, [
-          '👋 *Olá, Dr. Mauro!*',
-          '',
-          'Comandos disponíveis:',
-          '• */reset* — testar Dr. Ben como cliente',
-          '• */status* — ver estado do sistema',
-          '• */sair* — sair do modo cliente',
-          '',
-          '_Envie /reset para testar o Dr. Ben._',
-        ].join('\n'))
-        return res.status(200).json({ ok: true, acao: 'menu_dono' })
+      console.log(`[MARA IA] ✅ Respondido Dr. Mauro`)
+      return res.status(200).json({ ok: true, agente: 'MARA', respondido: true })
+    }
+
+    // ════════════════════════════════════════════════════
+    // MODO AUSENTE → MARA responde pelo Dr. Mauro
+    // ════════════════════════════════════════════════════
+    if (global.__modoAusente.ativo) {
+      console.log(`[MARA Ausente] Respondendo por Dr. Mauro para ${numero}`)
+      const resposta = await gerarRespostaModoAusente(texto, numero, pushName)
+      // Modo ausente sempre em texto (mais discreto)
+      await enviarMensagem(numero, resposta)
+      return res.status(200).json({ ok: true, agente: 'MARA_AUSENTE', respondido: true })
+    }
+
+    // ════════════════════════════════════════════════════
+    // FLUXO CLIENTE → DR. BEN
+    // ════════════════════════════════════════════════════
+
+    // Verificar preferência de áudio do cliente
+    const prefCliente = global.__audioPreferencias.get(numero)
+    if (!prefCliente) {
+      const prefDetectada = detectarPreferenciaAudio(texto)
+      if (prefDetectada) {
+        global.__audioPreferencias.set(numero, prefDetectada)
+        console.log(`[Dr. Ben] 🔊 Preferência do cliente ${numero}: ${prefDetectada}`)
       }
     }
 
-    // ── Criar/recuperar sessão ────────────────────────────
-    if (!global.__drbenSessoesZapi.has(numero)) {
-      global.__drbenSessoesZapi.set(numero, [])
-    }
+    // Sessão Dr. Ben
+    if (!global.__drbenSessoesZapi.has(numero)) global.__drbenSessoesZapi.set(numero, [])
 
-    // ── Formatar número WhatsApp do cliente ───────────────
-    // numero = ex: 5585991430969 → formatar como (85) 99143-0969
+    // Formatar telefone
     function formatarTelefone(n) {
       const d = n.replace(/\D/g, '')
-      // DDI 55 + DDD 2 dígitos + 9 dígitos
       if (d.length === 13) return `(${d.slice(2,4)}) ${d.slice(4,9)}-${d.slice(9)}`
-      // DDI 55 + DDD 2 dígitos + 8 dígitos
       if (d.length === 12) return `(${d.slice(2,4)}) ${d.slice(4,8)}-${d.slice(8)}`
       return d
     }
@@ -413,36 +726,30 @@ export default async function handler(req, res) {
 
     if (!global.__drbenTriagemZapi.has(numero)) {
       global.__drbenTriagemZapi.set(numero, {
-        nome:            pushName || null,
-        telefone:        telefoneWhatsApp, // ← número WhatsApp já é o telefone!
-        numeroWhatsApp:  numero,           // número puro para envio
+        nome: pushName || null,
+        telefone: telefoneWhatsApp,
+        numeroWhatsApp: numero,
         primeiroContato: new Date().toISOString(),
-        area:            null,
-        urgencia:        null,
-        notificado:      false,
+        area: null, urgencia: null, notificado: false,
+        contadorMsgs: 0,
       })
     } else {
       const t = global.__drbenTriagemZapi.get(numero)
-      // Atualizar nome se veio do pushName e ainda não temos
       if (pushName && !t.nome) t.nome = pushName
-      // Garantir telefone sempre preenchido
       if (!t.telefone) t.telefone = telefoneWhatsApp
     }
 
     const history      = global.__drbenSessoesZapi.get(numero)
     const dadosTriagem = global.__drbenTriagemZapi.get(numero)
+    dadosTriagem.contadorMsgs = (dadosTriagem.contadorMsgs || 0) + 1
 
-    // Registrar no CRM
     crmRegistrarMensagem(numero, 'lead', texto, pushName || dadosTriagem.nome)
 
-    // Dr. Ben responde
     const aiText = await consultarDrBen(history, texto)
 
-    // Salvar histórico
     history.push({ role: 'user',      content: texto  })
     history.push({ role: 'assistant', content: aiText })
 
-    // Extrair marcadores
     const marcadores = extrairMarcadores(aiText)
     if (marcadores.area)     dadosTriagem.area     = marcadores.area
     if (marcadores.urgencia) dadosTriagem.urgencia = marcadores.urgencia
@@ -451,54 +758,37 @@ export default async function handler(req, res) {
       dadosTriagem.telefone = marcadores.contact.phone ?? dadosTriagem.telefone
     }
 
-    // Limpar marcadores
     const cleanReply = aiText
       .replace(/\[CONTACT:\{[^}]*\}\]/g, '')
       .replace(/\[AREA:[\w|]+\]/g, '')
       .replace(/\[URGENCY:\w+\]/g, '')
       .trim()
 
-    // Registrar resposta no CRM
     crmRegistrarMensagem(numero, 'dr_ben', cleanReply)
 
-    // ── Criar lead no CRM assim que tiver nome (telefone já temos desde o início) ──
+    // Criar lead e avisar MARA quando tiver nome
     if (dadosTriagem.nome && dadosTriagem.telefone && !dadosTriagem.notificado) {
       dadosTriagem.notificado = true
-
-      // Resumo = mensagens do cliente concatenadas
-      const mensagensCliente = history.filter(m => m.role === 'user').map(m => m.content ?? '')
-      const resumo = mensagensCliente.slice(0, 3).join(' | ')?.slice(0, 200)
-
+      const resumo = history.filter(m => m.role === 'user').map(m => m.content ?? '').slice(0, 3).join(' | ')?.slice(0, 200)
       crmCriarLead({
-        nome:            dadosTriagem.nome,
-        telefone:        dadosTriagem.telefone,
-        numero,
-        area:            dadosTriagem.area     ?? 'outros',
-        urgencia:        dadosTriagem.urgencia ?? 'medium',
-        resumo,
-        primeiroContato: dadosTriagem.primeiroContato,
+        nome: dadosTriagem.nome, telefone: dadosTriagem.telefone, numero,
+        area: dadosTriagem.area ?? 'outros', urgencia: dadosTriagem.urgencia ?? 'medium',
+        resumo, primeiroContato: dadosTriagem.primeiroContato,
       })
-
       maraAvisarDrMauro({
-        nome:     dadosTriagem.nome,
-        telefone: dadosTriagem.telefone,
-        numero,
-        area:     dadosTriagem.area     ?? 'outros',
-        urgencia: dadosTriagem.urgencia ?? 'medium',
-        resumo,
-        pushName,
+        nome: dadosTriagem.nome, telefone: dadosTriagem.telefone, numero,
+        area: dadosTriagem.area ?? 'outros', urgencia: dadosTriagem.urgencia ?? 'medium',
+        resumo, pushName,
       })
-
-      console.log(`[Dr. Ben] Lead criado — ${dadosTriagem.nome} (${dadosTriagem.telefone}) — MARA avisou Dr. Mauro`)
     }
 
-    // Enviar resposta via Z-API
-    await enviarMensagem(numero, cleanReply)
+    // Enviar com voz Dr. Ben ou texto
+    await enviarResposta(numero, cleanReply, VOICE_DR_BEN)
 
-    return res.status(200).json({ ok: true, respondido: true })
+    return res.status(200).json({ ok: true, agente: 'DR_BEN', respondido: true })
 
   } catch (e) {
-    console.error('[Z-API Webhook] Erro:', e.message)
+    console.error('[Z-API Webhook] Erro geral:', e.message)
     return res.status(200).json({ ok: true })
   }
 }

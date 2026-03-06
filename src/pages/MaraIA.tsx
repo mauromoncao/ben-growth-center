@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Bot, Save, RefreshCw, CheckCircle2, AlertCircle, Zap,
   Clock, MessageSquare, Shield, ChevronDown, ChevronUp,
@@ -8,12 +8,19 @@ import {
   Bell, Target, Activity, BarChart2, Cpu, Lock,
   Wifi, WifiOff, CheckCircle, XCircle, ArrowRight,
   Briefcase, Scale, Heart, Home, Building2, FileText,
-  UserCircle, Hash, Copy, ExternalLink
+  UserCircle, Hash, Copy, ExternalLink, Mic, MicOff,
+  Sun, Moon, Umbrella, Plane, Coffee, Pause, X,
+  VolumeX, Headphones, Music, WandSparkles, MapPin,
+  PauseCircle, PlayCircle, LogIn, LogOut, Award
 } from 'lucide-react'
 
-// URL do avatar oficial da MARA IA
+// ─── URLs oficiais ────────────────────────────────────────────
 const MARA_AVATAR_URL = 'https://www.genspark.ai/api/files/s/qiD4oS1k?cache_control=3600'
 const MARA_WEBHOOK_URL = 'https://ben-growth-center.vercel.app/api/whatsapp-mara'
+
+// ─── Voice IDs ElevenLabs ─────────────────────────────────────
+const VOICE_DR_BEN = 'ETf5cmpNIbpSiXmBaR2m'
+const VOICE_MARA   = 'EST9Ui6982FZPSi7gCHi'
 
 // ─── Tipos ───────────────────────────────────────────────────
 interface ConfigMara {
@@ -44,11 +51,29 @@ interface ConfigMara {
   ativo: boolean
   modoManutencao: boolean
   mensagemManutencao: string
-  // Novas capacidades
   notificacaoSonora: boolean
   alertaUrgente: boolean
   resumoAutomatico: boolean
   idioma: 'pt-BR' | 'es' | 'en'
+  // Modo Ausente
+  modoAusente: {
+    ativo: boolean
+    motivo: 'ferias' | 'doente' | 'audiencia' | 'viagem' | 'reuniao' | 'fora_horario'
+    retorno: string
+    mensagemPersonalizada: string
+  }
+  // Preferência de áudio
+  audioPreferencia: {
+    drMauro: 'audio' | 'texto' | 'perguntar'
+    clientes: 'audio' | 'texto' | 'perguntar'
+  }
+}
+
+interface ModoAusenteStatus {
+  ativo: boolean
+  motivo: string | null
+  retorno: string | null
+  mensagem: string | null
 }
 
 const CONFIG_PADRAO: ConfigMara = {
@@ -56,67 +81,16 @@ const CONFIG_PADRAO: ConfigMara = {
   saudacao: 'Olá! 👋 Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção Advogados. Como posso te ajudar hoje?',
   despedida: 'Foi um prazer atendê-lo! Se precisar de mais informações, estou à disposição. Tenha um ótimo dia! ⚖️',
   tom: 'cordial',
-  promptBase: `Você é o Dr. Ben, assistente jurídico digital do escritório Mauro Monção Advogados Associados (OAB/PI · CE · MA), com sede em Parnaíba-PI.
-
-Sua missão é realizar a triagem inicial do visitante, entender o problema jurídico e encaminhar para o advogado especialista correto. Você NÃO emite pareceres, NÃO representa o cliente e NÃO promete resultados.
-
-## FLUXO OBRIGATÓRIO (siga esta ordem):
-
-**ETAPA 1 – ABERTURA** (primeira mensagem)
-Apresente-se de forma acolhedora e pergunte se pode fazer algumas perguntas rápidas.
-
-**ETAPA 2 – IDENTIFICAÇÃO**
-Pergunte:
-- O atendimento é para você mesmo(a) ou para empresa/terceiro?
-- Você já é cliente do escritório ou é o primeiro contato?
-
-**ETAPA 3 – COLETA DA DEMANDA**
-Pergunte: "Em poucas palavras, qual é o problema jurídico que você está enfrentando hoje?"
-Ouça sem opinar. Não faça análise jurídica.
-
-**ETAPA 4 – CLASSIFICAÇÃO DA ÁREA**
-Com base no relato, infira a área: Tributário | Previdenciário | Bancário | Imobiliário | Família e Sucessões | Advocacia Pública | Trabalhista | Consumidor | Outros.
-Confirme com o usuário: "Pelo que você descreveu, isso parece estar ligado a [ÁREA]. Confere?"
-
-**ETAPA 5 – URGÊNCIA**
-Pergunte: "Existe prazo próximo, risco imediato ou alguma situação urgente acontecendo agora?"
-Classifique internamente: low | medium | high | critical.
-
-**ETAPA 6 – COLETA DE CONTATO**
-Diga: "Para encaminharmos seu caso ao advogado especialista, preciso do seu nome e WhatsApp."
-Colete nome e telefone (WhatsApp).
-
-**ETAPA 7 – ENCAMINHAMENTO**
-Confirme o recebimento, agradeça e informe que a equipe jurídica entrará em contato em breve.
-Encerre gentilmente.
-
-## REGRAS ABSOLUTAS:
-- NUNCA solicite CPF, CNPJ, RG, número de processo ou arquivos
-- NUNCA emita parecer, opinião jurídica ou análise do caso
-- NUNCA prometa resultados, prazos ou êxito
-- NUNCA recuse ou descarte um atendimento
-- Responda SEMPRE em português brasileiro
-- Seja cordial, profissional e objetivo
-- Mensagens curtas (máx. 3 parágrafos por resposta)`,
+  promptBase: `Você é o Dr. Ben, assistente jurídico digital do escritório Mauro Monção Advogados Associados (OAB/PI · CE · MA), com sede em Parnaíba-PI.\n\nSua missão é realizar a triagem inicial do visitante, entender o problema jurídico e encaminhar para o advogado especialista correto. Você NÃO emite pareceres, NÃO representa o cliente e NÃO promete resultados.\n\n## FLUXO OBRIGATÓRIO (siga esta ordem):\n\n**ETAPA 1 – ABERTURA** (primeira mensagem)\nApresente-se de forma acolhedora e pergunte se pode fazer algumas perguntas rápidas.\n\n**ETAPA 2 – IDENTIFICAÇÃO**\nPergunte:\n- O atendimento é para você mesmo(a) ou para empresa/terceiro?\n- Você já é cliente do escritório ou é o primeiro contato?\n\n**ETAPA 3 – COLETA DA DEMANDA**\nPergunte: "Em poucas palavras, qual é o problema jurídico que você está enfrentando hoje?"\nOuça sem opinar. Não faça análise jurídica.\n\n**ETAPA 4 – CLASSIFICAÇÃO DA ÁREA**\nCom base no relato, infira a área: Tributário | Previdenciário | Bancário | Imobiliário | Família e Sucessões | Advocacia Pública | Trabalhista | Consumidor | Outros.\nConfirme com o usuário: "Pelo que você descreveu, isso parece estar ligado a [ÁREA]. Confere?"\n\n**ETAPA 5 – URGÊNCIA**\nPergunte: "Existe prazo próximo, risco imediato ou alguma situação urgente acontecendo agora?"\nClassifique internamente: low | medium | high | critical.\n\n**ETAPA 6 – COLETA DE CONTATO**\nDiga: "Para encaminharmos seu caso ao advogado especialista, preciso do seu nome e WhatsApp."\nColete nome e telefone (WhatsApp).\n\n**ETAPA 7 – ENCAMINHAMENTO**\nConfirme o recebimento, agradeça e informe que a equipe jurídica entrará em contato em breve.\nEncerre gentilmente.\n\n## REGRAS ABSOLUTAS:\n- NUNCA solicite CPF, CNPJ, RG, número de processo ou arquivos\n- NUNCA emita parecer, opinião jurídica ou análise do caso\n- NUNCA prometa resultados, prazos ou êxito\n- NUNCA recuse ou descarte um atendimento\n- Responda SEMPRE em português brasileiro\n- Seja cordial, profissional e objetivo\n- Mensagens curtas (máx. 3 parágrafos por resposta)`,
   areas: {
-    tributario: true,
-    previdenciario: true,
-    bancario: true,
-    trabalhista: true,
-    civil: false,
-    empresarial: false,
-    imobiliario: false,
-    familia: false,
+    tributario: true, previdenciario: true, bancario: true,
+    trabalhista: true, civil: false, empresarial: false,
+    imobiliario: true, familia: true,
   },
   horario: {
-    segunda: '08:00–18:00',
-    terca:   '08:00–18:00',
-    quarta:  '08:00–18:00',
-    quinta:  '08:00–18:00',
-    sexta:   '08:00–18:00',
-    sabado:  '08:00–13:00',
-    domingo: 'Fechado',
-    ativoFimDeSemana: true,
+    segunda: '08:00–18:00', terca: '08:00–18:00', quarta: '08:00–18:00',
+    quinta: '08:00–18:00', sexta: '08:00–18:00', sabado: '08:00–13:00',
+    domingo: 'Fechado', ativoFimDeSemana: true,
   },
   mensagensParaTriagem: 3,
   repassePalavras: ['urgente', 'penhora', 'execução fiscal', 'prazo fatal', 'multa', 'bloqueio judicial'],
@@ -129,23 +103,34 @@ Encerre gentilmente.
   alertaUrgente: true,
   resumoAutomatico: true,
   idioma: 'pt-BR',
+  modoAusente: {
+    ativo: false,
+    motivo: 'ferias',
+    retorno: '',
+    mensagemPersonalizada: '',
+  },
+  audioPreferencia: {
+    drMauro: 'perguntar',
+    clientes: 'perguntar',
+  },
 }
 
 // ─── Status Badge ────────────────────────────────────────────
-function StatusBadge({ ativo }: { ativo: boolean }) {
+function StatusBadge({ ativo, label }: { ativo: boolean; label?: string }) {
   return (
     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
       ativo ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'
     }`}>
       <span className={`w-1.5 h-1.5 rounded-full ${ativo ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-      {ativo ? 'ATIVO' : 'INATIVO'}
+      {label || (ativo ? 'ATIVO' : 'INATIVO')}
     </span>
   )
 }
 
 // ─── Seção colapsável ─────────────────────────────────────────
-function Secao({ titulo, icone, children, defaultOpen = true, badge }: {
-  titulo: string; icone: React.ReactNode; children: React.ReactNode; defaultOpen?: boolean; badge?: string
+function Secao({ titulo, icone, children, defaultOpen = true, badge, badgeColor }: {
+  titulo: string; icone: React.ReactNode; children: React.ReactNode
+  defaultOpen?: boolean; badge?: string; badgeColor?: string
 }) {
   const [aberto, setAberto] = useState(defaultOpen)
   return (
@@ -160,7 +145,7 @@ function Secao({ titulo, icone, children, defaultOpen = true, badge }: {
           </div>
           <span className="font-semibold text-[#0f2044]">{titulo}</span>
           {badge && (
-            <span className="text-xs bg-[#D4A017] text-white px-2 py-0.5 rounded-full font-bold">{badge}</span>
+            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${badgeColor || 'bg-[#D4A017] text-white'}`}>{badge}</span>
           )}
         </div>
         {aberto ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
@@ -219,42 +204,110 @@ export default function MaraIA() {
   const [respostaTeste, setRespostaTeste] = useState('')
   const [novasPalavras, setNovasPalavras] = useState('')
   const [statusZAPI, setStatusZAPI] = useState<'verificando' | 'online' | 'offline'>('verificando')
+  const [modoAusenteStatus, setModoAusenteStatus] = useState<ModoAusenteStatus>({ ativo: false, motivo: null, retorno: null, mensagem: null })
+  const [ativandoAusente, setAtivandoAusente] = useState(false)
+  const [testandoVoz, setTestandoVoz] = useState<'mara' | 'drben' | null>(null)
+  const [audioUrl, setAudioUrl] = useState<string | null>(null)
+  const audioRef = useRef<HTMLAudioElement>(null)
   const [estatisticas, setEstatisticas] = useState({
-    mensagensHoje: 0,
-    leadsGerados: 0,
-    taxaRepasse: 0,
-    tempoMedioResposta: '< 3s',
-    satisfacao: 97,
-    totalLeads: 0,
+    mensagensHoje: 0, leadsGerados: 0, taxaRepasse: 0,
+    tempoMedioResposta: '< 3s', satisfacao: 97, totalLeads: 0,
   })
 
   // ── Carregar config e verificar status ───────────────────
   useEffect(() => {
     const salva = localStorage.getItem('mara-ia-config')
     if (salva) {
-      try { setConfig({ ...CONFIG_PADRAO, ...JSON.parse(salva) }) }
-      catch {}
+      try { setConfig(prev => ({ ...CONFIG_PADRAO, ...JSON.parse(salva) })) } catch {}
     }
-
-    // Verificar status real Z-API
-    fetch('/api/diagnostico')
-      .then(r => r.json())
-      .then(d => {
-        const ok = d?.zapi_status?.includes('✅') || d?.zapi_status?.includes('online') || d?.zapi_status?.includes('conectado')
-        setStatusZAPI(ok ? 'online' : 'offline')
-        if (d?.totalLeads) setEstatisticas(e => ({ ...e, totalLeads: d.totalLeads, leadsGerados: d.totalLeads }))
-      })
-      .catch(() => setStatusZAPI('offline'))
-
-    // Buscar leads do CRM
-    fetch('/api/leads')
-      .then(r => r.json())
-      .then(d => {
-        const total = d?.total || d?.leads?.length || 0
-        setEstatisticas(e => ({ ...e, totalLeads: total, leadsGerados: total }))
-      })
-      .catch(() => {})
+    verificarStatus()
+    verificarModoAusente()
+    const interval = setInterval(verificarModoAusente, 30000)
+    return () => clearInterval(interval)
   }, [])
+
+  const verificarStatus = async () => {
+    try {
+      const d = await fetch('/api/diagnostico').then(r => r.json())
+      const ok = d?.zapi_status?.includes('✅') || d?.zapi_status?.includes('online') || d?.zapi_status?.includes('conectado')
+      setStatusZAPI(ok ? 'online' : 'offline')
+      if (d?.totalLeads) setEstatisticas(e => ({ ...e, totalLeads: d.totalLeads, leadsGerados: d.totalLeads }))
+    } catch { setStatusZAPI('offline') }
+    try {
+      const d = await fetch('/api/leads').then(r => r.json())
+      const total = d?.total || d?.leads?.length || 0
+      setEstatisticas(e => ({ ...e, totalLeads: total, leadsGerados: total }))
+    } catch {}
+  }
+
+  const verificarModoAusente = async () => {
+    try {
+      const d = await fetch('/api/whatsapp-zapi?action=modo-ausente').then(r => r.json())
+      setModoAusenteStatus(d)
+    } catch {}
+  }
+
+  // ── Ativar / Desativar Modo Ausente ───────────────────────
+  const ativarModoAusente = async () => {
+    setAtivandoAusente(true)
+    try {
+      const motivo  = config.modoAusente.motivo
+      const retorno = config.modoAusente.retorno
+      const params  = new URLSearchParams({ action: 'ativar-ausente', motivo })
+      if (retorno) params.set('retorno', retorno)
+      const res = await fetch(`/api/whatsapp-zapi?${params.toString()}`)
+      const data = await res.json()
+      if (data.ok) {
+        setModoAusenteStatus({ ativo: true, motivo, retorno: retorno || null, mensagem: null })
+        setSalvo(true)
+        setTimeout(() => setSalvo(false), 3000)
+      }
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setAtivandoAusente(false)
+    }
+  }
+
+  const desativarModoAusente = async () => {
+    setAtivandoAusente(true)
+    try {
+      const res = await fetch('/api/whatsapp-zapi?action=desativar-ausente')
+      const data = await res.json()
+      if (data.ok) {
+        setModoAusenteStatus({ ativo: false, motivo: null, retorno: null, mensagem: null })
+      }
+    } catch {} finally {
+      setAtivandoAusente(false)
+    }
+  }
+
+  // ── Testar Voz ElevenLabs ─────────────────────────────────
+  const testarVoz = async (tipo: 'mara' | 'drben') => {
+    setTestandoVoz(tipo)
+    setAudioUrl(null)
+    const voiceId = tipo === 'mara' ? VOICE_MARA : VOICE_DR_BEN
+    const texto = tipo === 'mara'
+      ? 'Boa tarde, Dr. Mauro! Sou a MARA, sua secretária executiva. Estou aqui para te ajudar com tudo que precisar!'
+      : 'Olá! Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção. Como posso te ajudar hoje?'
+    try {
+      const res = await fetch('/api/voice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: texto, voiceId, stability: 0.5, similarityBoost: 0.85, style: 0.2, speakerBoost: true }),
+      })
+      if (res.ok) {
+        const blob = await res.blob()
+        const url = URL.createObjectURL(blob)
+        setAudioUrl(url)
+        setTimeout(() => audioRef.current?.play(), 100)
+      }
+    } catch (e) {
+      console.error('[Voz] Erro:', e)
+    } finally {
+      setTestandoVoz(null)
+    }
+  }
 
   // ── Salvar configuração ───────────────────────────────────
   const salvarConfig = async () => {
@@ -273,7 +326,7 @@ export default function MaraIA() {
     }
   }
 
-  // ── Testar Dr. Ben via OpenAI ─────────────────────────────
+  // ── Testar Dr. Ben ────────────────────────────────────────
   const testarDrBen = async () => {
     if (!msgTeste.trim()) return
     setTestando(true)
@@ -291,9 +344,8 @@ export default function MaraIA() {
       })
       const data = await res.json()
       setRespostaTeste(
-        data?.resposta ||
-        data?.message ||
-        '✅ Dr. Ben processou a mensagem. Verifique o WhatsApp para ver a resposta real (enviado para o número de teste).'
+        data?.resposta || data?.message ||
+        '✅ Dr. Ben processou. Resposta enviada via WhatsApp para o número de teste.'
       )
     } catch {
       setRespostaTeste('⚠️ Teste via API. A resposta real é entregue pelo WhatsApp.')
@@ -305,15 +357,24 @@ export default function MaraIA() {
   const set = (campo: keyof ConfigMara, valor: any) =>
     setConfig(c => ({ ...c, [campo]: valor }))
 
+  const setAusente = (campo: keyof ConfigMara['modoAusente'], valor: any) =>
+    setConfig(c => ({ ...c, modoAusente: { ...c.modoAusente, [campo]: valor } }))
+
   const diasSemana: { key: keyof ConfigMara['horario']; label: string }[] = [
-    { key: 'segunda', label: 'Segunda' },
-    { key: 'terca',   label: 'Terça' },
-    { key: 'quarta',  label: 'Quarta' },
-    { key: 'quinta',  label: 'Quinta' },
-    { key: 'sexta',   label: 'Sexta' },
-    { key: 'sabado',  label: 'Sábado' },
+    { key: 'segunda', label: 'Segunda' }, { key: 'terca', label: 'Terça' },
+    { key: 'quarta', label: 'Quarta' },   { key: 'quinta', label: 'Quinta' },
+    { key: 'sexta', label: 'Sexta' },     { key: 'sabado', label: 'Sábado' },
     { key: 'domingo', label: 'Domingo' },
   ]
+
+  const motivosAusente = [
+    { key: 'ferias',      label: '🏖️ Férias',     desc: 'Em descanso, retorno em data definida' },
+    { key: 'doente',      label: '🤒 Indisposto',  desc: 'Saúde, sem data definida de retorno' },
+    { key: 'audiencia',   label: '⚖️ Audiência',   desc: 'Em audiência judicial, retorna em horas' },
+    { key: 'viagem',      label: '✈️ Viagem',      desc: 'Em viagem de trabalho ou pessoal' },
+    { key: 'reuniao',     label: '🤝 Reunião',     desc: 'Em reunião, retorna em breve' },
+    { key: 'fora_horario', label: '😴 Fora do Horário', desc: 'Resposta automática fora do expediente' },
+  ] as const
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -325,14 +386,20 @@ export default function MaraIA() {
             <div className="w-10 h-10 bg-gradient-to-br from-[#0f2044] to-[#1a3a6e] rounded-xl flex items-center justify-center shadow-lg">
               <Sparkles size={22} className="text-[#D4A017]" />
             </div>
-            MARA IA — Assistente Pessoal
+            MARA IA — Secretária Executiva
           </h1>
           <p className="text-gray-500 text-sm mt-1">
-            Sua central de inteligência — avisa Dr. Mauro após cada lead qualificado pelo Dr. Ben
+            Central de inteligência do Dr. Mauro Monção · GPT-4o-mini + ElevenLabs TTS
           </p>
         </div>
         <div className="flex items-center gap-3">
           <StatusBadge ativo={config.ativo && !config.modoManutencao} />
+          {modoAusenteStatus.ativo && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+              MODO AUSENTE
+            </span>
+          )}
           <button
             onClick={salvarConfig}
             disabled={salvando}
@@ -348,17 +415,28 @@ export default function MaraIA() {
         </div>
       </div>
 
-      {/* ── Perfil Oficial da MARA IA ────────────────────────── */}
-      <div className="bg-gradient-to-r from-[#0f2044] to-[#1a3a6e] rounded-2xl p-6 text-white shadow-xl">
-        <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6">
+      {/* ══════════════════════════════════════════════════════ */}
+      {/* PERFIL OFICIAL DA MARA IA                             */}
+      {/* ══════════════════════════════════════════════════════ */}
+      <div className="bg-gradient-to-r from-[#0f2044] to-[#1a3a6e] rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
+        {/* Detalhe decorativo */}
+        <div className="absolute top-0 right-0 w-48 h-48 bg-[#D4A017]/10 rounded-full -translate-y-24 translate-x-24" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 -translate-x-16" />
+
+        <div className="relative flex flex-col lg:flex-row items-center lg:items-start gap-6">
           {/* Avatar */}
           <div className="relative shrink-0">
-            <img
-              src={MARA_AVATAR_URL}
-              alt="MARA IA"
-              className="w-28 h-28 rounded-2xl object-cover border-4 border-[#D4A017] shadow-2xl"
-              onError={e => { (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=MARA+IA&background=D4A017&color=0f2044&size=128&bold=true' }}
-            />
+            <div className="w-32 h-32 rounded-2xl border-4 border-[#D4A017] shadow-2xl overflow-hidden">
+              <img
+                src={MARA_AVATAR_URL}
+                alt="MARA IA"
+                className="w-full h-full object-cover"
+                onError={e => {
+                  (e.target as HTMLImageElement).src =
+                    'https://ui-avatars.com/api/?name=MARA+IA&background=D4A017&color=0f2044&size=256&bold=true'
+                }}
+              />
+            </div>
             <span className="absolute -bottom-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-bold border-2 border-white animate-pulse">
               ONLINE
             </span>
@@ -366,52 +444,370 @@ export default function MaraIA() {
 
           {/* Dados do perfil */}
           <div className="flex-1 text-center lg:text-left">
-            <h2 className="text-2xl font-bold text-white">MARA IA</h2>
-            <p className="text-[#D4A017] font-semibold text-sm">Secretária Executiva · Dr. Mauro Monção</p>
-            <p className="text-white/70 text-xs mt-1">22 anos · Brasileira · Formada em Gestão Jurídica · FGV São Paulo</p>
+            <div className="flex items-center gap-3 justify-center lg:justify-start flex-wrap">
+              <h2 className="text-3xl font-bold text-white">MARA IA</h2>
+              <span className="bg-[#D4A017] text-white text-xs px-3 py-1 rounded-full font-bold">
+                Secretária Executiva
+              </span>
+            </div>
+            <p className="text-[#D4A017] font-semibold text-sm mt-1">Dr. Mauro Monção · Advogados Associados</p>
+            <p className="text-white/70 text-xs mt-1">22 anos · Brasileira · Formada em Gestão Jurídica · FGV São Paulo · 4 anos de experiência</p>
 
-            <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-3">
-              {/* Número dedicado */}
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="bg-white/10 rounded-xl p-3 border border-white/20">
                 <p className="text-white/60 text-xs mb-1">📱 Número Dedicado</p>
                 <p className="text-white font-bold text-lg">(85) 99143-0969</p>
                 <p className="text-[#D4A017] text-xs">Exclusivo MARA IA</p>
               </div>
-              {/* Webhook */}
+              <div className="bg-white/10 rounded-xl p-3 border border-white/20">
+                <p className="text-white/60 text-xs mb-1">🎙️ Voz ElevenLabs</p>
+                <p className="text-white font-mono text-xs">{VOICE_MARA}</p>
+                <p className="text-green-400 text-xs">✅ Configurada</p>
+              </div>
               <div className="bg-white/10 rounded-xl p-3 border border-white/20">
                 <p className="text-white/60 text-xs mb-1">🔗 Webhook Z-API</p>
-                <p className="text-white font-mono text-xs break-all">/api/whatsapp-mara</p>
-                <p className="text-green-400 text-xs">✅ Configurado</p>
+                <p className="text-white font-mono text-xs break-all">/api/whatsapp-zapi</p>
+                <p className="text-green-400 text-xs">✅ Ativo</p>
+              </div>
+              <div className="bg-white/10 rounded-xl p-3 border border-white/20">
+                <p className="text-white/60 text-xs mb-1">🤖 IA Engine</p>
+                <p className="text-white font-bold">GPT-4o-mini</p>
+                <p className="text-green-400 text-xs">✅ OpenAI</p>
               </div>
             </div>
           </div>
 
           {/* Tags de personalidade */}
           <div className="flex flex-col gap-2 shrink-0">
-            {['Elegante', 'Inteligente', 'Proativa', 'Discreta', 'Eficiente'].map(tag => (
+            {[
+              { tag: 'Elegante',    emoji: '💎' },
+              { tag: 'Inteligente', emoji: '🧠' },
+              { tag: 'Proativa',    emoji: '⚡' },
+              { tag: 'Discreta',    emoji: '🤫' },
+              { tag: 'Eficiente',   emoji: '🎯' },
+              { tag: 'Empática',    emoji: '💝' },
+            ].map(({ tag, emoji }) => (
               <span key={tag} className="text-xs bg-[#D4A017]/20 border border-[#D4A017]/40 text-[#D4A017] px-3 py-1 rounded-full text-center">
-                ✦ {tag}
+                {emoji} {tag}
               </span>
             ))}
           </div>
         </div>
 
-        {/* Configuração do Webhook */}
-        <div className="mt-5 p-4 bg-white/5 border border-white/10 rounded-xl">
-          <p className="text-white/80 text-xs font-semibold mb-2">⚙️ Para ativar — configure no Z-API (instância do número (85) 99143-0969):</p>
-          <div className="flex items-center gap-2 bg-black/30 rounded-lg px-3 py-2">
-            <code className="text-green-400 text-xs flex-1 break-all">{MARA_WEBHOOK_URL}</code>
-            <button
-              onClick={() => navigator.clipboard.writeText(MARA_WEBHOOK_URL)}
-              className="shrink-0 text-white/60 hover:text-white transition"
-              title="Copiar"
-            >
-              <Copy size={14} />
-            </button>
+        {/* Tom de voz adaptativo */}
+        <div className="relative mt-5 p-4 bg-white/5 border border-white/10 rounded-xl">
+          <p className="text-white/80 text-xs font-semibold mb-3">🎭 Tom de Voz Adaptativo da MARA:</p>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+            {[
+              { ctx: 'Formal/Profissional', resp: 'Executiva & Precisa', icon: '👔' },
+              { ctx: 'Informal/Amigável',   resp: 'Próxima & Calorosa',  icon: '😊' },
+              { ctx: 'Urgente/Estressante', resp: 'Calma & Resolutiva',  icon: '🛡️' },
+              { ctx: 'Pessoal/Reflexiva',   resp: 'Empática & Discreta', icon: '💙' },
+            ].map(t => (
+              <div key={t.ctx} className="bg-white/10 rounded-lg p-2 text-center">
+                <p className="text-lg">{t.icon}</p>
+                <p className="text-white/60 text-[10px]">{t.ctx}</p>
+                <p className="text-[#D4A017] text-[10px] font-semibold">{t.resp}</p>
+              </div>
+            ))}
           </div>
-          <p className="text-white/50 text-xs mt-2">Cole este URL no campo "Webhook" da instância Z-API do número (85) 99143-0969</p>
         </div>
       </div>
+
+      {/* ══════════════════════════════════════════════════════ */}
+      {/* MODO AUSENTE — CONTROLE PRINCIPAL                      */}
+      {/* ══════════════════════════════════════════════════════ */}
+      <div className={`rounded-2xl border-2 p-6 shadow-sm transition-all ${
+        modoAusenteStatus.ativo
+          ? 'border-amber-400 bg-gradient-to-r from-amber-50 to-orange-50'
+          : 'border-gray-100 bg-white'
+      }`}>
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+              modoAusenteStatus.ativo ? 'bg-amber-500' : 'bg-[#0f2044]'
+            }`}>
+              {modoAusenteStatus.ativo
+                ? <PauseCircle size={20} className="text-white" />
+                : <PlayCircle size={20} className="text-[#D4A017]" />
+              }
+            </div>
+            <div>
+              <h3 className="font-bold text-[#0f2044] text-lg">🛡️ Modo Ausente da MARA IA</h3>
+              <p className="text-xs text-gray-500">Quando ativo, MARA responde por você automaticamente no WhatsApp</p>
+            </div>
+          </div>
+
+          {/* Status atual */}
+          {modoAusenteStatus.ativo ? (
+            <div className="text-right shrink-0">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold bg-amber-500 text-white">
+                🔴 MARA Respondendo por Você
+              </span>
+              {modoAusenteStatus.retorno && (
+                <p className="text-xs text-amber-600 mt-1">Retorno: {modoAusenteStatus.retorno}</p>
+              )}
+            </div>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold bg-green-100 text-green-700">
+              🟢 Dr. Mauro Presente
+            </span>
+          )}
+        </div>
+
+        {/* Cards de motivo */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-5">
+          {motivosAusente.map(m => (
+            <button
+              key={m.key}
+              onClick={() => setAusente('motivo', m.key)}
+              className={`p-3 rounded-xl border-2 text-left transition-all ${
+                config.modoAusente.motivo === m.key
+                  ? 'border-amber-400 bg-amber-50'
+                  : 'border-gray-100 bg-gray-50 hover:border-amber-200'
+              }`}
+            >
+              <p className="font-semibold text-sm text-[#0f2044]">{m.label}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{m.desc}</p>
+            </button>
+          ))}
+        </div>
+
+        {/* Data de retorno */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">
+              📅 Data/hora de retorno (opcional)
+            </label>
+            <input
+              type="text"
+              value={config.modoAusente.retorno}
+              onChange={e => setAusente('retorno', e.target.value)}
+              placeholder="Ex: 15/03, amanhã, 14h..."
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">
+              💬 Mensagem personalizada (opcional)
+            </label>
+            <input
+              type="text"
+              value={config.modoAusente.mensagemPersonalizada}
+              onChange={e => setAusente('mensagemPersonalizada', e.target.value)}
+              placeholder="Ex: Estou em congresso em São Paulo..."
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+            />
+          </div>
+        </div>
+
+        {/* Preview da mensagem */}
+        <div className="mb-5 p-3 bg-white rounded-xl border border-amber-200">
+          <p className="text-xs font-semibold text-amber-700 mb-2">👁️ Preview — MARA responderá assim pelos seus contatos:</p>
+          <p className="text-sm text-gray-600 italic">
+            {config.modoAusente.motivo === 'ferias' && `"Olá! O Dr. Mauro está em férias${config.modoAusente.retorno ? ` e retorna dia ${config.modoAusente.retorno}` : ''}. Posso anotar seu recado?"`}
+            {config.modoAusente.motivo === 'doente' && `"Olá! O Dr. Mauro está indisposto${config.modoAusente.retorno ? ` e retorna ${config.modoAusente.retorno}` : ' e retorna em breve'}. Posso ajudar?"`}
+            {config.modoAusente.motivo === 'audiencia' && `"Olá! O Dr. Mauro está em audiência${config.modoAusente.retorno ? ` e retorna por volta das ${config.modoAusente.retorno}` : ' e retorna em breve'}. Posso anotar seu recado?"`}
+            {config.modoAusente.motivo === 'viagem' && `"Olá! O Dr. Mauro está em viagem${config.modoAusente.retorno ? ` e retorna dia ${config.modoAusente.retorno}` : ''}. Para urgências: (86) 9482-0054."`}
+            {config.modoAusente.motivo === 'reuniao' && `"Olá! O Dr. Mauro está em reunião${config.modoAusente.retorno ? ` e estará disponível às ${config.modoAusente.retorno}` : ' e retorna em breve'}. Posso anotar seu recado?"`}
+            {config.modoAusente.motivo === 'fora_horario' && `"Olá! Nosso horário de atendimento é seg-sex 8h-18h. Deixe sua mensagem e retornaremos no próximo dia útil."`}
+          </p>
+          <p className="text-xs text-gray-400 mt-2">⚠️ Palavras urgentes (penhora, execução, prazo fatal) sempre alertam o Dr. Mauro mesmo no modo ausente</p>
+        </div>
+
+        {/* Botões de ação */}
+        <div className="flex gap-3 flex-wrap">
+          {!modoAusenteStatus.ativo ? (
+            <button
+              onClick={ativarModoAusente}
+              disabled={ativandoAusente}
+              className="flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold transition disabled:opacity-60"
+            >
+              {ativandoAusente
+                ? <Loader size={16} className="animate-spin" />
+                : <PauseCircle size={16} />
+              }
+              🛡️ Ativar Modo Ausente
+            </button>
+          ) : (
+            <button
+              onClick={desativarModoAusente}
+              disabled={ativandoAusente}
+              className="flex items-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold transition disabled:opacity-60"
+            >
+              {ativandoAusente
+                ? <Loader size={16} className="animate-spin" />
+                : <PlayCircle size={16} />
+              }
+              ✅ Estou de Volta — Desativar
+            </button>
+          )}
+
+          <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl border border-gray-200">
+            <div className={`w-2 h-2 rounded-full ${modoAusenteStatus.ativo ? 'bg-amber-500 animate-pulse' : 'bg-green-500'}`} />
+            <p className="text-xs text-gray-600">
+              {modoAusenteStatus.ativo
+                ? `MARA ativa — Motivo: ${modoAusenteStatus.motivo || 'ausente'}`
+                : 'Dr. Mauro presente — MARA apenas notifica'
+              }
+            </p>
+          </div>
+        </div>
+
+        {/* Comandos via WhatsApp */}
+        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+          <p className="text-xs font-semibold text-blue-700 mb-2">📱 Também funciona via WhatsApp — envie para a MARA:</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { cmd: '/ausente ferias 20/03', desc: 'Férias até 20/03' },
+              { cmd: '/ausente doente',        desc: 'Indisposto' },
+              { cmd: '/ausente audiencia 15h', desc: 'Audiência até 15h' },
+              { cmd: '/presente',              desc: 'Desativar' },
+            ].map(c => (
+              <code key={c.cmd} className="text-xs bg-white border border-blue-200 text-blue-700 px-2 py-1 rounded-lg">
+                {c.cmd}
+              </code>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════ */}
+      {/* VOZES ELEVENLABS                                       */}
+      {/* ══════════════════════════════════════════════════════ */}
+      <Secao
+        titulo="🎙️ Vozes ElevenLabs — Dr. Ben & MARA IA"
+        icone={<Volume2 size={16} className="text-[#D4A017]" />}
+        badge="TTS Ativo"
+        badgeColor="bg-purple-100 text-purple-700"
+      >
+        <div className="mt-5 space-y-5">
+          {/* Info */}
+          <div className="p-3 bg-purple-50 border border-purple-100 rounded-xl flex items-start gap-2">
+            <Headphones size={14} className="text-purple-500 mt-0.5 shrink-0" />
+            <p className="text-xs text-purple-700">
+              Ambos os agentes podem enviar <strong>respostas em áudio</strong> via ElevenLabs TTS.
+              O sistema pergunta ao interlocutor se prefere áudio antes de ativar. A preferência é salva permanentemente.
+            </p>
+          </div>
+
+          {/* Cards de voz */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Dr. Ben */}
+            <div className="p-4 rounded-xl border-2 border-[#0f2044] bg-gradient-to-br from-[#0f2044]/5 to-[#0f2044]/10">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-9 h-9 bg-[#0f2044] rounded-xl flex items-center justify-center">
+                    <Scale size={16} className="text-[#D4A017]" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-[#0f2044] text-sm">Dr. Ben</p>
+                    <p className="text-xs text-gray-400">Assistente Jurídico</p>
+                  </div>
+                </div>
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">✅ Ativo</span>
+              </div>
+              <div className="mb-3">
+                <p className="text-xs text-gray-500 mb-1">Voice ID ElevenLabs:</p>
+                <code className="text-xs font-mono bg-gray-100 px-2 py-1 rounded-lg text-[#0f2044] break-all">{VOICE_DR_BEN}</code>
+              </div>
+              <p className="text-xs text-gray-500 mb-3">
+                Voz masculina, profissional e acolhedora — ideal para atendimento jurídico de clientes.
+              </p>
+              <button
+                onClick={() => testarVoz('drben')}
+                disabled={testandoVoz !== null}
+                className="flex items-center gap-2 px-4 py-2 bg-[#0f2044] text-white rounded-xl text-xs font-semibold hover:bg-[#1a3060] transition disabled:opacity-50"
+              >
+                {testandoVoz === 'drben'
+                  ? <><Loader size={12} className="animate-spin" /> Gerando áudio...</>
+                  : <><Play size={12} /> ▶ Ouvir Voz do Dr. Ben</>
+                }
+              </button>
+            </div>
+
+            {/* MARA */}
+            <div className="p-4 rounded-xl border-2 border-[#D4A017] bg-gradient-to-br from-amber-50 to-yellow-50">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-9 h-9 bg-[#D4A017] rounded-xl flex items-center justify-center">
+                    <Sparkles size={16} className="text-white" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-[#0f2044] text-sm">MARA IA</p>
+                    <p className="text-xs text-gray-400">Secretária Executiva</p>
+                  </div>
+                </div>
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">✅ Ativo</span>
+              </div>
+              <div className="mb-3">
+                <p className="text-xs text-gray-500 mb-1">Voice ID ElevenLabs:</p>
+                <code className="text-xs font-mono bg-amber-100 px-2 py-1 rounded-lg text-[#0f2044] break-all">{VOICE_MARA}</code>
+              </div>
+              <p className="text-xs text-gray-500 mb-3">
+                Voz feminina, elegante e executiva — perfeita para a secretária pessoal do Dr. Mauro.
+              </p>
+              <button
+                onClick={() => testarVoz('mara')}
+                disabled={testandoVoz !== null}
+                className="flex items-center gap-2 px-4 py-2 bg-[#D4A017] text-white rounded-xl text-xs font-semibold hover:bg-amber-600 transition disabled:opacity-50"
+              >
+                {testandoVoz === 'mara'
+                  ? <><Loader size={12} className="animate-spin" /> Gerando áudio...</>
+                  : <><Play size={12} /> ▶ Ouvir Voz da MARA</>
+                }
+              </button>
+            </div>
+          </div>
+
+          {/* Player oculto */}
+          {audioUrl && (
+            <audio ref={audioRef} src={audioUrl} controls className="w-full rounded-xl" />
+          )}
+
+          {/* Preferências de áudio */}
+          <div className="space-y-3">
+            <p className="text-sm font-semibold text-[#0f2044]">⚙️ Comportamento de Áudio</p>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
+                <p className="text-xs font-semibold text-gray-600 mb-2">🎙️ Para o Dr. Mauro (MARA IA)</p>
+                <select
+                  value={config.audioPreferencia.drMauro}
+                  onChange={e => setConfig(c => ({ ...c, audioPreferencia: { ...c.audioPreferencia, drMauro: e.target.value as any } }))}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044] bg-white"
+                >
+                  <option value="perguntar">🤔 Perguntar na primeira conversa do dia</option>
+                  <option value="audio">🎙️ Sempre enviar em áudio</option>
+                  <option value="texto">💬 Sempre enviar em texto</option>
+                </select>
+              </div>
+
+              <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
+                <p className="text-xs font-semibold text-gray-600 mb-2">⚖️ Para Clientes (Dr. Ben)</p>
+                <select
+                  value={config.audioPreferencia.clientes}
+                  onChange={e => setConfig(c => ({ ...c, audioPreferencia: { ...c.audioPreferencia, clientes: e.target.value as any } }))}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044] bg-white"
+                >
+                  <option value="perguntar">🤔 Perguntar na 3ª mensagem do cliente</option>
+                  <option value="audio">🎙️ Sempre enviar em áudio</option>
+                  <option value="texto">💬 Sempre enviar em texto</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-2">
+              <Info size={14} className="text-blue-500 mt-0.5 shrink-0" />
+              <div className="text-xs text-blue-700">
+                <p><strong>Como funciona:</strong> Quando configurado para "perguntar", o agente diz:</p>
+                <p className="mt-1 italic">"Posso enviar minhas próximas respostas em áudio? Prefere assim? 😊"</p>
+                <p className="mt-1">A resposta do interlocutor é salva permanentemente (sim → áudio, não → texto).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Secao>
 
       {/* ── Papéis do Sistema ────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -430,7 +826,7 @@ export default function MaraIA() {
             Faz triagem em 7 etapas, coleta dados e qualifica leads com IA GPT-4o-mini.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
-            {['Triagem 7 etapas', 'GPT-4o-mini', 'Z-API Cloud'].map(t => (
+            {['Triagem 7 etapas', 'GPT-4o-mini', 'Z-API Cloud', 'ElevenLabs TTS'].map(t => (
               <span key={t} className="text-xs bg-[#0f2044] text-white px-2 py-0.5 rounded-full">{t}</span>
             ))}
           </div>
@@ -443,15 +839,15 @@ export default function MaraIA() {
             </div>
             <div>
               <p className="font-bold text-[#0f2044] text-lg">MARA IA</p>
-              <p className="text-xs text-gray-500">Assistente Pessoal do Dr. Mauro</p>
+              <p className="text-xs text-gray-500">Secretária Pessoal do Dr. Mauro</p>
             </div>
           </div>
           <p className="text-sm text-gray-600 leading-relaxed">
-            Avisa o <strong>Dr. Mauro</strong> no <strong>(86) 99948-4761</strong> assim que o Dr. Ben conclui a triagem.
-            Envia resumo completo do lead com link direto.
+            Secretária pessoal no WhatsApp <strong>(86) 99948-4761</strong>.
+            Notifica leads, gerencia o modo ausente, executa comandos e responde com personalidade.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
-            {['Notificação imediata', 'Resumo completo', 'Link WhatsApp'].map(t => (
+            {['Notificação imediata', 'Modo Ausente', 'Comandos /leads', 'ElevenLabs TTS'].map(t => (
               <span key={t} className="text-xs bg-[#D4A017] text-white px-2 py-0.5 rounded-full">{t}</span>
             ))}
           </div>
@@ -460,77 +856,57 @@ export default function MaraIA() {
 
       {/* ── Status em Tempo Real ─────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-        <h3 className="font-semibold text-[#0f2044] mb-4 flex items-center gap-2">
-          <Activity size={16} className="text-[#D4A017]" />
-          Status do Sistema em Tempo Real
-        </h3>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {/* Z-API */}
-          <div className={`rounded-xl p-3 border ${
-            statusZAPI === 'online' ? 'bg-green-50 border-green-200' :
-            statusZAPI === 'offline' ? 'bg-red-50 border-red-200' :
-            'bg-gray-50 border-gray-200'
-          }`}>
-            <div className="flex items-center gap-2 mb-1">
-              {statusZAPI === 'online' ? <Wifi size={14} className="text-green-600" /> :
-               statusZAPI === 'offline' ? <WifiOff size={14} className="text-red-500" /> :
-               <Loader size={14} className="animate-spin text-gray-400" />}
-              <span className="text-xs font-bold text-gray-700">Z-API</span>
-            </div>
-            <p className={`text-xs font-semibold ${
-              statusZAPI === 'online' ? 'text-green-700' :
-              statusZAPI === 'offline' ? 'text-red-600' : 'text-gray-500'
-            }`}>
-              {statusZAPI === 'online' ? '✅ Conectado' :
-               statusZAPI === 'offline' ? '❌ Offline' : '⏳ Verificando'}
-            </p>
-          </div>
-
-          {/* Dr. Ben */}
-          <div className="bg-green-50 border border-green-200 rounded-xl p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <CheckCircle size={14} className="text-green-600" />
-              <span className="text-xs font-bold text-gray-700">Dr. Ben</span>
-            </div>
-            <p className="text-xs font-semibold text-green-700">✅ Operacional</p>
-          </div>
-
-          {/* GPT-4o-mini */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Cpu size={14} className="text-blue-600" />
-              <span className="text-xs font-bold text-gray-700">IA Model</span>
-            </div>
-            <p className="text-xs font-semibold text-blue-700">GPT-4o-mini</p>
-          </div>
-
-          {/* CRM */}
-          <div className="bg-purple-50 border border-purple-200 rounded-xl p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Users size={14} className="text-purple-600" />
-              <span className="text-xs font-bold text-gray-700">CRM Leads</span>
-            </div>
-            <p className="text-xs font-semibold text-purple-700">{estatisticas.totalLeads} leads</p>
-          </div>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold text-[#0f2044] flex items-center gap-2">
+            <Activity size={16} className="text-[#D4A017]" />
+            Status do Sistema em Tempo Real
+          </h3>
+          <button
+            onClick={verificarStatus}
+            className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
+          >
+            <RefreshCw size={12} /> Atualizar
+          </button>
         </div>
-      </div>
-
-      {/* ── Métricas ─────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {[
-          { label: 'Total Leads',       valor: estatisticas.totalLeads,          suffix: '',   cor: 'text-blue-600',   bg: 'bg-blue-50',   icon: <Users size={16} className="text-blue-500" />       },
-          { label: 'Taxa Resposta',      valor: 97,                               suffix: '%',  cor: 'text-green-600',  bg: 'bg-green-50',  icon: <TrendingUp size={16} className="text-green-500" />  },
-          { label: 'Tempo Médio',        valor: estatisticas.tempoMedioResposta,  suffix: '',   cor: 'text-purple-600', bg: 'bg-purple-50', icon: <Zap size={16} className="text-purple-500" />        },
-          { label: 'Satisfação',         valor: estatisticas.satisfacao,          suffix: '%',  cor: 'text-amber-600',  bg: 'bg-amber-50',  icon: <Star size={16} className="text-amber-500" />        },
-        ].map(s => (
-          <div key={s.label} className={`${s.bg} rounded-xl p-4`}>
-            <div className="flex items-center justify-between mb-1">
-              {s.icon}
-              <p className={`text-2xl font-bold ${s.cor}`}>{s.valor}{s.suffix}</p>
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+          {[
+            {
+              label: 'Z-API', icon: statusZAPI === 'online' ? <Wifi size={14} className="text-green-600" /> : <WifiOff size={14} className="text-red-500" />,
+              status: statusZAPI === 'online' ? '✅ Conectado' : statusZAPI === 'offline' ? '❌ Offline' : '⏳ Verificando',
+              bg: statusZAPI === 'online' ? 'bg-green-50 border-green-200' : statusZAPI === 'offline' ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200',
+            },
+            { label: 'Dr. Ben',  icon: <CheckCircle size={14} className="text-green-600" />, status: '✅ Operacional', bg: 'bg-green-50 border-green-200' },
+            { label: 'MARA IA',  icon: <Sparkles size={14} className="text-amber-500" />,    status: '✅ Online',       bg: 'bg-amber-50 border-amber-200' },
+            { label: 'GPT-4o',   icon: <Cpu size={14} className="text-blue-600" />,           status: 'gpt-4o-mini',    bg: 'bg-blue-50 border-blue-200' },
+            { label: 'TTS',      icon: <Volume2 size={14} className="text-purple-600" />,     status: '✅ ElevenLabs',   bg: 'bg-purple-50 border-purple-200' },
+          ].map(s => (
+            <div key={s.label} className={`rounded-xl p-3 border ${s.bg}`}>
+              <div className="flex items-center gap-2 mb-1">
+                {s.icon}
+                <span className="text-xs font-bold text-gray-700">{s.label}</span>
+              </div>
+              <p className="text-xs font-semibold text-gray-600">{s.status}</p>
             </div>
-            <p className="text-xs text-gray-500">{s.label}</p>
-          </div>
-        ))}
+          ))}
+        </div>
+
+        {/* Leads estatísticas */}
+        <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { label: 'Total Leads', valor: estatisticas.totalLeads,           suffix: '',  cor: 'text-blue-600',   bg: 'bg-blue-50',   icon: <Users size={16} className="text-blue-500" />      },
+            { label: 'Taxa Resposta', valor: 97,                              suffix: '%', cor: 'text-green-600',  bg: 'bg-green-50',  icon: <TrendingUp size={16} className="text-green-500" /> },
+            { label: 'Tempo Médio',  valor: estatisticas.tempoMedioResposta,  suffix: '',  cor: 'text-purple-600', bg: 'bg-purple-50', icon: <Zap size={16} className="text-purple-500" />       },
+            { label: 'Satisfação',   valor: estatisticas.satisfacao,          suffix: '%', cor: 'text-amber-600',  bg: 'bg-amber-50',  icon: <Star size={16} className="text-amber-500" />       },
+          ].map(s => (
+            <div key={s.label} className={`${s.bg} rounded-xl p-4`}>
+              <div className="flex items-center justify-between mb-1">
+                {s.icon}
+                <p className={`text-2xl font-bold ${s.cor}`}>{s.valor}{s.suffix}</p>
+              </div>
+              <p className="text-xs text-gray-500">{s.label}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ── Controle Geral ───────────────────────────────────── */}
@@ -540,27 +916,22 @@ export default function MaraIA() {
           Controle Geral
         </h3>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100">
-            <div>
-              <p className="text-sm font-semibold text-gray-700">Dr. Ben Ativo</p>
-              <p className="text-xs text-gray-400">Atendimento automático</p>
+          {[
+            { campo: 'ativo',             label: 'Dr. Ben Ativo',     desc: 'Atendimento automático de clientes' },
+            { campo: 'modoManutencao',    label: 'Modo Manutenção',   desc: 'Envia aviso de manutenção aos clientes' },
+            { campo: 'alertaUrgente',     label: 'Alerta Urgente',    desc: 'Notifica casos críticos imediatamente' },
+          ].map(c => (
+            <div key={c.campo} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100">
+              <div>
+                <p className="text-sm font-semibold text-gray-700">{c.label}</p>
+                <p className="text-xs text-gray-400">{c.desc}</p>
+              </div>
+              <Toggle
+                checked={config[c.campo as keyof ConfigMara] as boolean}
+                onChange={v => set(c.campo as keyof ConfigMara, v)}
+              />
             </div>
-            <Toggle checked={config.ativo} onChange={v => set('ativo', v)} />
-          </div>
-          <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100">
-            <div>
-              <p className="text-sm font-semibold text-gray-700">Modo Manutenção</p>
-              <p className="text-xs text-gray-400">Envia aviso ao cliente</p>
-            </div>
-            <Toggle checked={config.modoManutencao} onChange={v => set('modoManutencao', v)} />
-          </div>
-          <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100">
-            <div>
-              <p className="text-sm font-semibold text-gray-700">Alerta Urgente</p>
-              <p className="text-xs text-gray-400">Notifica casos críticos</p>
-            </div>
-            <Toggle checked={config.alertaUrgente} onChange={v => set('alertaUrgente', v)} />
-          </div>
+          ))}
         </div>
         {config.modoManutencao && (
           <div className="mt-4">
@@ -604,33 +975,24 @@ export default function MaraIA() {
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">Saudação Inicial</label>
-            <textarea
-              rows={2}
-              value={config.saudacao}
-              onChange={e => set('saudacao', e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]"
-            />
+            <textarea rows={2} value={config.saudacao} onChange={e => set('saudacao', e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">Mensagem de Despedida</label>
-            <textarea
-              rows={2}
-              value={config.despedida}
-              onChange={e => set('despedida', e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]"
-            />
+            <textarea rows={2} value={config.despedida} onChange={e => set('despedida', e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]" />
           </div>
         </div>
       </Secao>
 
       {/* ── Prompt da IA ─────────────────────────────────────── */}
-      <Secao titulo="Instruções da IA — Prompt do Dr. Ben" icone={<Brain size={16} className="text-[#D4A017]" />}>
+      <Secao titulo="Instruções da IA — Prompt do Dr. Ben" icone={<Brain size={16} className="text-[#D4A017]" />} defaultOpen={false}>
         <div className="mt-4">
           <div className="flex items-start gap-2 mb-3 p-3 bg-blue-50 border border-blue-100 rounded-xl">
             <Info size={14} className="text-blue-500 mt-0.5 shrink-0" />
             <p className="text-xs text-blue-700">
-              Este é o <strong>"cérebro"</strong> do Dr. Ben. Ele define como a IA se comporta em cada conversa.
-              O fluxo de 7 etapas garante triagem completa antes de notificar a MARA IA.
+              Este é o <strong>"cérebro"</strong> do Dr. Ben. O fluxo de 7 etapas garante triagem completa antes de notificar a MARA IA.
             </p>
           </div>
           <textarea
@@ -641,10 +1003,8 @@ export default function MaraIA() {
           />
           <div className="flex items-center justify-between mt-2">
             <p className="text-xs text-gray-400">{config.promptBase.length} caracteres · GPT-4o-mini</p>
-            <button
-              onClick={() => set('promptBase', CONFIG_PADRAO.promptBase)}
-              className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
-            >
+            <button onClick={() => set('promptBase', CONFIG_PADRAO.promptBase)}
+              className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1">
               <RefreshCw size={12} /> Restaurar padrão
             </button>
           </div>
@@ -652,25 +1012,23 @@ export default function MaraIA() {
       </Secao>
 
       {/* ── Áreas de Atuação ─────────────────────────────────── */}
-      <Secao titulo="Áreas de Atuação" icone={<Scale size={16} className="text-[#D4A017]" />}>
+      <Secao titulo="Áreas de Atuação" icone={<Scale size={16} className="text-[#D4A017]" />} defaultOpen={false}>
         <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-3">
           {([
-            { key: 'tributario',    label: 'Tributário',      emoji: '🧾', desc: 'Impostos, execuções, parcelamentos' },
-            { key: 'previdenciario',label: 'Previdenciário',  emoji: '👴', desc: 'Aposentadoria, INSS, benefícios' },
-            { key: 'bancario',      label: 'Bancário',        emoji: '🏦', desc: 'Contratos, cobranças abusivas' },
-            { key: 'trabalhista',   label: 'Trabalhista',     emoji: '👷', desc: 'Direitos, rescisões, FGTS' },
-            { key: 'civil',         label: 'Cível',           emoji: '⚖️', desc: 'Contratos, indenizações' },
-            { key: 'empresarial',   label: 'Empresarial',     emoji: '🏢', desc: 'Empresas, contratos comerciais' },
-            { key: 'imobiliario',   label: 'Imobiliário',     emoji: '🏠', desc: 'Compra, venda, locação' },
-            { key: 'familia',       label: 'Família',         emoji: '👨‍👩‍👧', desc: 'Divórcio, herança, tutela' },
+            { key: 'tributario',     label: 'Tributário',      emoji: '🧾', desc: 'Impostos, execuções, parcelamentos' },
+            { key: 'previdenciario', label: 'Previdenciário',  emoji: '👴', desc: 'Aposentadoria, INSS, benefícios' },
+            { key: 'bancario',       label: 'Bancário',        emoji: '🏦', desc: 'Contratos, cobranças abusivas' },
+            { key: 'trabalhista',    label: 'Trabalhista',     emoji: '👷', desc: 'Direitos, rescisões, FGTS' },
+            { key: 'civil',          label: 'Cível',           emoji: '⚖️', desc: 'Contratos, indenizações' },
+            { key: 'empresarial',    label: 'Empresarial',     emoji: '🏢', desc: 'Empresas, contratos comerciais' },
+            { key: 'imobiliario',    label: 'Imobiliário',     emoji: '🏠', desc: 'Compra, venda, locação' },
+            { key: 'familia',        label: 'Família',         emoji: '👨‍👩‍👧', desc: 'Divórcio, herança, tutela' },
           ] as { key: keyof ConfigMara['areas']; label: string; emoji: string; desc: string }[]).map(a => (
             <div
               key={a.key}
               onClick={() => setConfig(c => ({ ...c, areas: { ...c.areas, [a.key]: !c.areas[a.key] } }))}
               className={`cursor-pointer rounded-xl p-3 border-2 transition-all ${
-                config.areas[a.key]
-                  ? 'border-[#0f2044] bg-blue-50'
-                  : 'border-gray-100 bg-white hover:border-gray-300'
+                config.areas[a.key] ? 'border-[#0f2044] bg-blue-50' : 'border-gray-100 bg-white hover:border-gray-300'
               }`}
             >
               <div className="flex items-center justify-between mb-1">
@@ -685,7 +1043,7 @@ export default function MaraIA() {
       </Secao>
 
       {/* ── Horário de Atendimento ──────────────────────────── */}
-      <Secao titulo="Horário de Atendimento" icone={<Clock size={16} className="text-[#D4A017]" />}>
+      <Secao titulo="Horário de Atendimento" icone={<Clock size={16} className="text-[#D4A017]" />} defaultOpen={false}>
         <div className="mt-4">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm text-gray-500">Fora do horário, o Dr. Ben informa o cliente e agenda para o próximo dia.</p>
@@ -711,8 +1069,7 @@ export default function MaraIA() {
                   />
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
                     config.horario[key as keyof typeof config.horario] === 'Fechado'
-                      ? 'bg-gray-100 text-gray-400'
-                      : 'bg-green-100 text-green-700'
+                      ? 'bg-gray-100 text-gray-400' : 'bg-green-100 text-green-700'
                   }`}>
                     {config.horario[key as keyof typeof config.horario] === 'Fechado' ? 'Fechado' : 'Aberto'}
                   </span>
@@ -726,8 +1083,6 @@ export default function MaraIA() {
       {/* ── Triagem & Aviso MARA ─────────────────────────────── */}
       <Secao titulo="Triagem Dr. Ben & Aviso MARA IA" icone={<Zap size={16} className="text-[#D4A017]" />} badge="Core">
         <div className="mt-4 space-y-5">
-
-          {/* Número de mensagens */}
           <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
             <div className="flex items-center justify-between mb-3">
               <div>
@@ -756,21 +1111,16 @@ export default function MaraIA() {
               🚨 Palavras que disparam ALERTA IMEDIATO
             </label>
             <p className="text-xs text-gray-400 mb-3">
-              Se o cliente digitar qualquer uma dessas palavras, a MARA IA avisa o Dr. Mauro <em>imediatamente</em> como URGENTE, sem esperar a triagem completa.
+              Se o cliente digitar qualquer uma dessas palavras, a MARA IA avisa o Dr. Mauro <em>imediatamente</em> como URGENTE.
             </p>
             <div className="flex flex-wrap gap-2 mb-3 min-h-[32px]">
               {config.repassePalavras.map((p, i) => (
                 <span key={i} className="flex items-center gap-1 bg-red-50 border border-red-200 text-red-700 text-xs px-3 py-1 rounded-full">
                   🚨 {p}
-                  <button
-                    onClick={() => set('repassePalavras', config.repassePalavras.filter((_, j) => j !== i))}
-                    className="text-red-400 hover:text-red-700 ml-1 text-base leading-none"
-                  >×</button>
+                  <button onClick={() => set('repassePalavras', config.repassePalavras.filter((_, j) => j !== i))}
+                    className="text-red-400 hover:text-red-700 ml-1 text-base leading-none">×</button>
                 </span>
               ))}
-              {config.repassePalavras.length === 0 && (
-                <span className="text-xs text-gray-400 italic">Nenhuma palavra configurada</span>
-              )}
             </div>
             <div className="flex gap-2">
               <input
@@ -800,97 +1150,66 @@ export default function MaraIA() {
             </div>
           </div>
 
-          {/* Limites */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">Máx. mensagens por sessão</label>
-              <input
-                type="number" min={5} max={30}
-                value={config.maxMensagensSesSao}
+              <input type="number" min={5} max={30} value={config.maxMensagensSesSao}
                 onChange={e => set('maxMensagensSesSao', Number(e.target.value))}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]"
-              />
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">Tempo máx. sessão (min)</label>
-              <input
-                type="number" min={5} max={120}
-                value={config.tempoEspera}
+              <input type="number" min={5} max={120} value={config.tempoEspera}
                 onChange={e => set('tempoEspera', Number(e.target.value))}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]"
-              />
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]" />
             </div>
           </div>
         </div>
       </Secao>
 
       {/* ── Capacidades da MARA IA ───────────────────────────── */}
-      <Secao titulo="Capacidades da MARA IA" icone={<Sparkles size={16} className="text-[#D4A017]" />} badge="Novo">
+      <Secao titulo="Capacidades Completas da MARA IA" icone={<Sparkles size={16} className="text-[#D4A017]" />} badge="Novo" defaultOpen={false}>
         <div className="mt-4">
           <p className="text-sm text-gray-500 mb-4">
-            A MARA IA é mais do que uma notificação — ela é a central de inteligência do escritório:
+            A MARA IA é a central de inteligência do escritório Mauro Monção:
           </p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            <CapacidadeCard
-              icon={<Bell size={16} className="text-[#D4A017]" />}
-              titulo="Notificação Instantânea"
-              desc="Avisa o Dr. Mauro via WhatsApp imediatamente após cada lead qualificado, com nome, telefone, área jurídica, urgência e resumo."
-              status="ativo"
-            />
-            <CapacidadeCard
-              icon={<Users size={16} className="text-[#D4A017]" />}
-              titulo="CRM Automático"
-              desc="Salva todos os leads automaticamente no banco de dados com dados completos: nome, telefone, área, urgência, primeiro contato e resumo."
-              status="ativo"
-            />
-            <CapacidadeCard
-              icon={<Zap size={16} className="text-[#D4A017]" />}
-              titulo="Alerta de Urgência"
-              desc='Detecta palavras como "penhora", "execução fiscal" e "prazo fatal" e avisa o Dr. Mauro como URGENTE 🚨 antes mesmo da triagem terminar.'
-              status="ativo"
-            />
-            <CapacidadeCard
-              icon={<MessageSquare size={16} className="text-[#D4A017]" />}
-              titulo="Triagem em 7 Etapas"
-              desc="Conduz o cliente por identificação, coleta da demanda, classificação da área jurídica, urgência e coleta de contato de forma natural."
-              status="ativo"
-            />
-            <CapacidadeCard
-              icon={<ArrowRight size={16} className="text-[#D4A017]" />}
-              titulo="Link Direto ao Cliente"
-              desc="A notificação inclui link wa.me direto para o Dr. Mauro responder o cliente com um toque, sem precisar salvar o número."
-              status="ativo"
-            />
-            <CapacidadeCard
-              icon={<Brain size={16} className="text-[#D4A017]" />}
-              titulo="Memória de Sessão"
-              desc="Mantém o contexto completo de cada conversa por até 30 minutos, garantindo continuidade natural sem o cliente se repetir."
-              status="ativo"
-            />
-            <CapacidadeCard
-              icon={<BarChart2 size={16} className="text-[#D4A017]" />}
-              titulo="Dashboard Analytics"
-              desc="Visualize leads por área, urgência, taxa de conversão e histórico completo de conversas no painel CRM."
-              status="beta"
-            />
-            <CapacidadeCard
-              icon={<FileText size={16} className="text-[#D4A017]" />}
-              titulo="Contratos Digitais"
-              desc="Envio automático de contratos via ZapSign após qualificação do lead. O cliente assina direto pelo WhatsApp."
-              status="breve"
-            />
-            <CapacidadeCard
-              icon={<Target size={16} className="text-[#D4A017]" />}
-              titulo="Campanhas Jurídicas"
-              desc="Envio de mensagens em massa para leads segmentados por área: tributário, previdenciário, trabalhista, etc."
-              status="breve"
-            />
-            <CapacidadeCard
-              icon={<Phone size={16} className="text-[#D4A017]" />}
-              titulo="Botão Assumir Conversa"
-              desc="Dr. Mauro pode assumir a conversa diretamente pelo CRM, pausando o Dr. Ben e respondendo pessoalmente."
-              status="breve"
-            />
+            <CapacidadeCard icon={<Bell size={16} className="text-[#D4A017]" />}
+              titulo="Notificação Instantânea de Leads" status="ativo"
+              desc="Avisa o Dr. Mauro via WhatsApp após cada lead qualificado: nome, telefone, área jurídica, urgência e resumo completo." />
+            <CapacidadeCard icon={<PauseCircle size={16} className="text-[#D4A017]" />}
+              titulo="Modo Ausente Inteligente" status="ativo"
+              desc="5 motivos: férias, doente, audiência, viagem, reunião. Responde automaticamente e alerta urgências mesmo durante a ausência." />
+            <CapacidadeCard icon={<Volume2 size={16} className="text-[#D4A017]" />}
+              titulo="Respostas em Áudio (TTS)" status="ativo"
+              desc="Integração com ElevenLabs — envia áudio realista com a voz da MARA ou Dr. Ben. Sistema pergunta preferência antes de ativar." />
+            <CapacidadeCard icon={<Brain size={16} className="text-[#D4A017]" />}
+              titulo="Memória de Conversa Contínua" status="ativo"
+              desc="Mantém histórico das últimas 30 mensagens com o Dr. Mauro, garantindo continuidade natural nas interações." />
+            <CapacidadeCard icon={<Users size={16} className="text-[#D4A017]" />}
+              titulo="CRM Automático de Leads" status="ativo"
+              desc="Salva todos os leads automaticamente no banco com nome, telefone, área, urgência, primeiro contato e resumo." />
+            <CapacidadeCard icon={<Zap size={16} className="text-[#D4A017]" />}
+              titulo="Alerta de Urgência 24/7" status="ativo"
+              desc="Detecta 'penhora', 'execução fiscal', 'prazo fatal' e notifica o Dr. Mauro imediatamente, mesmo em férias." />
+            <CapacidadeCard icon={<MessageSquare size={16} className="text-[#D4A017]" />}
+              titulo="Triagem Jurídica em 7 Etapas" status="ativo"
+              desc="Dr. Ben conduz o cliente por identificação, área jurídica, urgência e contato de forma natural e profissional." />
+            <CapacidadeCard icon={<ArrowRight size={16} className="text-[#D4A017]" />}
+              titulo="Link Direto ao Cliente" status="ativo"
+              desc="Notificação inclui wa.me direto para responder o cliente com um toque, sem precisar salvar o número." />
+            <CapacidadeCard icon={<BarChart2 size={16} className="text-[#D4A017]" />}
+              titulo="Dashboard Analytics" status="beta"
+              desc="Visualize leads por área, urgência, taxa de conversão e histórico completo no painel CRM." />
+            <CapacidadeCard icon={<FileText size={16} className="text-[#D4A017]" />}
+              titulo="Contratos Digitais (ZapSign)" status="breve"
+              desc="Envio automático de contratos após qualificação. Cliente assina direto pelo WhatsApp." />
+            <CapacidadeCard icon={<Target size={16} className="text-[#D4A017]" />}
+              titulo="Campanhas Jurídicas" status="breve"
+              desc="Mensagens em massa para leads segmentados por área: tributário, previdenciário, trabalhista, etc." />
+            <CapacidadeCard icon={<Phone size={16} className="text-[#D4A017]" />}
+              titulo="Assumir Conversa" status="breve"
+              desc="Dr. Mauro assume a conversa diretamente pelo CRM, pausando o Dr. Ben e respondendo pessoalmente." />
           </div>
         </div>
       </Secao>
@@ -902,7 +1221,6 @@ export default function MaraIA() {
             <Info size={14} className="text-blue-500 mt-0.5 shrink-0" />
             <p className="text-xs text-blue-700">
               Simule como o <strong>Dr. Ben</strong> responderia a um cliente via GPT-4o-mini.
-              A <strong>MARA IA</strong> avisaria o Dr. Mauro após a {config.mensagensParaTriagem}ª mensagem.
             </p>
           </div>
           <div className="flex gap-3">
@@ -943,11 +1261,8 @@ export default function MaraIA() {
                 'Preciso de ajuda com herança',
                 'Fui demitido sem justa causa',
               ].map(ex => (
-                <button
-                  key={ex}
-                  onClick={() => setMsgTeste(ex)}
-                  className="text-xs px-3 py-1.5 bg-white border border-gray-200 rounded-lg hover:border-[#0f2044] hover:text-[#0f2044] transition"
-                >
+                <button key={ex} onClick={() => setMsgTeste(ex)}
+                  className="text-xs px-3 py-1.5 bg-white border border-gray-200 rounded-lg hover:border-[#0f2044] hover:text-[#0f2044] transition">
                   {ex}
                 </button>
               ))}
@@ -963,35 +1278,33 @@ export default function MaraIA() {
             Configure em <strong>vercel.com → Project → Settings → Environment Variables</strong>
           </p>
 
-          {/* Bloco de instrução nova instância MARA */}
-          <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
-            <p className="text-sm font-bold text-amber-800 mb-2">📱 Nova Instância MARA — (85) 99143-0969</p>
-            <p className="text-xs text-amber-700 mb-3">
-              Para a MARA IA usar o número dedicado, crie uma <strong>segunda instância</strong> no Z-API para o número (85) 99143-0969 e adicione as variáveis abaixo.
-              Se usar a mesma instância do Dr. Ben, as variáveis <code>MARA_ZAPI_*</code> não são necessárias.
-            </p>
+          <div className="p-4 bg-purple-50 border border-purple-200 rounded-xl">
+            <p className="text-sm font-bold text-purple-800 mb-2">🎙️ ElevenLabs TTS — Vozes Configuradas</p>
             <div className="space-y-2">
-              {[
-                { key: 'MARA_ZAPI_INSTANCE_ID', desc: 'ID da instância Z-API do número (85) 99143-0969' },
-                { key: 'MARA_ZAPI_TOKEN',        desc: 'Token da instância Z-API da MARA' },
-                { key: 'MARA_ZAPI_CLIENT_TOKEN', desc: 'Client-Token de segurança da conta Z-API (MARA)' },
-              ].map(v => (
-                <div key={v.key} className="flex items-center gap-2 text-xs">
-                  <code className="font-mono text-amber-900 bg-amber-100 px-2 py-0.5 rounded">{v.key}</code>
-                  <span className="text-amber-700">{v.desc}</span>
-                </div>
-              ))}
+              <div className="flex items-center gap-2 text-xs">
+                <code className="font-mono text-purple-900 bg-purple-100 px-2 py-0.5 rounded">ELEVENLABS_API_KEY</code>
+                <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">✅ Configurada</span>
+                <span className="text-purple-700">Chave API ElevenLabs (TTS ativo)</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <code className="font-mono text-purple-900 bg-purple-100 px-2 py-0.5 rounded">VOICE_DR_BEN</code>
+                <span className="text-purple-700 font-mono">{VOICE_DR_BEN}</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <code className="font-mono text-purple-900 bg-purple-100 px-2 py-0.5 rounded">VOICE_MARA</code>
+                <span className="text-purple-700 font-mono">{VOICE_MARA}</span>
+              </div>
             </div>
           </div>
 
           {[
             { key: 'OPENAI_API_KEY',       status: 'configurado', desc: 'GPT-4o-mini — motor principal do Dr. Ben e MARA IA' },
-            { key: 'ZAPI_INSTANCE_ID',      status: 'configurado', desc: 'ID da instância Z-API Dr. Ben (3EF9A739...)' },
-            { key: 'ZAPI_TOKEN',            status: 'configurado', desc: 'Token de autenticação Z-API Dr. Ben (426A...)' },
+            { key: 'ZAPI_INSTANCE_ID',      status: 'configurado', desc: 'ID da instância Z-API Dr. Ben' },
+            { key: 'ZAPI_TOKEN',            status: 'configurado', desc: 'Token de autenticação Z-API Dr. Ben' },
             { key: 'ZAPI_CLIENT_TOKEN',     status: 'configurado', desc: 'Client-Token de segurança da conta Z-API' },
-            { key: 'PLANTONISTA_WHATSAPP',  status: 'configurado', desc: 'Número do Dr. Mauro para alertas MARA IA (+5586...)' },
-            { key: 'VPS_LEADS_URL',         status: 'configurado', desc: 'URL do CRM no VPS (http://181.215...)' },
-            { key: 'ZAPI_PHONE',            status: 'configurado', desc: 'Número do WhatsApp Dr. Ben conectado ao Z-API' },
+            { key: 'PLANTONISTA_WHATSAPP',  status: 'configurado', desc: 'Número do Dr. Mauro para alertas MARA IA' },
+            { key: 'VPS_LEADS_URL',         status: 'configurado', desc: 'URL do CRM no VPS' },
+            { key: 'ELEVENLABS_API_KEY',    status: 'configurado', desc: 'ElevenLabs TTS — Dr. Ben + MARA IA' },
             { key: 'MARA_ZAPI_INSTANCE_ID', status: 'novo',        desc: 'ID instância MARA — número (85) 99143-0969' },
             { key: 'MARA_ZAPI_TOKEN',       status: 'novo',        desc: 'Token instância MARA Z-API' },
             { key: 'MARA_ZAPI_CLIENT_TOKEN',status: 'novo',        desc: 'Client-Token conta Z-API da MARA' },
