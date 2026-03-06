@@ -12,7 +12,8 @@ export const config = { maxDuration: 30 }
 const MARA_INSTANCE_ID  = process.env.MARA_ZAPI_INSTANCE_ID  || ''
 const MARA_TOKEN        = process.env.MARA_ZAPI_TOKEN        || ''
 const CLIENT_TOKEN      = process.env.MARA_ZAPI_CLIENT_TOKEN || process.env.ZAPI_CLIENT_TOKEN || ''
-const DR_MAURO_NUMERO   = process.env.PLANTONISTA_WHATSAPP   || '+5586999484761'
+const DR_MAURO_NUMERO   = process.env.PLANTONISTA_WHATSAPP   || ''
+const MARA_AVATAR_URL   = 'https://www.genspark.ai/api/files/s/qiD4oS1k'
 
 const MARA_BASE = `https://api.z-api.io/instances/${MARA_INSTANCE_ID}/token/${MARA_TOKEN}`
 
@@ -33,6 +34,20 @@ async function zapiPost(path, body) {
   try {
     const r = await fetch(`${MARA_BASE}${path}`, {
       method: 'POST',
+      headers: headers(),
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(10000),
+    })
+    return await r.json().catch(() => ({ error: 'resposta inválida' }))
+  } catch (e) {
+    return { error: e.message }
+  }
+}
+
+async function zapiPut(path, body) {
+  try {
+    const r = await fetch(`${MARA_BASE}${path}`, {
+      method: 'PUT',
       headers: headers(),
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(10000),
@@ -74,16 +89,16 @@ async function ativarModoAusente() {
   }
 
   // 2. Trocar para perfil MARA
-  resultados.nome = await zapiPost('/update-profile-name', {
+  resultados.nome = await zapiPut('/profile-name', {
     value: 'MARA — Assistente Dr. Mauro'
   })
 
-  resultados.status = await zapiPost('/update-profile-status', {
+  resultados.status = await zapiPut('/profile-status', {
     value: '🤖 Assistente do Dr. Mauro Monção | Respondendo por ele'
   })
 
-  // 3. Atualizar foto para avatar MARA (opcional - URL da foto MARA)
-  // resultados.foto = await zapiPost('/update-profile-picture', { value: MARA_AVATAR_URL })
+  // 3. Atualizar foto para avatar MARA
+  resultados.foto = await zapiPut('/profile-picture', { value: MARA_AVATAR_URL })
 
   // 4. Marcar como ativo
   modoAusente = true
@@ -104,14 +119,19 @@ async function desativarModoAusente() {
   }
 
   // 1. Restaurar nome original
-  resultados.nome = await zapiPost('/update-profile-name', {
+  resultados.nome = await zapiPut('/profile-name', {
     value: perfilOriginal.nome
   })
 
   // 2. Restaurar status original
-  resultados.status = await zapiPost('/update-profile-status', {
+  resultados.status = await zapiPut('/profile-status', {
     value: perfilOriginal.status
   })
+
+  // 3. Restaurar foto original (se tiver salvo)
+  if (perfilOriginal.foto) {
+    resultados.foto = await zapiPut('/profile-picture', { value: perfilOriginal.foto })
+  }
 
   // 3. Calcular resumo do período ausente
   const totalConversas = conversasNoAusente.length
