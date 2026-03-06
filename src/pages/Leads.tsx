@@ -47,7 +47,7 @@ export default function Leads() {
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         {[
           { label: 'Total', value: mockLeads.length, color: 'text-white' },
-          { label: 'Novos', value: mockLeads.filter(l => l.status === 'new').length, color: 'text-blue-600' },
+          { label: 'Novos', value: mockLeads.filter(l => l.status === 'new').length, color: 'text-[#0f2044]' },
           { label: 'Qualificados', value: mockLeads.filter(l => l.status === 'qualified').length, color: 'text-green-600' },
           { label: 'Convertidos', value: mockLeads.filter(l => l.status === 'converted').length, color: 'text-purple-600' },
           { label: 'Perdidos', value: mockLeads.filter(l => l.status === 'lost').length, color: 'text-red-500' },
@@ -134,7 +134,7 @@ export default function Leads() {
                       <a href={`tel:${lead.phone}`} className="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded transition-colors">
                         <Phone className="w-3.5 h-3.5" />
                       </a>
-                      <a href={`mailto:${lead.email}`} className="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded transition-colors">
+                      <a href={`mailto:${lead.email}`} className="p-1.5 text-gray-400 hover:text-[#0f2044] hover:bg-[#f0f3fa] rounded transition-colors">
                         <Mail className="w-3.5 h-3.5" />
                       </a>
                       <button className="p-1.5 text-gray-400 hover:text-gold hover:bg-navy-50 rounded transition-colors">
@@ -154,7 +154,7 @@ export default function Leads() {
         <h2 className="font-semibold mb-3">Pipeline de Conversão</h2>
         <div className="flex items-center gap-2 overflow-x-auto pb-2">
           {[
-            { label: 'Novos', count: mockLeads.filter(l => l.status === 'new').length, color: 'bg-blue-400' },
+            { label: 'Novos', count: mockLeads.filter(l => l.status === 'new').length, color: 'bg-[#2d4a8a]' },
             { label: '→ Contatados', count: mockLeads.filter(l => l.status === 'contacted').length, color: 'bg-yellow-400' },
             { label: '→ Qualificados', count: mockLeads.filter(l => l.status === 'qualified').length, color: 'bg-green-400' },
             { label: '→ Convertidos', count: mockLeads.filter(l => l.status === 'converted').length, color: 'bg-purple-400' },

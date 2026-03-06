@@ -140,9 +140,9 @@ export default function WhatsAppConnect() {
                   <p className="text-xs text-gray-500">Canal</p>
                   <p className="font-bold text-green-700 text-sm">Z-API ☁️</p>
                 </div>
-                <div className="bg-blue-50 rounded-xl p-3 text-center">
+                <div className="bg-[#f0f3fa] rounded-xl p-3 text-center">
                   <p className="text-xs text-gray-500">IA</p>
-                  <p className="font-bold text-blue-700 text-sm">GPT-4o-mini</p>
+                  <p className="font-bold text-[#0f2044] text-sm">GPT-4o-mini</p>
                 </div>
                 <div className="bg-purple-50 rounded-xl p-3 text-center">
                   <p className="text-xs text-gray-500">Sessão ativa</p>
@@ -220,9 +220,9 @@ export default function WhatsAppConnect() {
           </div>
 
           {/* Keepalive info */}
-          <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-50 border border-blue-200">
-            <Clock size={16} className="text-blue-600 mt-0.5 shrink-0" />
-            <p className="text-xs text-blue-700">
+          <div className="flex items-start gap-2 p-3 rounded-xl bg-[#f0f3fa] border border-[#c5d0e8]">
+            <Clock size={16} className="text-[#0f2044] mt-0.5 shrink-0" />
+            <p className="text-xs text-[#0f2044]">
               Monitoramento automático a cada <strong>5 minutos</strong> — se desconectar, Dr. Mauro é avisado imediatamente.
             </p>
           </div>

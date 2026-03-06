@@ -1,5 +1,5 @@
-/* ── Ben Growth Center — Design System v2 (SaaS Premium / Light) ──────────── */
-/* Paleta: White #FFFFFF · Slate #F7F9FC · Blue #1E40AF · Gold #D4A017        */
+/* ── Ben Growth Center — Design System v3 (SaaS Premium / Light) ──────────── */
+/* Paleta: Navy #0f2044 · Slate #F7F9FC · Gold #D4A017 · Growth #00b37e       */
 /* Fonts:  Inter (sans)                                                         */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -51,7 +51,7 @@
 
   /* ── Buttons ── */
   .btn-primary {
-    background: #1E40AF;
+    background: #0f2044;
     color: #ffffff;
     padding: 0.5rem 1rem;
     border-radius: 8px;
@@ -63,7 +63,7 @@
     align-items: center;
     gap: 0.5rem;
   }
-  .btn-primary:hover  { background: #1D3BAF; }
+  .btn-primary:hover  { background: #1a3060; }
   .btn-primary:active { transform: scale(0.97); }
 
   .btn-secondary {
@@ -123,7 +123,7 @@
     font-weight: 600;
     font-family: 'Inter', sans-serif;
   }
-  .badge-blue   { background: #DBEAFE; color: #1D4ED8; }
+  .badge-blue   { background: #e8edf7; color: #0f2044; }
   .badge-green  { background: #DCFCE7; color: #16A34A; }
   .badge-yellow { background: #FEF9C3; color: #A16207; }
   .badge-red    { background: #FEE2E2; color: #DC2626; }
@@ -144,8 +144,8 @@
     outline: none;
   }
   .input:focus {
-    border-color: #3B82F6;
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+    border-color: #0f2044;
+    box-shadow: 0 0 0 3px rgba(15,32,68,0.12);
   }
   .input::placeholder { color: #9CA3AF; }
 

@@ -13,9 +13,9 @@ import {
 import { mockDailyMetrics } from '../lib/mockData'
 
 const metaComercial = [
-  { name: 'Leads', value: 89, meta: 120, cor: '#1a2a5e' },
-  { name: 'Conversões', value: 17, meta: 25, cor: '#c9a84c' },
-  { name: 'ROAS', value: 48, meta: 60, cor: '#34a853' },
+  { name: 'Leads', value: 89, meta: 120, cor: '#0f2044' },
+  { name: 'Conversões', value: 17, meta: 25, cor: '#D4A017' },
+  { name: 'ROAS', value: 48, meta: 60, cor: '#00b37e' },
 ]
 
 export default function HubComercial() {
@@ -62,7 +62,7 @@ export default function HubComercial() {
           {
             titulo: 'Leads Totais', valor: formatNumber(mockKPIs.totalLeads),
             sub: 'Este mês', variacao: '+23%', positivo: true,
-            icone: <Users className="w-5 h-5" style={{ color: '#38bdf8' }} />, cor: 'rgba(56,189,248,0.18)'
+            icone: <Users className="w-5 h-5" style={{ color: '#4B6EA3' }} />, cor: 'rgba(56,189,248,0.18)'
           },
           {
             titulo: 'Valor Convertido', valor: formatCurrency(valorTotal),
@@ -100,22 +100,22 @@ export default function HubComercial() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           {
-            label: 'Tráfego', icone: '📊', cor: 'from-blue-600 to-blue-800',
+            label: 'Tráfego', icone: '📊', cor: 'from-[#0f2044] to-[#07182e]',
             stats: `${mockCampaigns.filter(c => c.status === 'active').length} camp. ativas`,
             link: '/campanhas', status: '✅ Operacional'
           },
           {
-            label: 'Marketing IA', icone: '✍️', cor: 'from-purple-600 to-purple-800',
+            label: 'Marketing IA', icone: '✍️', cor: 'from-[#6d28d9] to-[#4c1d95]',
             stats: `${mockKPIs.contentPublished} conteúdos publicados`,
             link: '/conteudo', status: '✅ Operacional'
           },
           {
-            label: 'CRM', icone: '👥', cor: 'from-emerald-600 to-emerald-800',
+            label: 'CRM', icone: '👥', cor: 'from-[#00b37e] to-[#007a56]',
             stats: `${crmLeadsMock.length} leads ativos`,
             link: '/crm', status: aguardando.length > 0 ? `⚠️ ${aguardando.length} aguardando` : '✅ Operacional'
           },
           {
-            label: 'Dr. Ben IA', icone: '🤖', cor: 'from-amber-500 to-amber-700',
+            label: 'Dr. Ben IA', icone: '🤖', cor: 'from-[#D4A017] to-[#C8960E]',
             stats: 'WhatsApp + Site ativos',
             link: '/dr-ben', status: '✅ Online'
           },
@@ -124,8 +124,8 @@ export default function HubComercial() {
             className={`bg-gradient-to-br ${mod.cor} rounded-xl p-4 text-white hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer`}>
             <span className="text-3xl block mb-2">{mod.icone}</span>
             <p className="font-bold text-lg">{mod.label}</p>
-            <p className="text-gray-500 text-xs mt-1">{mod.stats}</p>
-            <p className="text-gray-700 text-xs mt-2 font-medium">{mod.status}</p>
+            <p className="text-xs mt-1" style={{color:"rgba(255,255,255,0.55)"}}>{mod.stats}</p>
+            <p className="text-xs mt-2 font-medium" style={{color:"rgba(255,255,255,0.90)"}}>{mod.status}</p>
           </a>
         ))}
       </div>
@@ -136,17 +136,17 @@ export default function HubComercial() {
         <div className="card">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold" style={{color:"#111827"}}>Pipeline Comercial</h2>
-            <a href="/crm" className="text-yellow-700 text-xs hover:underline flex items-center gap-1">
+            <a href="/crm" style={{color:"#D4A017"}} className="text-xs hover:underline flex items-center gap-1">
               CRM Completo <ArrowUpRight className="w-3 h-3" />
             </a>
           </div>
           <div className="space-y-2">
             {[
-              { label: 'Novos Leads', count: crmLeadsMock.filter(l => l.status === 'novo').length, cor: 'bg-blue-400', pct: 30 },
-              { label: 'Qualificados', count: crmLeadsMock.filter(l => l.status === 'qualificado').length, cor: 'bg-green-400', pct: 20 },
-              { label: '⏳ Aguard. Humano', count: crmLeadsMock.filter(l => l.status === 'aguardando').length, cor: 'bg-amber-400', pct: 15 },
-              { label: 'Em Atendimento', count: crmLeadsMock.filter(l => l.status === 'em_atendimento').length, cor: 'bg-purple-400', pct: 10 },
-              { label: '🏆 Convertidos', count: crmLeadsMock.filter(l => l.status === 'convertido').length, cor: 'bg-emerald-400', pct: 25 },
+              { label: 'Novos Leads', count: crmLeadsMock.filter(l => l.status === 'novo').length, cor: 'bg-[#0f2044]', pct: 30 },
+              { label: 'Qualificados', count: crmLeadsMock.filter(l => l.status === 'qualificado').length, cor: 'bg-[#00b37e]', pct: 20 },
+              { label: '⏳ Aguard. Humano', count: crmLeadsMock.filter(l => l.status === 'aguardando').length, cor: 'bg-[#D4A017]', pct: 15 },
+              { label: 'Em Atendimento', count: crmLeadsMock.filter(l => l.status === 'em_atendimento').length, cor: 'bg-[#7c3aed]', pct: 10 },
+              { label: '🏆 Convertidos', count: crmLeadsMock.filter(l => l.status === 'convertido').length, cor: 'bg-[#00b37e]', pct: 25 },
             ].map(etapa => (
               <div key={etapa.label} className="flex items-center gap-3">
                 <p className="text-sm w-36 flex-shrink-0" style={{color:"#374151"}}>{etapa.label}</p>
@@ -168,15 +168,15 @@ export default function HubComercial() {
             <AreaChart data={mockDailyMetrics.slice(-7)}>
               <defs>
                 <linearGradient id="colorLeads" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#c9a84c" stopOpacity={0.4} />
-                  <stop offset="95%" stopColor="#c9a84c" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#D4A017" stopOpacity={0.4} />
+                  <stop offset="95%" stopColor="#D4A017" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
               <XAxis dataKey="date" tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 8, color: '#1F2937', fontFamily: 'Inter', fontSize: 12 }} />
-              <Area type="monotone" dataKey="leads" stroke="#c9a84c" fill="url(#colorLeads)" strokeWidth={2} name="Leads" />
+              <Area type="monotone" dataKey="leads" stroke="#D4A017" fill="url(#colorLeads)" strokeWidth={2} name="Leads" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -188,7 +188,7 @@ export default function HubComercial() {
         <div className="card">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold" style={{color:"#111827"}}>Agentes IA</h2>
-            <a href="/agentes" className="text-yellow-700 text-xs hover:underline flex items-center gap-1">
+            <a href="/agentes" style={{color:"#D4A017"}} className="text-xs hover:underline flex items-center gap-1">
               Ver todos <ArrowUpRight className="w-3 h-3" />
             </a>
           </div>
@@ -220,7 +220,7 @@ export default function HubComercial() {
         <div className="card">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold" style={{color:"#111827"}}>Últimas Entradas — Dr. Ben</h2>
-            <a href="/dr-ben" className="text-yellow-700 text-xs hover:underline flex items-center gap-1">
+            <a href="/dr-ben" style={{color:"#D4A017"}} className="text-xs hover:underline flex items-center gap-1">
               Ver integração <ArrowUpRight className="w-3 h-3" />
             </a>
           </div>
@@ -228,8 +228,8 @@ export default function HubComercial() {
             {crmLeadsMock.slice(0, 5).map(lead => (
               <div key={lead.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-blue-700 font-bold text-xs">{lead.nome[0]}</span>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{background:"#e8edf7"}}>
+                    <span className="font-bold text-xs" style={{color:"#0f2044"}}>{lead.nome[0]}</span>
                   </div>
                   <div>
                     <p className="font-medium text-sm" style={{color:"#111827"}}>{lead.nome}</p>
@@ -267,19 +267,19 @@ export default function HubComercial() {
             <p className="text-sm mb-4 font-sans" style={{ color: "rgba(212,160,23,0.80)" }}>Ben Growth Center: tráfego + IA + CRM centralizado — sem sistemas externos</p>
             <div className="grid grid-cols-3 gap-4">
               {[
-                { label: 'Leads/mês', atual: 89, meta: 150, cor: 'bg-blue-400' },
-                { label: 'Conversões', atual: 17, meta: 30, cor: 'bg-yellow-500' },
-                { label: 'Receita (R$)', atual: 34800, meta: 60000, cor: 'bg-green-400' },
+                { label: 'Leads/mês', atual: 89, meta: 150, cor: 'bg-[#0f2044]' },
+                { label: 'Conversões', atual: 17, meta: 30, cor: 'bg-[#D4A017]' },
+                { label: 'Receita (R$)', atual: 34800, meta: 60000, cor: 'bg-[#00b37e]' },
               ].map(m => (
                 <div key={m.label}>
-                  <div className="flex justify-between text-xs text-gray-500 mb-1">
+                  <div className="flex justify-between text-xs mb-1" style={{color:"rgba(255,255,255,0.65)"}}>
                     <span>{m.label}</span>
                     <span>{typeof m.atual === 'number' && m.atual > 999 ? formatCurrency(m.atual) : m.atual}/{typeof m.meta === 'number' && m.meta > 999 ? formatCurrency(m.meta) : m.meta}</span>
                   </div>
                   <div className="h-2 rounded-full" style={{ background: "rgba(255,255,255,0.10)" }}>
                     <div className={`h-full ${m.cor} rounded-full`} style={{ width: `${Math.min((m.atual / m.meta) * 100, 100)}%` }} />
                   </div>
-                  <p className="text-gray-500 text-xs mt-1">{Math.round((m.atual / m.meta) * 100)}% da meta</p>
+                  <p className="text-xs mt-1" style={{color:"rgba(255,255,255,0.55)"}}>{Math.round((m.atual / m.meta) * 100)}% da meta</p>
                 </div>
               ))}
             </div>

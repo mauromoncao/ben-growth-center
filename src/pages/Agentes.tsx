@@ -13,7 +13,7 @@ import { getStatusColor, getStatusLabel } from '../lib/utils'
 
 // ─── Modelos disponíveis para seleção ────────────────────────
 const MODELOS_DISPONIVEIS = [
-  { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', badge: 'bg-blue-100 text-blue-700',    custo: 'Gratuito',        forca: 'Velocidade' },
+  { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', badge: 'bg-[#e8edf7] text-[#0f2044]',    custo: 'Gratuito',        forca: 'Velocidade' },
   { value: 'gemini-2.5-pro',   label: 'Gemini 2.5 Pro',   badge: 'bg-indigo-100 text-indigo-700', custo: 'R$ 0,10/1M tok', forca: 'Contexto longo' },
   { value: 'gpt-5',            label: 'GPT-5',             badge: 'bg-green-100 text-green-700',   custo: 'Genspark ✅',      forca: 'Criatividade' },
   { value: 'claude-opus-4',    label: 'Claude Opus 4',     badge: 'bg-orange-100 text-orange-700', custo: 'Genspark ✅',      forca: 'Escrita longa' },
@@ -64,8 +64,8 @@ function AgentCard({ agent, onExecute, executing }: {
         <div className="flex gap-1.5 items-center">
           {agent.ativo && (
             isRunning ? (
-              <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                <RefreshCw className="w-4 h-4 text-blue-500 animate-spin" />
+              <div className="w-8 h-8 bg-[#f0f3fa] rounded-lg flex items-center justify-center">
+                <RefreshCw className="w-4 h-4 text-[#0f2044] animate-spin" />
               </div>
             ) : (
               <button
@@ -105,13 +105,13 @@ function AgentCard({ agent, onExecute, executing }: {
 
       {/* Execução em andamento */}
       {isRunning && (
-        <div className="mt-3 bg-blue-50 border border-blue-200 rounded-xl p-3">
+        <div className="mt-3 bg-[#f0f3fa] border border-[#c5d0e8] rounded-xl p-3">
           <div className="flex items-center gap-2 mb-2">
-            <RefreshCw className="w-4 h-4 text-blue-500 animate-spin" />
-            <span className="text-blue-700 text-sm font-medium">Executando {agent.nome}...</span>
+            <RefreshCw className="w-4 h-4 text-[#0f2044] animate-spin" />
+            <span className="text-[#0f2044] text-sm font-medium">Executando {agent.nome}...</span>
           </div>
-          <div className="h-1.5 bg-blue-100 rounded-full overflow-hidden">
-            <div className="h-full bg-blue-400 rounded-full animate-pulse w-2/3" />
+          <div className="h-1.5 bg-[#e8edf7] rounded-full overflow-hidden">
+            <div className="h-full bg-[#2d4a8a] rounded-full animate-pulse w-2/3" />
           </div>
         </div>
       )}
@@ -251,7 +251,7 @@ export default function Agentes() {
         </h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-            { modelo: 'Gemini 2.5 Flash', agentes: ['Dr. Ben', 'Lex Monitor'], cor: 'bg-blue-500/30 border-blue-400/40', desc: 'Velocidade · 24/7' },
+            { modelo: 'Gemini 2.5 Flash', agentes: ['Dr. Ben', 'Lex Monitor'], cor: 'bg-[#0f2044]/30 border-[#2d4a8a]/40', desc: 'Velocidade · 24/7' },
             { modelo: 'Gemini 2.5 Pro',   agentes: ['Lex Conteúdo', 'Lex Relatório'], cor: 'bg-indigo-500/30 border-indigo-400/40', desc: 'Contexto longo' },
             { modelo: 'GPT-5',            agentes: ['Lex Campanhas', 'Lex Marketing'], cor: 'bg-green-500/30 border-green-400/40', desc: 'via Genspark ✅' },
             { modelo: 'Claude Opus 4',    agentes: ['Lex Petições', 'Lex Jurídico'], cor: 'bg-orange-500/30 border-orange-400/40', desc: 'via Genspark ✅' },
@@ -323,7 +323,7 @@ export default function Agentes() {
             <div key={activity.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors">
               <div className="mt-0.5 flex-shrink-0">
                 {activity.status === 'success' && <CheckCircle2 className="w-4 h-4 text-green-500" />}
-                {activity.status === 'running' && <RefreshCw className="w-4 h-4 text-blue-500 animate-spin" />}
+                {activity.status === 'running' && <RefreshCw className="w-4 h-4 text-[#0f2044] animate-spin" />}
                 {activity.status === 'error' && <AlertCircle className="w-4 h-4 text-red-500" />}
                 {activity.status === 'scheduled' && <Clock className="w-4 h-4 text-gray-400" />}
               </div>

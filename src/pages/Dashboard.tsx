@@ -29,7 +29,7 @@ const tooltipStyle = {
   boxShadow: '0 4px 12px rgba(0,0,0,0.10)',
 }
 
-const PIE_COLORS = ['#1E40AF', '#16A34A', '#D97706', '#7C3AED']
+const PIE_COLORS = ['#0f2044', '#00b37e', '#D4A017', '#7C3AED']
 const sourceData = [
   { name: 'Google Ads', value: 34 },
   { name: 'Meta Ads',   value: 41 },
@@ -65,9 +65,9 @@ function KPICard({ title, value, variation, icon, accent, subtitle }: {
       {variation !== undefined && (
         <div className="flex items-center gap-1.5">
           {isPositive
-            ? <TrendingUp className="w-3.5 h-3.5" style={{ color: '#16A34A' }} />
+            ? <TrendingUp className="w-3.5 h-3.5" style={{ color: '#00b37e' }} />
             : <TrendingDown className="w-3.5 h-3.5" style={{ color: '#DC2626' }} />}
-          <span className="text-sm font-bold" style={{ color: isPositive ? '#16A34A' : '#DC2626' }}>
+          <span className="text-sm font-bold" style={{ color: isPositive ? '#00b37e' : '#e11d48' }}>
             {formatPercent(variation)}
           </span>
           <span className="text-xs" style={{ color: '#9CA3AF' }}>vs. mês anterior</span>
@@ -105,8 +105,8 @@ export default function Dashboard() {
 
       {/* ── KPI CARDS ───────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <KPICard title="Leads Gerados"   value={formatNumber(mockKPIs.totalLeads)}      variation={mockKPIs.leadsVariation}  icon={<Users      className="w-5 h-5" style={{ color: '#1E40AF' }} />} accent="#1E40AF" subtitle="Este mês" />
-        <KPICard title="Investimento"    value={formatCurrency(mockKPIs.totalSpent)}    variation={mockKPIs.spentVariation}  icon={<DollarSign className="w-5 h-5" style={{ color: '#16A34A' }} />} accent="#16A34A" subtitle="Google + Meta" />
+        <KPICard title="Leads Gerados"   value={formatNumber(mockKPIs.totalLeads)}      variation={mockKPIs.leadsVariation}  icon={<Users      className="w-5 h-5" style={{ color: '#0f2044' }} />} accent="#0f2044" subtitle="Este mês" />
+        <KPICard title="Investimento"    value={formatCurrency(mockKPIs.totalSpent)}    variation={mockKPIs.spentVariation}  icon={<DollarSign className="w-5 h-5" style={{ color: '#00b37e' }} />} accent="#00b37e" subtitle="Google + Meta" />
         <KPICard title="Custo por Lead"  value={formatCurrency(mockKPIs.avgCPL)}        variation={mockKPIs.cplVariation}    icon={<Target     className="w-5 h-5" style={{ color: '#7C3AED' }} />} accent="#7C3AED" subtitle="CPL médio" />
         <KPICard title="ROAS Geral"      value={`${mockKPIs.roas}x`}                   variation={mockKPIs.roasVariation}   icon={<TrendingUp className="w-5 h-5" style={{ color: '#D97706' }} />} accent="#D97706" subtitle="Retorno sobre investimento" />
       </div>
@@ -114,8 +114,8 @@ export default function Dashboard() {
       {/* ── KPI SECUNDÁRIOS ─────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Impressões',     value: formatNumber(mockKPIs.totalImpressions), icon: '👁️',  accent: '#1E40AF' },
-          { label: 'Cliques',        value: formatNumber(mockKPIs.totalClicks),       icon: '🖱️',  accent: '#16A34A' },
+          { label: 'Impressões',     value: formatNumber(mockKPIs.totalImpressions), icon: '👁️',  accent: '#0f2044' },
+          { label: 'Cliques',        value: formatNumber(mockKPIs.totalClicks),       icon: '🖱️',  accent: '#00b37e' },
           { label: 'CTR Médio',      value: `${mockKPIs.avgCTR}%`,                   icon: '📊',  accent: '#D97706' },
           { label: 'Taxa Conversão', value: `${mockKPIs.conversionRate}%`,            icon: '✅',  accent: '#7C3AED' },
         ].map(item => (
@@ -138,8 +138,8 @@ export default function Dashboard() {
               <BarChart3 size={16} style={{ color: '#D4A017' }} />Cliques e Leads — Últimos 14 dias
             </span>
             <div className="flex gap-4 text-xs" style={{ color: '#9CA3AF' }}>
-              <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-blue-500 inline-block rounded" /> Google</span>
-              <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-violet-500 inline-block rounded" /> Meta</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-0.5 inline-block rounded" style={{background:"#0f2044"}} /> Google</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-0.5 inline-block rounded" style={{background:"#7C3AED"}} /> Meta</span>
               <span className="flex items-center gap-1"><span className="w-3 h-0.5 inline-block rounded" style={{ background: '#D4A017' }} /> Leads</span>
             </div>
           </div>
@@ -149,8 +149,8 @@ export default function Dashboard() {
               <XAxis dataKey="date" tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={tooltipStyle} formatter={(v, n) => [formatNumber(Number(v)), n === 'googleClicks' ? 'Google' : n === 'metaClicks' ? 'Meta' : 'Leads']} />
-              <Line type="monotone" dataKey="googleClicks" stroke="#3B82F6" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="metaClicks"   stroke="#8B5CF6" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="googleClicks" stroke="#0f2044" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="metaClicks"   stroke="#7C3AED" strokeWidth={2} dot={false} />
               <Line type="monotone" dataKey="leads"        stroke="#D4A017" strokeWidth={2} dot={{ r: 3, fill: '#D4A017' }} />
             </LineChart>
           </ResponsiveContainer>
@@ -159,7 +159,7 @@ export default function Dashboard() {
         {/* Pie — Origem dos Leads */}
         <div className="p-5 rounded-xl" style={card}>
           <span className="font-semibold text-sm flex items-center gap-2 mb-4" style={{ color: '#111827' }}>
-            <Target size={16} style={{ color: '#16A34A' }} />Origem dos Leads
+            <Target size={16} style={{ color: '#00b37e' }} />Origem dos Leads
           </span>
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
@@ -187,8 +187,8 @@ export default function Dashboard() {
               <XAxis dataKey="name" tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={tooltipStyle} />
-              <Bar dataKey="leads"      fill="#DBEAFE" radius={[4,4,0,0]} name="Leads" />
-              <Bar dataKey="conversões" fill="#1E40AF" radius={[4,4,0,0]} name="Conversões" />
+              <Bar dataKey="leads"      fill="#c5d0e8" radius={[4,4,0,0]} name="Leads" />
+              <Bar dataKey="conversões" fill="#0f2044" radius={[4,4,0,0]} name="Conversões" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -200,7 +200,7 @@ export default function Dashboard() {
               <Bot size={16} style={{ color: '#7C3AED' }} />Atividade dos Agentes IA
             </span>
             <a href="/agentes" className="text-xs flex items-center gap-1 hover:underline"
-              style={{ color: '#1E40AF' }}>
+              style={{ color: '#0f2044' }}>
               Ver todos <ArrowUpRight className="w-3 h-3" />
             </a>
           </div>
@@ -208,8 +208,8 @@ export default function Dashboard() {
             {recentActivities.map((activity) => (
               <div key={activity.id} className="flex items-start gap-3 p-2.5 rounded-lg" style={{ background: '#F9FAFB' }}>
                 <div className="mt-0.5 flex-shrink-0">
-                  {activity.status === 'success'   && <CheckCircle2 className="w-4 h-4" style={{ color: '#16A34A' }} />}
-                  {activity.status === 'running'   && <Clock className="w-4 h-4 animate-spin" style={{ color: '#1E40AF' }} />}
+                  {activity.status === 'success'   && <CheckCircle2 className="w-4 h-4" style={{ color: '#00b37e' }} />}
+                  {activity.status === 'running'   && <Clock className="w-4 h-4 animate-spin" style={{ color: '#0f2044' }} />}
                   {activity.status === 'error'     && <AlertCircle className="w-4 h-4" style={{ color: '#DC2626' }} />}
                   {activity.status === 'scheduled' && <Clock className="w-4 h-4" style={{ color: '#9CA3AF' }} />}
                 </div>
@@ -231,7 +231,7 @@ export default function Dashboard() {
           <Users size={16} style={{ color: '#D4A017' }} />
           <span className="font-semibold text-sm" style={{ color: '#111827' }}>Leads Recentes</span>
           <a href="/leads" className="ml-auto text-xs flex items-center gap-1 hover:underline"
-            style={{ color: '#1E40AF' }}>
+            style={{ color: '#0f2044' }}>
             Ver todos <ArrowUpRight className="w-3 h-3" />
           </a>
         </div>
@@ -283,7 +283,7 @@ export default function Dashboard() {
           <Megaphone size={16} style={{ color: '#D4A017' }} />
           <span className="font-semibold text-sm" style={{ color: '#111827' }}>Campanhas Ativas</span>
           <a href="/campanhas" className="ml-auto text-xs flex items-center gap-1 hover:underline"
-            style={{ color: '#1E40AF' }}>
+            style={{ color: '#0f2044' }}>
             Gerenciar <ArrowUpRight className="w-3 h-3" />
           </a>
         </div>
@@ -291,12 +291,12 @@ export default function Dashboard() {
           {mockCampaigns.filter(c => c.status === 'active').slice(0, 3).map((c) => (
             <div key={c.id} className="rounded-xl p-4 transition-all cursor-pointer"
               style={{ background: '#F9FAFB', border: '1px solid #E5E7EB' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#1E40AF'; (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 8px rgba(30,64,175,0.08)'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#0f2044'; (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 8px rgba(15,32,68,0.10)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#E5E7EB'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}>
               <div className="mb-3">
                 <p className="font-semibold text-sm truncate" style={{ color: '#111827' }}>{c.name}</p>
                 <div className="flex items-center gap-2 mt-1.5">
-                  <span className="badge" style={{ background: c.platform === 'google' ? '#DBEAFE' : '#EDE9FE', color: c.platform === 'google' ? '#1D4ED8' : '#6D28D9', fontSize: '0.65rem' }}>
+                  <span className="badge" style={{ background: c.platform === 'google' ? '#e8edf7' : '#EDE9FE', color: c.platform === 'google' ? '#0f2044' : '#6D28D9', fontSize: '0.65rem' }}>
                     {c.platform === 'google' ? 'Google Ads' : 'Meta Ads'}
                   </span>
                   <span className="badge badge-green">Ativo</span>
@@ -321,7 +321,7 @@ export default function Dashboard() {
                 </div>
                 <div className="h-1.5 rounded-full" style={{ background: '#E5E7EB' }}>
                   <div className="h-full rounded-full transition-all"
-                    style={{ width: `${Math.min((c.spent / c.budget) * 100, 100)}%`, background: '#1E40AF' }} />
+                    style={{ width: `${Math.min((c.spent / c.budget) * 100, 100)}%`, background: '#0f2044' }} />
                 </div>
               </div>
             </div>

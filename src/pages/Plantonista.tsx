@@ -254,7 +254,7 @@ export default function Plantonista() {
         <h2 className="font-semibold text-gray-900 mb-4">🔄 Fluxo de Repasse Automático</h2>
         <div className="flex items-center gap-2 overflow-x-auto pb-2">
           {[
-            { icone: '🌐', titulo: 'Lead Entra', desc: 'Site, WhatsApp\nou Google/Meta Ads', cor: 'bg-blue-50 border-blue-200' },
+            { icone: '🌐', titulo: 'Lead Entra', desc: 'Site, WhatsApp\nou Google/Meta Ads', cor: 'bg-[#f0f3fa] border-[#c5d0e8]' },
             { icone: '🤖', titulo: 'Dr. Ben Qualifica', desc: 'IA coleta dados,\navalia urgência e área', cor: 'bg-amber-50 border-amber-200' },
             { icone: '📊', titulo: 'Score ≥ 70', desc: 'Lead aprovado\npara humano', cor: 'bg-purple-50 border-purple-200' },
             { icone: '📲', titulo: 'Alerta Push', desc: 'Notificação no celular\ndo plantonista', cor: 'bg-red-50 border-red-200' },
@@ -341,7 +341,7 @@ export default function Plantonista() {
                 <p className="text-gray-400 text-xs">{dia.data}</p>
                 <div className="mt-2 flex items-center gap-2">
                   <div className="w-6 h-6 bg-navy-100 rounded-full flex items-center justify-center">
-                    <span className="text-blue-700 font-bold text-xs">{p.avatar}</span>
+                    <span className="text-[#0f2044] font-bold text-xs">{p.avatar}</span>
                   </div>
                   <div>
                     <p className="text-gray-700 text-xs font-medium">{p.nome.split(' ')[1]}</p>

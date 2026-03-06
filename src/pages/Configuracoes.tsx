@@ -228,7 +228,7 @@ export default function Configuracoes() {
                 <div key={key} className="bg-white/5 border border-gray-200 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-white text-sm font-semibold">{tpl.nome}</p>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#0f2044]/20 text-blue-300 border border-[#0f2044]/30">
                       {tpl.idioma}
                     </span>
                   </div>

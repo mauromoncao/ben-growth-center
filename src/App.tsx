@@ -149,7 +149,7 @@ function Sidebar() {
             <h1 className="font-bold text-sm leading-tight" style={{ color: '#FFFFFF' }}>
               Ben Growth Center
             </h1>
-            <p className="text-[10px] font-medium tracking-wide" style={{ color: '#93C5FD' }}>
+            <p className="text-[10px] font-medium tracking-wide" style={{ color: '#D4A017' }}>
               Centro de Inteligência Comercial
             </p>
           </div>
@@ -162,7 +162,7 @@ function Sidebar() {
           <div key={group.label}>
             <p
               className="text-[10px] font-semibold px-2 mb-1 tracking-wider uppercase"
-              style={{ color: '#60A5FA' }}
+              style={{ color: '#D4A017' }}
             >
               {group.label}
             </p>
@@ -232,7 +232,7 @@ function Sidebar() {
             <p className="text-xs font-semibold truncate" style={{ color: '#FFFFFF' }}>
               Mauro Monção
             </p>
-            <p className="text-[10px] truncate" style={{ color: '#93C5FD' }}>
+            <p className="text-[10px] truncate" style={{ color: '#c9b98a' }}>
               OAB/PI · Tributarista
             </p>
           </div>
@@ -240,9 +240,9 @@ function Sidebar() {
             onClick={logout}
             title="Sair"
             className="p-1 rounded transition-colors flex-shrink-0"
-            style={{ color: '#60A5FA' }}
+            style={{ color: '#D4A017' }}
             onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#FCA5A5')}
-            onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#60A5FA')}
+            onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#D4A017')}
           >
             <LogOut className="w-3.5 h-3.5" />
           </button>
@@ -280,10 +280,10 @@ function TopBar() {
 
       {/* Breadcrumb */}
       <div className="flex-1 flex items-center px-6">
-        <span className="text-xs font-semibold" style={{ color: '#93C5FD' }}>
+        <span className="text-xs font-semibold" style={{ color: '#D4A017' }}>
           {crumb.section}
         </span>
-        <span className="mx-2 text-xs" style={{ color: '#60A5FA' }}>›</span>
+        <span className="mx-2 text-xs" style={{ color: '#F0C040' }}>›</span>
         <span className="text-sm font-semibold" style={{ color: '#FFFFFF' }}>
           {crumb.page}
         </span>
@@ -295,7 +295,7 @@ function TopBar() {
         <button
           className="relative p-2 rounded-lg transition-colors"
           style={{ color: '#FFFFFF' }}
-          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#BFDBFE')}
+          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#F0C040')}
           onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#FFFFFF')}
           title="Notificações"
         >

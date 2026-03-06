@@ -22,7 +22,7 @@ const copyText  = (t: string)  => navigator.clipboard.writeText(t).catch(() => {
 const TIPO_ICON: Record<string, React.ReactNode> = {
   PIX:         <QrCode  className="w-4 h-4 text-emerald-400" />,
   BOLETO:      <FileText className="w-4 h-4 text-amber-400" />,
-  CREDIT_CARD: <CreditCard className="w-4 h-4 text-blue-400" />,
+  CREDIT_CARD: <CreditCard className="w-4 h-4 text-[#2d4a8a]" />,
 }
 
 // ─── StatusBadge ──────────────────────────────────────────────
@@ -308,7 +308,7 @@ const CobrancaCard = ({ pag, onRefresh }: { pag: AsaasPaymentResponse; onRefresh
           )}
           {pag.invoiceUrl && (
             <a href={pag.invoiceUrl} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-all">
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-[#0f2044]/10 text-[#2d4a8a] hover:bg-[#0f2044]/20 transition-all">
               <ExternalLink className="w-3 h-3" /> Link Pagamento
             </a>
           )}

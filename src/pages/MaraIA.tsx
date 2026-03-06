@@ -176,7 +176,7 @@ function CapacidadeCard({ icon, titulo, desc, status }: {
 }) {
   const cores = {
     ativo: { bg: 'bg-green-50', border: 'border-green-200', badge: 'bg-green-100 text-green-700', label: '✅ Ativo' },
-    beta:  { bg: 'bg-blue-50',  border: 'border-blue-200',  badge: 'bg-blue-100 text-blue-700',   label: '🔬 Beta'  },
+    beta:  { bg: 'bg-[#f0f3fa]',  border: 'border-[#c5d0e8]',  badge: 'bg-[#e8edf7] text-[#0f2044]',   label: '🔬 Beta'  },
     breve: { bg: 'bg-gray-50',  border: 'border-gray-200',  badge: 'bg-gray-100 text-gray-500',   label: '🔜 Em breve' },
   }
   const c = cores[status]
@@ -655,8 +655,8 @@ export default function MaraIA() {
         </div>
 
         {/* Comandos via WhatsApp */}
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl">
-          <p className="text-xs font-semibold text-blue-700 mb-2">📱 Também funciona via WhatsApp — envie para a MARA:</p>
+        <div className="mt-4 p-3 bg-[#f0f3fa] border border-[#c5d0e8] rounded-xl">
+          <p className="text-xs font-semibold text-[#0f2044] mb-2">📱 Também funciona via WhatsApp — envie para a MARA:</p>
           <div className="flex flex-wrap gap-2">
             {[
               { cmd: '/ausente ferias 20/03', desc: 'Férias até 20/03' },
@@ -664,7 +664,7 @@ export default function MaraIA() {
               { cmd: '/ausente audiencia 15h', desc: 'Audiência até 15h' },
               { cmd: '/presente',              desc: 'Desativar' },
             ].map(c => (
-              <code key={c.cmd} className="text-xs bg-white border border-blue-200 text-blue-700 px-2 py-1 rounded-lg">
+              <code key={c.cmd} className="text-xs bg-white border border-[#c5d0e8] text-[#0f2044] px-2 py-1 rounded-lg">
                 {c.cmd}
               </code>
             ))}
@@ -797,9 +797,9 @@ export default function MaraIA() {
               </div>
             </div>
 
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-2">
-              <Info size={14} className="text-blue-500 mt-0.5 shrink-0" />
-              <div className="text-xs text-blue-700">
+            <div className="p-3 bg-[#f0f3fa] border border-[#c5d0e8] rounded-xl flex items-start gap-2">
+              <Info size={14} className="text-[#0f2044] mt-0.5 shrink-0" />
+              <div className="text-xs text-[#0f2044]">
                 <p><strong>Como funciona:</strong> Quando configurado para "perguntar", o agente diz:</p>
                 <p className="mt-1 italic">"Posso enviar minhas próximas respostas em áudio? Prefere assim? 😊"</p>
                 <p className="mt-1">A resposta do interlocutor é salva permanentemente (sim → áudio, não → texto).</p>
@@ -877,7 +877,7 @@ export default function MaraIA() {
             },
             { label: 'Dr. Ben',  icon: <CheckCircle size={14} className="text-green-600" />, status: '✅ Operacional', bg: 'bg-green-50 border-green-200' },
             { label: 'MARA IA',  icon: <Sparkles size={14} className="text-amber-500" />,    status: '✅ Online',       bg: 'bg-amber-50 border-amber-200' },
-            { label: 'GPT-4o',   icon: <Cpu size={14} className="text-blue-600" />,           status: 'gpt-4o-mini',    bg: 'bg-blue-50 border-blue-200' },
+            { label: 'GPT-4o',   icon: <Cpu size={14} className="text-[#0f2044]" />,           status: 'gpt-4o-mini',    bg: 'bg-[#f0f3fa] border-[#c5d0e8]' },
             { label: 'TTS',      icon: <Volume2 size={14} className="text-purple-600" />,     status: '✅ ElevenLabs',   bg: 'bg-purple-50 border-purple-200' },
           ].map(s => (
             <div key={s.label} className={`rounded-xl p-3 border ${s.bg}`}>
@@ -893,7 +893,7 @@ export default function MaraIA() {
         {/* Leads estatísticas */}
         <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-            { label: 'Total Leads', valor: estatisticas.totalLeads,           suffix: '',  cor: 'text-blue-600',   bg: 'bg-blue-50',   icon: <Users size={16} className="text-blue-500" />      },
+            { label: 'Total Leads', valor: estatisticas.totalLeads,           suffix: '',  cor: 'text-[#0f2044]',   bg: 'bg-[#f0f3fa]',   icon: <Users size={16} className="text-[#0f2044]" />      },
             { label: 'Taxa Resposta', valor: 97,                              suffix: '%', cor: 'text-green-600',  bg: 'bg-green-50',  icon: <TrendingUp size={16} className="text-green-500" /> },
             { label: 'Tempo Médio',  valor: estatisticas.tempoMedioResposta,  suffix: '',  cor: 'text-purple-600', bg: 'bg-purple-50', icon: <Zap size={16} className="text-purple-500" />       },
             { label: 'Satisfação',   valor: estatisticas.satisfacao,          suffix: '%', cor: 'text-amber-600',  bg: 'bg-amber-50',  icon: <Star size={16} className="text-amber-500" />       },
@@ -989,9 +989,9 @@ export default function MaraIA() {
       {/* ── Prompt da IA ─────────────────────────────────────── */}
       <Secao titulo="Instruções da IA — Prompt do Dr. Ben" icone={<Brain size={16} className="text-[#D4A017]" />} defaultOpen={false}>
         <div className="mt-4">
-          <div className="flex items-start gap-2 mb-3 p-3 bg-blue-50 border border-blue-100 rounded-xl">
-            <Info size={14} className="text-blue-500 mt-0.5 shrink-0" />
-            <p className="text-xs text-blue-700">
+          <div className="flex items-start gap-2 mb-3 p-3 bg-[#f0f3fa] border border-[#e8edf7] rounded-xl">
+            <Info size={14} className="text-[#0f2044] mt-0.5 shrink-0" />
+            <p className="text-xs text-[#0f2044]">
               Este é o <strong>"cérebro"</strong> do Dr. Ben. O fluxo de 7 etapas garante triagem completa antes de notificar a MARA IA.
             </p>
           </div>
@@ -1028,7 +1028,7 @@ export default function MaraIA() {
               key={a.key}
               onClick={() => setConfig(c => ({ ...c, areas: { ...c.areas, [a.key]: !c.areas[a.key] } }))}
               className={`cursor-pointer rounded-xl p-3 border-2 transition-all ${
-                config.areas[a.key] ? 'border-[#0f2044] bg-blue-50' : 'border-gray-100 bg-white hover:border-gray-300'
+                config.areas[a.key] ? 'border-[#0f2044] bg-[#f0f3fa]' : 'border-gray-100 bg-white hover:border-gray-300'
               }`}
             >
               <div className="flex items-center justify-between mb-1">
@@ -1083,7 +1083,7 @@ export default function MaraIA() {
       {/* ── Triagem & Aviso MARA ─────────────────────────────── */}
       <Secao titulo="Triagem Dr. Ben & Aviso MARA IA" icone={<Zap size={16} className="text-[#D4A017]" />} badge="Core">
         <div className="mt-4 space-y-5">
-          <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
+          <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-[#c5d0e8] rounded-xl">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <label className="text-sm font-semibold text-gray-700">Mensagens até a triagem completa</label>
@@ -1217,9 +1217,9 @@ export default function MaraIA() {
       {/* ── Testar Dr. Ben ao Vivo ───────────────────────────── */}
       <Secao titulo="Simular Conversa com Dr. Ben" icone={<Play size={16} className="text-[#D4A017]" />} defaultOpen={false}>
         <div className="mt-4 space-y-4">
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-2">
-            <Info size={14} className="text-blue-500 mt-0.5 shrink-0" />
-            <p className="text-xs text-blue-700">
+          <div className="p-3 bg-[#f0f3fa] border border-[#c5d0e8] rounded-xl flex items-start gap-2">
+            <Info size={14} className="text-[#0f2044] mt-0.5 shrink-0" />
+            <p className="text-xs text-[#0f2044]">
               Simule como o <strong>Dr. Ben</strong> responderia a um cliente via GPT-4o-mini.
             </p>
           </div>
