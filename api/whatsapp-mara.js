@@ -297,6 +297,38 @@ async function processarComando(comando, numero) {
       `_— MARA IA 🌟_`
   }
 
+  // /ausente — ativa modo ausente (MARA assume o número)
+  if (cmd === '/ausente' || cmd.startsWith('/ausente ')) {
+    try {
+      const r = await fetch(`${getBaseUrl()}/api/mara-ausente`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'ausente' }),
+        signal: AbortSignal.timeout(15000),
+      })
+      const data = await r.json().catch(() => null)
+      return data?.mensagem || '🤖 *Modo AUSENTE ativado!*\n\nEstou no controle, Dr. Mauro. Responderei por você.\n\nEnvie */presente* para retornar.\n\n_— MARA IA 🌟_'
+    } catch {
+      return '⚠️ Erro ao ativar modo ausente. Tente novamente.'
+    }
+  }
+
+  // /presente — desativa modo ausente (restaura perfil do Dr. Mauro)
+  if (cmd === '/presente' || cmd.startsWith('/presente ')) {
+    try {
+      const r = await fetch(`${getBaseUrl()}/api/mara-ausente`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'presente' }),
+        signal: AbortSignal.timeout(15000),
+      })
+      const data = await r.json().catch(() => null)
+      return data?.mensagem || '✅ *Modo PRESENTE restaurado!*\n\nBem-vindo de volta, Dr. Mauro! Perfil original restaurado.\n\n_— MARA IA 🌟_'
+    } catch {
+      return '⚠️ Erro ao restaurar perfil. Tente novamente.'
+    }
+  }
+
   // /ajuda
   if (cmd.includes('/ajuda') || cmd.includes('o que você faz') || cmd.includes('comandos')) {
     return `📖 *Meus Comandos, Dr. Mauro:*\n\n` +
@@ -304,7 +336,9 @@ async function processarComando(comando, numero) {
       `🚨 */urgentes* — Casos críticos\n` +
       `📊 */resumo* — Relatório do dia\n` +
       `⚙️ */status* — Status dos sistemas\n` +
-      `📅 */agenda* — Seus compromissos\n\n` +
+      `📅 */agenda* — Seus compromissos\n` +
+      `🔴 */ausente* — MARA assume seu número\n` +
+      `🟢 */presente* — Restaura seu perfil\n\n` +
       `Ou pode falar naturalmente comigo! Estou aqui. 😊\n\n` +
       `_— MARA IA 🌟_`
   }

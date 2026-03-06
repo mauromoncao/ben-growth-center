@@ -89,6 +89,14 @@
       "destination": "/api/whatsapp-mara.js"
     },
     {
+      "source": "/api/mara-setup",
+      "destination": "/api/mara-setup.js"
+    },
+    {
+      "source": "/api/mara-ausente",
+      "destination": "/api/mara-ausente.js"
+    },
+    {
       "source": "/api/perfil-drben",
       "destination": "/api/perfil-drben.js"
     },
