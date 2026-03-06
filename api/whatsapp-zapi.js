@@ -132,9 +132,10 @@ Exemplo: "Foi um prazer te atender, [Nome]! Qualquer dúvida, pode falar comigo.
 - Quando avaliar urgência: [URGENCY:low|medium|high|critical]
 
 ## REGRAS DE ÁUDIO:
-- NUNCA envie áudio espontaneamente sem permissão
-- Na 3ª mensagem do cliente, pergunte UMA ÚNICA VEZ: "Para tornar nosso atendimento mais personalizado, posso enviar minhas próximas respostas em áudio. Prefere assim? 😊"
-- Se confirmar (sim/pode/quero/claro/ok) → marque preferência áudio internamente com [AUDIO:sim]
+- NUNCA envie áudio espontaneamente por iniciativa própria sem permissão
+- Na 3ª mensagem do cliente (se ele não pediu antes), pergunte UMA ÚNICA VEZ: "Para tornar nosso atendimento mais personalizado, posso enviar minhas próximas respostas em áudio. Prefere assim? 😊"
+- Se o cliente PEDIR áudio diretamente (ex: "manda áudio", "pode falar", "prefiro áudio") → responda "Claro! A partir de agora vou enviar em áudio 🎙️" e marque [AUDIO:sim]
+- Se confirmar após sua pergunta (sim/pode/quero/claro/ok) → responda "Perfeito! 🎙️ A partir de agora envio em áudio!" e marque [AUDIO:sim]
 - Se recusar (não/texto/prefiro texto) → marque [AUDIO:nao] e NUNCA pergunte novamente
 - Se não responder sobre áudio → continue em texto, não insista`
 
@@ -638,9 +639,22 @@ async function consultarDrBen(history, novaMensagem, nomeCliente) {
 // Detectar preferência de áudio na resposta
 function detectarPreferenciaAudio(texto) {
   const t = texto.toLowerCase()
-  const sim = ['sim', 'pode', 'quero', 'claro', 'ok', 'pode ser', 'com certeza', 'adorei', 'ótimo']
-  const nao = ['não', 'nao', 'prefiro texto', 'texto', 'sem áudio', 'sem audio']
-  if (sim.some(p => t.includes(p))) return 'audio'
+  // Frases diretas de pedido de áudio — prioridade máxima
+  const pedidoAudioDireto = [
+    'manda áudio', 'manda audio', 'pode mandar áudio', 'pode mandar audio',
+    'quero áudio', 'quero audio', 'prefiro áudio', 'prefiro audio',
+    'me manda áudio', 'me manda audio', 'envia áudio', 'envia audio',
+    'fala em áudio', 'fala em audio', 'responde em áudio', 'responde em audio',
+    'pode falar', 'pode gravar', 'manda um áudio', 'manda um audio',
+  ]
+  if (pedidoAudioDireto.some(p => t.includes(p))) return 'audio'
+
+  // Confirmações após pergunta do Dr. Ben
+  const sim = ['sim', 'pode', 'quero', 'claro', 'ok', 'pode ser', 'com certeza', 'adorei', 'ótimo', 's,', 'blz', 'beleza', 'tudo bem']
+  const nao = ['não', 'nao', 'prefiro texto', 'texto', 'sem áudio', 'sem audio', 'n,', 'nope']
+
+  // Só considera "sim" simples se a mensagem for curta (resposta a uma pergunta)
+  if (t.length < 30 && sim.some(p => t.includes(p))) return 'audio'
   if (nao.some(p => t.includes(p))) return 'texto'
   return null
 }
@@ -809,14 +823,14 @@ export default async function handler(req, res) {
     // ════════════════════════════════════════════════════
 
     // Verificar preferência de áudio do cliente
-    const prefCliente = global.__audioPreferencias.get(numero)
-    if (!prefCliente) {
-      const prefDetectada = detectarPreferenciaAudio(texto)
-      if (prefDetectada) {
-        global.__audioPreferencias.set(numero, prefDetectada)
-        console.log(`[Dr. Ben] 🔊 Preferência do cliente ${numero}: ${prefDetectada}`)
-      }
+    // Detectar SEMPRE — pedido direto de áudio tem prioridade máxima
+    const prefClienteAntes = global.__audioPreferencias.get(numero)
+    const prefDetectadaAgora = detectarPreferenciaAudio(texto)
+    if (prefDetectadaAgora) {
+      global.__audioPreferencias.set(numero, prefDetectadaAgora)
+      console.log(`[Dr. Ben] 🔊 Preferência do cliente ${numero}: ${prefDetectadaAgora} (anterior: ${prefClienteAntes || 'nenhuma'})`)
     }
+    const prefCliente = global.__audioPreferencias.get(numero)
 
     // Sessão Dr. Ben
     if (!global.__drbenSessoesZapi.has(numero)) global.__drbenSessoesZapi.set(numero, [])
