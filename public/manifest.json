@@ -1,8 +1,9 @@
 {
   "name": "Ben Growth Center",
-  "short_name": "Ben Growth",
-  "description": "Centro de Inteligência Comercial Jurídica — Mauro Monção Advogados",
-  "start_url": "/",
+  "short_name": "MARA IA",
+  "description": "Centro de Inteligência Comercial Jurídica — Mauro Monção Advogados. MARA IA Secretária Executiva.",
+  "start_url": "/mara-app",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0f2044",
   "theme_color": "#0f2044",
@@ -11,6 +12,33 @@
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ],
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "MARA IA — App Mobile"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "🛡️ Modo Ausente",
+      "short_name": "Ausente",
+      "description": "Ativar modo ausente da MARA IA",
+      "url": "/mara-app#ausente",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "📋 Ver Leads",
+      "short_name": "Leads",
+      "description": "Ver leads de hoje",
+      "url": "/mara-app#leads",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
   "categories": ["business", "productivity"],
-  "lang": "pt-BR"
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "prefer_related_applications": false
 }
