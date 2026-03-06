@@ -33,6 +33,7 @@ import GoogleAds       from './pages/GoogleAds'
 import WhatsAppConnect from './pages/WhatsAppConnect'
 import MaraIA         from './pages/MaraIA'
 import MaraMobile     from './pages/MaraMobile'
+import MaraChat       from './pages/MaraChat'
 
 // ─── Rota privada ─────────────────────────────────────────────
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -344,7 +345,8 @@ function AppRoutes() {
   return (
     <Routes>
       {/* ── Rota pública: App Mobile MARA IA (acesso via PIN) ── */}
-      <Route path="/mara-app" element={<MaraMobile />} />
+      <Route path="/mara-app"  element={<MaraMobile />} />
+      <Route path="/mara-chat" element={<MaraChat />} />
       <Route
         path="/login"
         element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />}
