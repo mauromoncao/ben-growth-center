@@ -7,8 +7,13 @@ import {
   Play, Info, Edit3, Sparkles, TrendingUp, Users,
   Bell, Target, Activity, BarChart2, Cpu, Lock,
   Wifi, WifiOff, CheckCircle, XCircle, ArrowRight,
-  Briefcase, Scale, Heart, Home, Building2, FileText
+  Briefcase, Scale, Heart, Home, Building2, FileText,
+  UserCircle, Hash, Copy, ExternalLink
 } from 'lucide-react'
+
+// URL do avatar oficial da MARA IA
+const MARA_AVATAR_URL = 'https://www.genspark.ai/api/files/s/qiD4oS1k?cache_control=3600'
+const MARA_WEBHOOK_URL = 'https://ben-growth-center.vercel.app/api/whatsapp-mara'
 
 // ─── Tipos ───────────────────────────────────────────────────
 interface ConfigMara {
@@ -340,6 +345,71 @@ export default function MaraIA() {
               : <><Save size={16} /> Salvar</>
             }
           </button>
+        </div>
+      </div>
+
+      {/* ── Perfil Oficial da MARA IA ────────────────────────── */}
+      <div className="bg-gradient-to-r from-[#0f2044] to-[#1a3a6e] rounded-2xl p-6 text-white shadow-xl">
+        <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6">
+          {/* Avatar */}
+          <div className="relative shrink-0">
+            <img
+              src={MARA_AVATAR_URL}
+              alt="MARA IA"
+              className="w-28 h-28 rounded-2xl object-cover border-4 border-[#D4A017] shadow-2xl"
+              onError={e => { (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=MARA+IA&background=D4A017&color=0f2044&size=128&bold=true' }}
+            />
+            <span className="absolute -bottom-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-bold border-2 border-white animate-pulse">
+              ONLINE
+            </span>
+          </div>
+
+          {/* Dados do perfil */}
+          <div className="flex-1 text-center lg:text-left">
+            <h2 className="text-2xl font-bold text-white">MARA IA</h2>
+            <p className="text-[#D4A017] font-semibold text-sm">Secretária Executiva · Dr. Mauro Monção</p>
+            <p className="text-white/70 text-xs mt-1">22 anos · Brasileira · Formada em Gestão Jurídica · FGV São Paulo</p>
+
+            <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-3">
+              {/* Número dedicado */}
+              <div className="bg-white/10 rounded-xl p-3 border border-white/20">
+                <p className="text-white/60 text-xs mb-1">📱 Número Dedicado</p>
+                <p className="text-white font-bold text-lg">(85) 99143-0969</p>
+                <p className="text-[#D4A017] text-xs">Exclusivo MARA IA</p>
+              </div>
+              {/* Webhook */}
+              <div className="bg-white/10 rounded-xl p-3 border border-white/20">
+                <p className="text-white/60 text-xs mb-1">🔗 Webhook Z-API</p>
+                <p className="text-white font-mono text-xs break-all">/api/whatsapp-mara</p>
+                <p className="text-green-400 text-xs">✅ Configurado</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Tags de personalidade */}
+          <div className="flex flex-col gap-2 shrink-0">
+            {['Elegante', 'Inteligente', 'Proativa', 'Discreta', 'Eficiente'].map(tag => (
+              <span key={tag} className="text-xs bg-[#D4A017]/20 border border-[#D4A017]/40 text-[#D4A017] px-3 py-1 rounded-full text-center">
+                ✦ {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Configuração do Webhook */}
+        <div className="mt-5 p-4 bg-white/5 border border-white/10 rounded-xl">
+          <p className="text-white/80 text-xs font-semibold mb-2">⚙️ Para ativar — configure no Z-API (instância do número (85) 99143-0969):</p>
+          <div className="flex items-center gap-2 bg-black/30 rounded-lg px-3 py-2">
+            <code className="text-green-400 text-xs flex-1 break-all">{MARA_WEBHOOK_URL}</code>
+            <button
+              onClick={() => navigator.clipboard.writeText(MARA_WEBHOOK_URL)}
+              className="shrink-0 text-white/60 hover:text-white transition"
+              title="Copiar"
+            >
+              <Copy size={14} />
+            </button>
+          </div>
+          <p className="text-white/50 text-xs mt-2">Cole este URL no campo "Webhook" da instância Z-API do número (85) 99143-0969</p>
         </div>
       </div>
 
@@ -892,21 +962,48 @@ export default function MaraIA() {
           <p className="text-sm text-gray-500">
             Configure em <strong>vercel.com → Project → Settings → Environment Variables</strong>
           </p>
+
+          {/* Bloco de instrução nova instância MARA */}
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+            <p className="text-sm font-bold text-amber-800 mb-2">📱 Nova Instância MARA — (85) 99143-0969</p>
+            <p className="text-xs text-amber-700 mb-3">
+              Para a MARA IA usar o número dedicado, crie uma <strong>segunda instância</strong> no Z-API para o número (85) 99143-0969 e adicione as variáveis abaixo.
+              Se usar a mesma instância do Dr. Ben, as variáveis <code>MARA_ZAPI_*</code> não são necessárias.
+            </p>
+            <div className="space-y-2">
+              {[
+                { key: 'MARA_ZAPI_INSTANCE_ID', desc: 'ID da instância Z-API do número (85) 99143-0969' },
+                { key: 'MARA_ZAPI_TOKEN',        desc: 'Token da instância Z-API da MARA' },
+                { key: 'MARA_ZAPI_CLIENT_TOKEN', desc: 'Client-Token de segurança da conta Z-API (MARA)' },
+              ].map(v => (
+                <div key={v.key} className="flex items-center gap-2 text-xs">
+                  <code className="font-mono text-amber-900 bg-amber-100 px-2 py-0.5 rounded">{v.key}</code>
+                  <span className="text-amber-700">{v.desc}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {[
-            { key: 'OPENAI_API_KEY',       status: 'configurado', desc: 'GPT-4o-mini — motor principal do Dr. Ben' },
-            { key: 'ZAPI_INSTANCE_ID',      status: 'configurado', desc: 'ID da instância Z-API (3EF9A739...)' },
-            { key: 'ZAPI_TOKEN',            status: 'configurado', desc: 'Token de autenticação Z-API (426A...)' },
+            { key: 'OPENAI_API_KEY',       status: 'configurado', desc: 'GPT-4o-mini — motor principal do Dr. Ben e MARA IA' },
+            { key: 'ZAPI_INSTANCE_ID',      status: 'configurado', desc: 'ID da instância Z-API Dr. Ben (3EF9A739...)' },
+            { key: 'ZAPI_TOKEN',            status: 'configurado', desc: 'Token de autenticação Z-API Dr. Ben (426A...)' },
             { key: 'ZAPI_CLIENT_TOKEN',     status: 'configurado', desc: 'Client-Token de segurança da conta Z-API' },
             { key: 'PLANTONISTA_WHATSAPP',  status: 'configurado', desc: 'Número do Dr. Mauro para alertas MARA IA (+5586...)' },
             { key: 'VPS_LEADS_URL',         status: 'configurado', desc: 'URL do CRM no VPS (http://181.215...)' },
-            { key: 'ZAPI_PHONE',            status: 'configurado', desc: 'Número do WhatsApp conectado ao Z-API' },
+            { key: 'ZAPI_PHONE',            status: 'configurado', desc: 'Número do WhatsApp Dr. Ben conectado ao Z-API' },
+            { key: 'MARA_ZAPI_INSTANCE_ID', status: 'novo',        desc: 'ID instância MARA — número (85) 99143-0969' },
+            { key: 'MARA_ZAPI_TOKEN',       status: 'novo',        desc: 'Token instância MARA Z-API' },
+            { key: 'MARA_ZAPI_CLIENT_TOKEN',status: 'novo',        desc: 'Client-Token conta Z-API da MARA' },
           ].map(v => (
             <div key={v.key} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
-              <code className="text-xs font-mono text-[#0f2044] w-48 shrink-0">{v.key}</code>
+              <code className="text-xs font-mono text-[#0f2044] w-52 shrink-0">{v.key}</code>
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
-                v.status === 'configurado' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'
+                v.status === 'configurado' ? 'bg-green-100 text-green-700' :
+                v.status === 'novo'        ? 'bg-amber-100 text-amber-700' :
+                'bg-red-100 text-red-600'
               }`}>
-                {v.status === 'configurado' ? '✅ OK' : '⚠️ Falta'}
+                {v.status === 'configurado' ? '✅ OK' : v.status === 'novo' ? '🆕 Novo' : '⚠️ Falta'}
               </span>
               <p className="text-xs text-gray-500">{v.desc}</p>
             </div>

@@ -81,6 +81,14 @@
       "destination": "/api/whatsapp-zapi.js"
     },
     {
+      "source": "/api/whatsapp-mara",
+      "destination": "/api/whatsapp-mara.js"
+    },
+    {
+      "source": "/api/whatsapp-mara/:path*",
+      "destination": "/api/whatsapp-mara.js"
+    },
+    {
       "source": "/api/perfil-drben",
       "destination": "/api/perfil-drben.js"
     },
@@ -172,6 +180,10 @@
     {
       "path": "/api/whatsapp-keepalive",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/whatsapp-mara",
+      "schedule": "0 7 * * 1-5"
     }
   ]
 }
