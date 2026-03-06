@@ -31,6 +31,30 @@ const VOICE_MARA   = 'EST9Ui6982FZPSi7gCHi'   // Voz da MARA IA
 
 const ZAPI_BASE = `https://api.z-api.io/instances/${ZAPI_INSTANCE_ID}/token/${ZAPI_TOKEN}`
 
+// ── Fuso horário Brasil (Fortaleza = UTC-3 sem horário de verão) ──
+const FUSO_BR = 'America/Fortaleza'
+
+function horaAtual() {
+  return new Date().toLocaleTimeString('pt-BR', { timeZone: FUSO_BR, hour: '2-digit', minute: '2-digit' })
+}
+
+function dataAtual() {
+  return new Date().toLocaleDateString('pt-BR', { timeZone: FUSO_BR, day: '2-digit', month: '2-digit', year: 'numeric' })
+}
+
+function dataHoraAtual() {
+  return new Date().toLocaleString('pt-BR', { timeZone: FUSO_BR, day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+}
+
+// Retorna saudação correta pelo período do dia em Fortaleza
+function saudacaoPeriodo() {
+  const h = parseInt(new Date().toLocaleString('pt-BR', { timeZone: FUSO_BR, hour: 'numeric', hour12: false }))
+  if (h >= 6  && h < 12) return 'Bom dia'
+  if (h >= 12 && h < 18) return 'Boa tarde'
+  if (h >= 18 && h < 23) return 'Boa noite'
+  return 'Olá'
+}
+
 function getBaseUrl() {
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
   return 'https://ben-growth-center.vercel.app'
@@ -101,11 +125,18 @@ Se responder não/texto/prefiro texto → continue em texto. Nunca pergunte nova
 - NUNCA emita parecer, opinião jurídica ou análise do caso
 - NUNCA prometa resultados, prazos ou êxito
 - NUNCA recuse ou descarte um atendimento
-- Responda SEMPRE em português brasileiro
+- **IDIOMA: Responda SEMPRE em português brasileiro nativo**, independentemente do idioma da pergunta. Só mude de idioma se o interlocutor iniciar a conversa em outro idioma ou pedir explicitamente.
 - Seja cordial, profissional e objetivo
 - Mensagens curtas (máx. 3 parágrafos por resposta)
 - Quando identificar área: [AREA:tributario|previdenciario|bancario|imobiliario|familia|publico|trabalhista|consumidor|outros]
-- Quando avaliar urgência: [URGENCY:low|medium|high|critical]`
+- Quando avaliar urgência: [URGENCY:low|medium|high|critical]
+
+## REGRAS DE ÁUDIO:
+- NUNCA envie áudio espontaneamente sem permissão
+- Na 3ª mensagem do cliente, pergunte UMA ÚNICA VEZ: "Para tornar nosso atendimento mais personalizado, posso enviar minhas próximas respostas em áudio. Prefere assim? 😊"
+- Se confirmar (sim/pode/quero/claro/ok) → marque preferência áudio internamente com [AUDIO:sim]
+- Se recusar (não/texto/prefiro texto) → marque [AUDIO:nao] e NUNCA pergunte novamente
+- Se não responder sobre áudio → continue em texto, não insista`
 
 // ── MARA IA — Secretária Executiva ──────────────────────────
 const MARA_SYSTEM_PROMPT = `Você é MARA, a Secretária Executiva Pessoal e Assistente de Inteligência Artificial do Dr. Mauro Monção, advogado sênior do escritório Mauro Monção Advogados Associados (OAB/PI · CE · MA).
@@ -205,6 +236,52 @@ async function gerarAudio(texto, voiceId) {
     return base64
   } catch (e) {
     console.error('[ElevenLabs] fetch error:', e.message)
+    return null
+  }
+}
+
+// ============================================================
+// ELEVENLABS — SPEECH-TO-TEXT (transcrição de áudio do cliente)
+// ============================================================
+async function transcreverAudioElevenLabs(audioUrl) {
+  if (!ELEVENLABS_KEY || !audioUrl) return null
+  try {
+    // Baixar o arquivo de áudio da URL do Z-API
+    console.log(`[STT] Baixando áudio: ${audioUrl.slice(0, 80)}...`)
+    const audioResp = await fetch(audioUrl, { signal: AbortSignal.timeout(15000) })
+    if (!audioResp.ok) {
+      console.error('[STT] Erro ao baixar áudio:', audioResp.status)
+      return null
+    }
+    const audioBuffer = await audioResp.arrayBuffer()
+    const audioBlob   = new Blob([audioBuffer], { type: 'audio/ogg' })
+
+    // Enviar para ElevenLabs Speech-to-Text
+    const formData = new FormData()
+    formData.append('audio', audioBlob, 'audio.ogg')
+    formData.append('model_id', 'scribe_v1')
+    formData.append('language_code', 'pt')
+
+    const res = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
+      method: 'POST',
+      headers: { 'xi-api-key': ELEVENLABS_KEY },
+      body: formData,
+      signal: AbortSignal.timeout(20000),
+    })
+
+    if (!res.ok) {
+      console.error('[STT ElevenLabs] Erro:', res.status, await res.text())
+      return null
+    }
+
+    const data = await res.json()
+    const transcricao = data?.text || data?.transcript || null
+    if (transcricao) {
+      console.log(`[STT] ✅ Transcrito: "${transcricao.slice(0, 100)}"`)
+    }
+    return transcricao
+  } catch (e) {
+    console.error('[STT ElevenLabs] Erro:', e.message)
     return null
   }
 }
@@ -330,7 +407,7 @@ async function maraAvisarDrMauro({ nome, telefone, numero, area, urgencia, resum
     familia: '👨‍👩‍👧 Família', publico: '⚖️ Advocacia Pública',
     trabalhista: '👷 Trabalhista', consumidor: '🛒 Consumidor', outros: '📋 Outros',
   }[area] ?? '📋 Outros'
-  const hora = new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Fortaleza', hour: '2-digit', minute: '2-digit' })
+  const hora = horaAtual()
   const numLimpo = numero.replace(/\D/g, '')
   const nomeExibir = nome ?? pushName ?? 'Não informado'
   const foneExibir = telefone ?? `+${numLimpo}`
@@ -419,7 +496,7 @@ async function processarComandoMara(texto, numero) {
       const hoje = new Date().toISOString().split('T')[0]
       const leadsHoje = leads.filter(l => (l.createdAt || l.created_at || '').startsWith(hoje))
       const urgentes = leads.filter(l => l.urgencia === 'high' || l.urgencia === 'critical')
-      const hora = new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Fortaleza', hour: '2-digit', minute: '2-digit' })
+      const hora = horaAtual()
       const ausente = global.__modoAusente.ativo ? `🔴 Modo ${global.__modoAusente.motivo}` : '🟢 Presente'
       return `📊 *Relatório Executivo — ${hora}*\n\n👥 Leads hoje: *${leadsHoje.length}*\n🚨 Urgentes: *${urgentes.length}*\n📦 Total CRM: *${leads.length}*\n🤖 Dr. Ben: *Operacional*\n📱 Z-API: *Conectado*\n🛡️ Status: *${ausente}*\n\n_— MARA IA 🌟_`
     } catch {
@@ -485,7 +562,7 @@ async function gerarRespostaModoAusente(mensagem, numero, pushName) {
   if (ehUrgente) {
     // Alertar Dr. Mauro mesmo ausente
     const mauroNum = DR_MAURO_WHATSAPP.replace(/\D/g, '')
-    const hora = new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Fortaleza', hour: '2-digit', minute: '2-digit' })
+    const hora = horaAtual()
     await enviarMensagem(mauroNum,
       `🚨 *ALERTA URGENTE — Modo Ausente*\n\n_Recebido às ${hora}_\n\n👤 *De:* ${pushName || numero}\n💬 *Mensagem:* "${mensagem.slice(0, 200)}"\n\n⚠️ Parece urgente mesmo em modo ${motivo}!`
     )
@@ -516,21 +593,27 @@ async function gerarRespostaModoAusente(mensagem, numero, pushName) {
 // DR. BEN — CONSULTA OpenAI
 // ============================================================
 function extrairMarcadores(texto) {
-  const resultado = { contact: null, area: null, urgencia: null }
+  const resultado = { contact: null, area: null, urgencia: null, audio: null }
   const contactMatch = texto.match(/\[CONTACT:(\{[^}]+\})\]/)
   if (contactMatch) { try { resultado.contact = JSON.parse(contactMatch[1]) } catch {} }
   const areaMatch = texto.match(/\[AREA:([\w|]+)\]/)
   if (areaMatch) resultado.area = areaMatch[1].split('|')[0]
   const urgenciaMatch = texto.match(/\[URGENCY:(\w+)\]/)
   if (urgenciaMatch) resultado.urgencia = urgenciaMatch[1]
+  const audioMatch = texto.match(/\[AUDIO:(sim|nao)\]/i)
+  if (audioMatch) resultado.audio = audioMatch[1].toLowerCase()
   return resultado
 }
 
 async function consultarDrBen(history, novaMensagem) {
   const fallback = '⚖️ Olá! Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção Advogados. Estou com uma instabilidade técnica. Por favor, entre em contato: *(86) 99482-0054*'
   if (!OPENAI_KEY) return fallback
+
+  // Injetar contexto de data/hora brasileiro no prompt
+  const contextoTempo = `\n\n---\n🕐 Contexto atual (Fortaleza/CE — UTC-3): ${dataHoraAtual()}\nSaudação correta para este horário: "${saudacaoPeriodo()}"`
+
   const messages = [
-    { role: 'system', content: DR_BEN_SYSTEM_PROMPT },
+    { role: 'system', content: DR_BEN_SYSTEM_PROMPT + contextoTempo },
     ...history.slice(-20).map(m => ({ role: m.role === 'model' ? 'assistant' : (m.role ?? 'user'), content: m.content ?? '' })),
     { role: 'user', content: novaMensagem },
   ]
@@ -637,11 +720,34 @@ export default async function handler(req, res) {
     if (!body?.phone && !body?.from) return res.status(200).json({ ok: true })
 
     const numero   = (body?.phone || body?.from || '').replace(/[^0-9]/g, '')
-    const texto    = body?.text?.message || body?.text || body?.message || ''
     const pushName = body?.senderName || body?.pushName || ''
 
     if (numero.includes('@g') || numero.endsWith('@broadcast')) return res.status(200).json({ ok: true })
-    if (!numero || numero.length < 8 || !texto) return res.status(200).json({ ok: true })
+    if (!numero || numero.length < 8) return res.status(200).json({ ok: true })
+
+    // ── Detectar tipo de mensagem ─────────────────────────
+    // Texto direto
+    let texto = body?.text?.message || body?.text || body?.message || ''
+
+    // Áudio: Z-API envia { audio: { audioUrl: '...' } } ou { type: 'audio', audioUrl: '...' }
+    const audioUrl = body?.audio?.audioUrl || body?.audioUrl || (body?.type === 'audio' ? body?.url : null)
+
+    // Se é áudio e não tem texto → transcrever via ElevenLabs STT
+    if (!texto && audioUrl) {
+      console.log(`[Webhook] 🎙️ Áudio recebido de ${pushName} (${numero}) — transcrevendo...`)
+      const transcricao = await transcreverAudioElevenLabs(audioUrl)
+      if (transcricao) {
+        texto = `[🎙️ Áudio transcrito]: ${transcricao}`
+        console.log(`[Webhook] 📝 Transcrição: "${transcricao.slice(0, 100)}"`)
+      } else {
+        // Não conseguiu transcrever — avisar o cliente
+        await enviarMensagem(numero, '🎙️ Recebi seu áudio! Tive uma instabilidade para processar agora. Pode digitar sua mensagem? Estou aqui!')
+        console.log(`[Webhook] ⚠️ Não foi possível transcrever áudio de ${numero}`)
+        return res.status(200).json({ ok: true, transcricao: false })
+      }
+    }
+
+    if (!texto) return res.status(200).json({ ok: true })
 
     console.log(`[Webhook] Mensagem de ${pushName} (${numero}): "${texto.slice(0, 100)}"`)
 
@@ -757,11 +863,20 @@ export default async function handler(req, res) {
       dadosTriagem.nome     = marcadores.contact.name  ?? dadosTriagem.nome
       dadosTriagem.telefone = marcadores.contact.phone ?? dadosTriagem.telefone
     }
+    // Atualizar preferência de áudio com base na resposta do Dr. Ben
+    if (marcadores.audio === 'sim') {
+      global.__audioPreferencias.set(numero, 'audio')
+      console.log(`[Dr. Ben] 🔊 Cliente ${numero} confirmou áudio`)
+    } else if (marcadores.audio === 'nao') {
+      global.__audioPreferencias.set(numero, 'texto')
+      console.log(`[Dr. Ben] 📝 Cliente ${numero} prefere texto`)
+    }
 
     const cleanReply = aiText
       .replace(/\[CONTACT:\{[^}]*\}\]/g, '')
       .replace(/\[AREA:[\w|]+\]/g, '')
       .replace(/\[URGENCY:\w+\]/g, '')
+      .replace(/\[AUDIO:(sim|nao)\]/gi, '')
       .trim()
 
     crmRegistrarMensagem(numero, 'dr_ben', cleanReply)
