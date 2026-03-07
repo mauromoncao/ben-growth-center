@@ -31,6 +31,14 @@ const VOICE_MARA   = 'EST9Ui6982FZPSi7gCHi'   // Voz da MARA IA
 
 const ZAPI_BASE = `https://api.z-api.io/instances/${ZAPI_INSTANCE_ID}/token/${ZAPI_TOKEN}`
 
+// ── Instância MARA (para responder ao Dr. Mauro) ─────────────
+const MARA_INSTANCE_ID  = process.env.MARA_ZAPI_INSTANCE_ID || ''
+const MARA_TOKEN        = process.env.MARA_ZAPI_TOKEN       || ''
+const MARA_CLIENT_TOKEN = process.env.MARA_ZAPI_CLIENT_TOKEN || ZAPI_CLIENT_TOKEN
+const MARA_BASE = MARA_INSTANCE_ID
+  ? `https://api.z-api.io/instances/${MARA_INSTANCE_ID}/token/${MARA_TOKEN}`
+  : ZAPI_BASE
+
 // ── Fuso horário Brasil (Fortaleza = UTC-3 sem horário de verão) ──
 const FUSO_BR = 'America/Fortaleza'
 
@@ -331,6 +339,20 @@ async function enviarResposta(numero, texto, voiceId) {
   return 'texto'
 }
 
+// Resposta via instância MARA (para o Dr. Mauro não enviar para si mesmo)
+async function enviarRespostaMara(numero, texto, voiceId) {
+  const pref = global.__audioPreferencias.get(numero)
+  if (pref === 'audio' && ELEVENLABS_KEY && voiceId) {
+    const audio = await gerarAudio(texto, voiceId)
+    if (audio) {
+      await enviarAudio(numero, audio)
+      return 'audio'
+    }
+  }
+  await enviarMensagemMara(numero, texto)
+  return 'texto'
+}
+
 // ============================================================
 // Z-API — ENVIAR MENSAGEM DE TEXTO
 // ============================================================
@@ -354,6 +376,26 @@ async function enviarMensagem(numero, texto) {
     return data
   } catch (e) {
     console.error('[Z-API] fetch error:', e.message)
+  }
+}
+
+// Enviar mensagem VIA INSTÂNCIA MARA (para responder ao Dr. Mauro)
+async function enviarMensagemMara(numero, texto) {
+  try {
+    const headers = { 'Content-Type': 'application/json' }
+    if (MARA_CLIENT_TOKEN) headers['Client-Token'] = MARA_CLIENT_TOKEN
+    const res = await fetch(`${MARA_BASE}/send-text`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ phone: numero, message: texto }),
+      signal: AbortSignal.timeout(10000),
+    })
+    const data = await res.json()
+    if (res.ok) console.log('[MARA→Dr.Mauro] ✅ Msg enviada para', numero)
+    else console.error('[MARA→Dr.Mauro] ❌ Erro:', JSON.stringify(data).slice(0, 200))
+    return data
+  } catch (e) {
+    console.error('[MARA→Dr.Mauro] fetch error:', e.message)
   }
 }
 
@@ -426,8 +468,8 @@ async function maraAvisarDrMauro({ nome, telefone, numero, area, urgencia, resum
     `_— MARA IA 🌟_`,
   ].filter(l => l !== null).join('\n')
   const mauroNum = DR_MAURO_WHATSAPP.replace(/\D/g, '')
-  await enviarMensagem(mauroNum, msg)
-  console.log(`[MARA IA] ✅ Dr. Mauro avisado — ${nomeExibir}`)
+  await enviarMensagemMara(mauroNum, msg)
+  console.log(`[MARA IA] ✅ Dr. Mauro avisado via instância MARA — ${nomeExibir}`)
 }
 
 // Processar comandos do Dr. Mauro
@@ -561,10 +603,10 @@ async function gerarRespostaModoAusente(mensagem, numero, pushName) {
   const ehUrgente = palavrasUrgentes.some(p => mensagem.toLowerCase().includes(p))
 
   if (ehUrgente) {
-    // Alertar Dr. Mauro mesmo ausente
+    // Alertar Dr. Mauro mesmo ausente — usar instância MARA
     const mauroNum = DR_MAURO_WHATSAPP.replace(/\D/g, '')
     const hora = horaAtual()
-    await enviarMensagem(mauroNum,
+    await enviarMensagemMara(mauroNum,
       `🚨 *ALERTA URGENTE — Modo Ausente*\n\n_Recebido às ${hora}_\n\n👤 *De:* ${pushName || numero}\n💬 *Mensagem:* "${mensagem.slice(0, 200)}"\n\n⚠️ Parece urgente mesmo em modo ${motivo}!`
     )
   }
@@ -800,10 +842,10 @@ export default async function handler(req, res) {
         respostaFinal = await gerarRespostaMara(numero, texto)
       }
 
-      // Enviar com voz MARA ou texto
-      await enviarResposta(numero, respostaFinal, VOICE_MARA)
+      // Enviar via instância MARA (não pode usar a mesma instância que recebeu)
+      await enviarRespostaMara(numero, respostaFinal, VOICE_MARA)
 
-      console.log(`[MARA IA] ✅ Respondido Dr. Mauro`)
+      console.log(`[MARA IA] ✅ Respondido Dr. Mauro via instância MARA`)
       return res.status(200).json({ ok: true, agente: 'MARA', respondido: true })
     }
 
