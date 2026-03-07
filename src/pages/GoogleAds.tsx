@@ -125,33 +125,52 @@ function CampanhaCard({
 // ─── Tela de credenciais pendentes ───────────────────────────
 function PendingCredentials({ account }: { account: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-        style={{ background: 'rgba(212,160,23,0.12)', border: '1px solid rgba(212,160,23,0.30)' }}>
-        <Zap size={28} style={{ color: '#D4A017' }} />
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      {/* Ícone central */}
+      <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-5"
+        style={{ background: 'linear-gradient(135deg, rgba(212,160,23,0.15), rgba(212,160,23,0.08))', border: '2px solid rgba(212,160,23,0.30)' }}>
+        <Zap size={36} style={{ color: '#D4A017' }} />
       </div>
-      <h3 className="text-white text-lg font-bold font-sans mb-2">Google Ads — Configurando</h3>
-      <p className="text-sm font-sans mb-1" style={{ color: 'rgba(159,176,215,0.70)' }}>
+
+      <h3 className="text-white text-xl font-bold font-sans mb-2">Google Ads — Aguardando Configuração</h3>
+      <p className="text-sm font-sans mb-1" style={{ color: 'rgba(159,176,215,0.80)' }}>
         Conta selecionada: <strong className="text-white">{account}</strong>
       </p>
-      <p className="text-sm font-sans mb-6 max-w-sm" style={{ color: 'rgba(159,176,215,0.60)' }}>
-        As credenciais OAuth estão sendo configuradas. Em produção, os dados reais das campanhas serão exibidos aqui.
+      <p className="text-sm font-sans mb-8 max-w-md leading-relaxed" style={{ color: 'rgba(159,176,215,0.65)' }}>
+        As credenciais OAuth 2.0 do Google Ads ainda precisam ser configuradas.
+        Após configurar, os dados reais das campanhas serão exibidos automaticamente.
       </p>
-      <div className="grid grid-cols-2 gap-3 w-full max-w-sm text-left">
+
+      {/* Status das credenciais */}
+      <div className="grid grid-cols-2 gap-3 w-full max-w-md text-left mb-6">
         {[
-          { label: 'MCC ID', value: '104-876-3500', ok: true },
-          { label: 'Developer Token', value: 'fFzZ3NC...', ok: true },
-          { label: 'OAuth Client ID', value: 'Pendente', ok: false },
-          { label: 'Refresh Token', value: 'Pendente', ok: false },
+          { label: 'MCC ID',         value: '104-876-3500',  ok: true,  desc: 'Manager Account' },
+          { label: 'Developer Token', value: 'fFzZ3NC...',   ok: true,  desc: 'API Access' },
+          { label: 'OAuth Client ID', value: 'Pendente',     ok: false, desc: 'Google Cloud Console' },
+          { label: 'Refresh Token',   value: 'Pendente',     ok: false, desc: 'Autorização OAuth' },
         ].map(item => (
-          <div key={item.label} className="card p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-2 h-2 rounded-full" style={{ background: item.ok ? '#22c55e' : '#f59e0b' }} />
-              <p className="text-xs font-sans font-medium" style={{ color: 'rgba(159,176,215,0.70)' }}>{item.label}</p>
+          <div key={item.label} className="rounded-xl p-3 text-left"
+            style={{
+              background: item.ok ? 'rgba(34,197,94,0.07)' : 'rgba(245,158,11,0.07)',
+              border: `1px solid ${item.ok ? 'rgba(34,197,94,0.25)' : 'rgba(245,158,11,0.25)'}`,
+            }}>
+            <div className="flex items-center gap-2 mb-1.5">
+              <div className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{ background: item.ok ? '#22c55e' : '#f59e0b' }} />
+              <p className="text-xs font-semibold font-sans" style={{ color: item.ok ? '#86efac' : '#fcd34d' }}>
+                {item.label}
+              </p>
             </div>
-            <p className="text-xs font-mono text-white truncate">{item.value}</p>
+            <p className="text-xs font-mono font-bold text-white mb-0.5">{item.value}</p>
+            <p className="text-xs font-sans" style={{ color: 'rgba(159,176,215,0.50)' }}>{item.desc}</p>
           </div>
         ))}
+      </div>
+
+      {/* Instrução */}
+      <div className="rounded-xl px-5 py-3 text-sm font-sans max-w-md"
+        style={{ background: 'rgba(15,32,68,0.60)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(159,176,215,0.75)' }}>
+        💡 Configure <strong className="text-white">GOOGLE_ADS_CLIENT_ID</strong> e <strong className="text-white">GOOGLE_ADS_REFRESH_TOKEN</strong> nas variáveis de ambiente do Vercel para ativar.
       </div>
     </div>
   )
@@ -194,10 +213,16 @@ export default function GoogleAds() {
       setDiario(daily.diario)
     } catch (e: any) {
       // Se retornar pending_credentials no erro
-      if (e.message?.includes('pending_credentials') || e.message?.includes('Configure')) {
+      if (e.message?.includes('pending_credentials') || e.message?.includes('Configure') || e.message?.includes('inválida')) {
         setPendingCredentials(true)
       } else {
-        setError(e.message || 'Erro ao carregar dados')
+        // Tratar erro de JSON inválido (<!DOCTYPE) de forma amigável
+        const msg = e.message || 'Erro ao carregar dados'
+        if (msg.includes('<!DOCTYPE') || msg.includes('not valid JSON') || msg.includes('Unexpected token')) {
+          setPendingCredentials(true)
+        } else {
+          setError(msg)
+        }
       }
     } finally {
       setLoading(false)
@@ -225,7 +250,7 @@ export default function GoogleAds() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 font-sans">Google Ads</h1>
-          <p className="text-sm font-sans mt-0.5" style={{ color: 'rgba(159,176,215,0.65)' }}>
+          <p className="text-sm font-sans mt-0.5 text-gray-500">
             Performance de campanhas — MCC 104-876-3500
           </p>
         </div>

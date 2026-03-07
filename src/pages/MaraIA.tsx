@@ -229,7 +229,9 @@ export default function MaraIA() {
   const verificarStatus = async () => {
     try {
       const d = await fetch('/api/diagnostico').then(r => r.json())
-      const ok = d?.zapi_status?.includes('✅') || d?.zapi_status?.includes('online') || d?.zapi_status?.includes('conectado')
+      // A API retorna o campo "zapi" (não "zapi_status")
+      const zapiField = d?.zapi || d?.zapi_status || ''
+      const ok = zapiField.includes('✅') || zapiField.toLowerCase().includes('online') || zapiField.toLowerCase().includes('conectado')
       setStatusZAPI(ok ? 'online' : 'offline')
       if (d?.totalLeads) setEstatisticas(e => ({ ...e, totalLeads: d.totalLeads, leadsGerados: d.totalLeads }))
     } catch { setStatusZAPI('offline') }

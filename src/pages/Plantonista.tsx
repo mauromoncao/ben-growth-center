@@ -78,35 +78,74 @@ function AlertaPush({ onClose }: { onClose: () => void }) {
   const lead = crmLeadsMock.find(l => l.status === 'aguardando')!
 
   return (
-    <div className="fixed top-4 right-4 z-50 w-80 bg-white/5 rounded-2xl shadow-2xl border-2 border-amber-400 animate-bounce-once overflow-hidden">
-      {/* Header vermelho */}
-      <div className="bg-amber-500 px-4 py-3 flex items-center justify-between">
+    <div
+      className="fixed top-4 right-4 z-50 w-84 overflow-hidden animate-bounce-once"
+      style={{
+        width: '340px',
+        background: '#ffffff',
+        borderRadius: '16px',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.25), 0 4px 16px rgba(0,0,0,0.15)',
+        border: '2px solid #f59e0b',
+      }}
+    >
+      {/* Header laranja sólido */}
+      <div
+        className="px-4 py-3 flex items-center justify-between"
+        style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)' }}
+      >
         <div className="flex items-center gap-2">
-          <Bell className="w-5 h-5 text-white animate-pulse" />
-          <span className="text-white font-bold text-sm">⚡ LEAD AGUARDANDO VOCÊ</span>
+          <div className="w-7 h-7 rounded-full flex items-center justify-center"
+            style={{ background: 'rgba(255,255,255,0.25)' }}>
+            <Bell className="w-4 h-4 text-white animate-pulse" />
+          </div>
+          <span className="text-white font-bold text-sm tracking-wide">⚡ LEAD AGUARDANDO VOCÊ</span>
         </div>
-        <button onClick={onClose} className="text-gray-600 hover:text-white text-lg leading-none">✕</button>
+        <button
+          onClick={onClose}
+          className="w-6 h-6 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors text-sm font-bold"
+        >
+          ✕
+        </button>
       </div>
-      {/* Corpo */}
-      <div className="p-4">
+
+      {/* Corpo branco sólido */}
+      <div className="p-4" style={{ background: '#ffffff' }}>
+        {/* Lead info */}
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-12 h-12 bg-navy rounded-full flex items-center justify-center">
-            <span className="text-white font-bold">{lead.nome[0]}</span>
+          <div className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{ background: '#0f2044' }}>
+            <span className="text-white font-bold text-base">{lead.nome[0]}</span>
           </div>
-          <div>
-            <p className="font-bold text-gray-900">{lead.nome}</p>
-            <p className="text-gray-500 text-xs">{lead.area} · {lead.origem}</p>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-gray-900 text-sm">{lead.nome}</p>
+            <p className="text-gray-500 text-xs truncate">{lead.area} · {lead.origem}</p>
           </div>
-          <span className="ml-auto bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full font-bold">URGENTE</span>
+          <span className="text-xs px-2 py-1 rounded-full font-bold flex-shrink-0"
+            style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fca5a5' }}>
+            URGENTE
+          </span>
         </div>
-        <p className="text-gray-600 text-sm bg-gray-50 rounded-lg p-3 mb-3">
-          "{lead.resumoIA.substring(0, 100)}..."
-        </p>
+
+        {/* Resumo */}
+        <div className="rounded-xl p-3 mb-3 text-sm"
+          style={{ background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+          <p className="text-gray-700 leading-relaxed">
+            "{lead.resumoIA.substring(0, 100)}..."
+          </p>
+        </div>
+
+        {/* Ações */}
         <div className="flex gap-2">
-          <button className="flex-1 bg-green-500 text-white py-2 rounded-xl text-sm font-bold hover:bg-green-600 transition-colors flex items-center justify-center gap-1">
+          <button
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
+            style={{ background: 'linear-gradient(135deg, #16a34a, #22c55e)' }}
+          >
             <MessageCircle className="w-4 h-4" /> Assumir
           </button>
-          <button className="flex-1 bg-gray-100 text-gray-600 py-2 rounded-xl text-sm font-medium hover:bg-white/8 transition-colors">
+          <button
+            className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all hover:opacity-80"
+            style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0' }}
+          >
             Adiar 10min
           </button>
         </div>
@@ -154,45 +193,50 @@ export default function Plantonista() {
       </div>
 
       {/* Plantonista ativo agora */}
-      <div className="card bg-gradient-to-r from-primary-900 to-primary-700 text-white">
+      <div className="rounded-2xl p-5 text-white"
+        style={{ background: 'linear-gradient(135deg, #0f2044 0%, #1a3a6e 100%)', border: '1px solid #1e3a6e', boxShadow: '0 4px 20px rgba(15,32,68,0.3)' }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold flex items-center gap-2">
-            <Shield className="w-5 h-5 text-gold" /> Plantonista Agora
+          <h2 className="font-semibold flex items-center gap-2 text-white">
+            <Shield className="w-5 h-5" style={{ color: '#D4A017' }} /> Plantonista Agora
           </h2>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-green-300 text-sm">Online</span>
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-emerald-300 text-sm font-medium">Online</span>
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-gold rounded-2xl flex items-center justify-center">
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0"
+            style={{ background: '#D4A017' }}>
             <span className="text-white font-bold text-xl">{plantonistaHoje.avatar}</span>
           </div>
           <div className="flex-1">
             <p className="text-white font-bold text-xl">{plantonistaHoje.nome}</p>
-            <p className="text-gray-500">{plantonistaHoje.cargo}</p>
-            <p className="text-gold-300 text-sm mt-1">{plantonistaHoje.telefone}</p>
+            <p className="text-blue-200 text-sm">{plantonistaHoje.cargo}</p>
+            <p className="text-amber-300 text-sm mt-1 font-medium">{plantonistaHoje.telefone}</p>
           </div>
           <div className="text-right">
-            <p className="text-3xl font-bold text-gold">{plantonistaHoje.atendimentosHoje}</p>
-            <p className="text-gray-500 text-sm">atend. hoje</p>
+            <p className="text-3xl font-bold" style={{ color: '#D4A017' }}>{plantonistaHoje.atendimentosHoje}</p>
+            <p className="text-blue-200 text-sm">atend. hoje</p>
           </div>
         </div>
 
         {/* Fila de espera */}
         {aguardando.length > 0 && (
-          <div className="mt-4 bg-amber-500/20 border border-amber-400/40 rounded-xl p-3">
+          <div className="mt-4 rounded-xl p-3"
+            style={{ background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.35)' }}>
             <p className="text-amber-300 font-medium text-sm mb-2 flex items-center gap-2">
               <AlertCircle className="w-4 h-4" />
               {aguardando.length} lead(s) aguardando atendimento humano
             </p>
             {aguardando.map(lead => (
-              <div key={lead.id} className="flex items-center justify-between bg-white/5/10 rounded-lg p-2 mb-1">
+              <div key={lead.id} className="flex items-center justify-between rounded-lg p-2 mb-1"
+                style={{ background: 'rgba(255,255,255,0.08)' }}>
                 <div>
                   <p className="text-white text-sm font-medium">{lead.nome}</p>
-                  <p className="text-gray-500 text-xs">{lead.area} · {lead.urgencia === 'alta' ? '🔴 Urgente' : '🟡 Normal'}</p>
+                  <p className="text-blue-200 text-xs">{lead.area} · {lead.urgencia === 'alta' ? '🔴 Urgente' : '🟡 Normal'}</p>
                 </div>
-                <button className="bg-green-500 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-green-400 transition-colors">
+                <button className="text-white text-xs px-3 py-1.5 rounded-lg font-bold transition-colors hover:opacity-90"
+                  style={{ background: '#16a34a' }}>
                   Assumir
                 </button>
               </div>
@@ -292,7 +336,7 @@ export default function Plantonista() {
         </div>
         <div className="space-y-3">
           {plantonistasMock.map(p => (
-            <div key={p.id} className={`flex items-center justify-between p-3 rounded-xl border transition-all ${plantonistaAtivo === p.id ? 'border-white/55 bg-navy-50' : 'border-gray-100 hover:border-gray-200'}`}>
+            <div key={p.id} className={`flex items-center justify-between p-3 rounded-xl border transition-all ${plantonistaAtivo === p.id ? 'bg-blue-50 border-blue-200' : 'border-gray-100 hover:border-gray-200 bg-white'}`}>
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className="w-10 h-10 bg-navy-100 rounded-full flex items-center justify-center">
@@ -301,7 +345,7 @@ export default function Plantonista() {
                   <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${p.online ? 'bg-green-400' : 'bg-slate-300'}`} />
                 </div>
                 <div>
-                  <p className="font-medium text-white text-sm">{p.nome}</p>
+                  <p className="font-medium text-gray-800 text-sm">{p.nome}</p>
                   <p className="text-gray-400 text-xs">{p.cargo} · {p.atendimentosHoje} hoje</p>
                 </div>
               </div>

@@ -78,8 +78,21 @@ const BASE = '/api/google-ads'
 async function call<T>(params: Record<string, string>): Promise<T> {
   const qs = new URLSearchParams(params).toString()
   const res = await fetch(`${BASE}?${qs}`)
+
+  // Verifica Content-Type antes de tentar parsear JSON
+  const contentType = res.headers.get('content-type') || ''
+  if (!contentType.includes('application/json')) {
+    // API retornou HTML (erro Vercel, rota não encontrada ou sem credenciais)
+    const text = await res.text()
+    if (text.includes('pending_credentials') || !res.ok) {
+      throw new Error('pending_credentials')
+    }
+    throw new Error('Resposta inválida da API (não é JSON)')
+  }
+
   const data = await res.json()
   if (!res.ok) throw new Error(data.error || 'Erro Google Ads')
+  if (data.status === 'pending_credentials') throw new Error('pending_credentials')
   return data as T
 }
 

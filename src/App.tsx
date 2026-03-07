@@ -133,7 +133,7 @@ function Sidebar() {
 
   return (
     <aside
-      className="w-56 min-h-screen flex flex-col fixed left-0 top-0 z-40 overflow-y-auto"
+      className="w-56 h-screen flex flex-col fixed left-0 top-0 z-40"
       style={{ background: '#0f2044', borderRight: '1px solid #0a1830' }}
     >
       {/* Logo / Brand */}
@@ -158,7 +158,8 @@ function Sidebar() {
       </div>
 
       {/* Navegação */}
-      <nav className="flex-1 px-2 py-3 space-y-3 overflow-y-auto">
+      <nav className="flex-1 px-2 py-3 space-y-3 overflow-y-auto pb-4"
+        style={{ scrollbarWidth: 'thin', scrollbarColor: '#1a3060 transparent' }}>
         {navGroups.map(group => (
           <div key={group.label}>
             <p
