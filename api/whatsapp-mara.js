@@ -22,10 +22,13 @@ const MARA_CLIENT_TOKEN    = process.env.MARA_ZAPI_CLIENT_TOKEN || process.env.Z
 const DR_MAURO_NUMERO      = process.env.PLANTONISTA_WHATSAPP   || ''
 const VPS_LEADS_URL        = process.env.VPS_LEADS_URL          || 'http://181.215.135.202:3001'
 const MARA_AVATAR_URL      = 'https://ben-growth-center.vercel.app/mara-avatar-circle.png'
+// Número do Dr. Ben — bloqueado para evitar loop entre instâncias
+const DR_BEN_NUMERO        = process.env.ZAPI_INSTANCE_ID ? '' : '5586994820054'
+const DR_BEN_NUM           = (process.env.DR_BEN_WHATSAPP || '5586994820054').replace(/\D/g, '')
 
 const MARA_BASE = `https://api.z-api.io/instances/${MARA_INSTANCE_ID}/token/${MARA_TOKEN}`
 
-// ── Número do Dr. Mauro (limpo) ──────────────────────────────
+// ── Números limpos ───────────────────────────────────────────
 const DR_MAURO_NUM = DR_MAURO_NUMERO.replace(/\D/g, '')
 
 function getBaseUrl() {
@@ -509,13 +512,22 @@ export default async function handler(req, res) {
 
   if (!numero) return res.json({ ok: true, ignorado: 'numero_invalido' })
 
-  // ── REGRA 1: Ignorar se remetente = instância MARA (loop) ───
-  // connectedPhone é o número da instância (86-999484761)
-  // Se phone == connectedPhone significa mensagem da própria instância
+  // ── REGRA 1: Bloquear loops entre instâncias ─────────────────
+  // 1a. Se o webhook veio da instância do Dr. Ben → ignorar
+  const drBenNorm = DR_BEN_NUM.slice(-10)
+  if (connectedPhone && connectedPhone.endsWith(drBenNorm)) {
+    console.log(`[MARA] ⛔ Webhook da instância Dr. Ben ignorado`)
+    return res.json({ ok: true, ignorado: 'webhook_drben' })
+  }
+  // 1b. Se o remetente é o Dr. Ben ou a própria instância MARA → ignorar
   const instanciaNum = DR_MAURO_NUM.replace(/\D/g, '')
-  if (numero === instanciaNum || numero === connectedPhone) {
-    console.log(`[MARA] ⛔ Loop detectado — remetente é a própria instância`)
-    return res.json({ ok: true, ignorado: 'loop_instancia' })
+  if (
+    numero === instanciaNum ||
+    numero === connectedPhone ||
+    numero.endsWith(drBenNorm)
+  ) {
+    console.log(`[MARA] ⛔ Loop bloqueado — remetente é instância interna (${numero})`)
+    return res.json({ ok: true, ignorado: 'loop_instancia_interna' })
   }
 
   // ── REGRA 2: Só atende terceiros quando modo ausente está ativo ──
