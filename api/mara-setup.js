@@ -82,6 +82,20 @@ export default async function handler(req, res) {
     })
   }
 
+  // ── ACTION: numero ────────────────────────────────────────
+  if (action === 'numero') {
+    const phone   = await zapiGet('/phone-exists').catch(() => null)
+    const status  = await zapiGet('/status').catch(e => ({ error: e.message }))
+    const profile = await zapiGet('/profile-name').catch(() => null)
+    return res.json({
+      ok: true,
+      numero_conectado: phone,
+      profile_name: profile,
+      status_zapi: status,
+      instancia: MARA_INSTANCE_ID,
+    })
+  }
+
   // ── ACTION: status ────────────────────────────────────────
   if (action === 'status') {
     const status = await zapiGet('/status').catch(e => ({ error: e.message }))
