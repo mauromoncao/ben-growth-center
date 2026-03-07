@@ -39,6 +39,16 @@ async function zapiPost(path, body) {
   return r.json().catch(() => ({ error: 'resposta inválida' }))
 }
 
+async function zapiPut(path, body) {
+  const r = await fetch(`${MARA_BASE}${path}`, {
+    method: 'PUT',
+    headers: headers(),
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(10000),
+  })
+  return r.json().catch(() => ({ error: 'resposta inválida' }))
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
@@ -91,18 +101,18 @@ export default async function handler(req, res) {
   if (action === 'webhook') {
     const resultados = {}
 
-    // Configurar webhook de mensagens recebidas
-    resultados.received = await zapiPost('/update-webhook-received', {
+    // Usar update-every-webhooks para configurar todos de uma vez (PUT)
+    resultados.todos = await zapiPut('/update-every-webhooks', {
+      value: WEBHOOK_URL,
+      notifySentByMe: false,
+    }).catch(e => ({ error: e.message }))
+
+    // Configurar individualmente também (PUT) como backup
+    resultados.received = await zapiPut('/update-webhook-received', {
       value: WEBHOOK_URL,
     }).catch(e => ({ error: e.message }))
 
-    // Configurar webhook de entrega
-    resultados.delivery = await zapiPost('/update-webhook-received-delivery', {
-      value: WEBHOOK_URL,
-    }).catch(e => ({ error: e.message }))
-
-    // Configurar webhook de conexão
-    resultados.connection = await zapiPost('/update-webhook-disconnect', {
+    resultados.delivery = await zapiPut('/update-webhook-received-delivery', {
       value: WEBHOOK_URL,
     }).catch(e => ({ error: e.message }))
 
