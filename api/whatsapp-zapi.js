@@ -826,7 +826,6 @@ export default async function handler(req, res) {
     console.log(`[Webhook] Mensagem de ${pushName} (${numero}): "${texto.slice(0, 100)}"`)
 
     // ── Detectar se é o Dr. Mauro ────────────────────────
-    const mauroNorm = DR_MAURO_WHATSAPP.replace(/\D/g, '')
     const ehDrMauro = mauroNorm && numero.endsWith(mauroNorm.slice(-10))
 
     // ════════════════════════════════════════════════════
