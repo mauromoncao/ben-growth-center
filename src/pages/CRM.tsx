@@ -275,11 +275,19 @@ const COLUNAS = [
   { id: 'perdido', label: 'Perdidos', icone: '❌', cor: 'border-gray-200 bg-gray-50/50' },
 ] as const
 
-const URGENCIA_CONFIG = {
-  alta: { label: 'Urgente', cor: 'bg-red-100 text-red-700', dot: 'bg-red-500' },
-  media: { label: 'Médio', cor: 'bg-amber-100 text-amber-700', dot: 'bg-amber-500' },
-  baixa: { label: 'Baixo', cor: 'bg-green-100 text-green-700', dot: 'bg-green-500' },
+const URGENCIA_CONFIG: Record<string, { label: string; cor: string; dot: string }> = {
+  // PT-BR (interno)
+  alta:     { label: 'Urgente', cor: 'bg-red-100 text-red-700',    dot: 'bg-red-500'   },
+  media:    { label: 'Médio',   cor: 'bg-amber-100 text-amber-700', dot: 'bg-amber-500' },
+  baixa:    { label: 'Baixo',   cor: 'bg-green-100 text-green-700', dot: 'bg-green-500' },
+  // EN (vindo da API / WhatsApp)
+  critical: { label: 'Crítico', cor: 'bg-red-100 text-red-700',    dot: 'bg-red-500'   },
+  high:     { label: 'Urgente', cor: 'bg-red-100 text-red-700',    dot: 'bg-red-500'   },
+  medium:   { label: 'Médio',   cor: 'bg-amber-100 text-amber-700', dot: 'bg-amber-500' },
+  low:      { label: 'Baixo',   cor: 'bg-green-100 text-green-700', dot: 'bg-green-500' },
 }
+// fallback para urgência desconhecida
+const URGENCIA_DEFAULT = { label: 'Normal', cor: 'bg-gray-100 text-gray-600', dot: 'bg-gray-400' }
 
 const ORIGEM_ICONE: Record<string, string> = {
   'WhatsApp': '💬',
@@ -787,7 +795,7 @@ function ModalCobranca({ lead, onClose, onConfirm }: {
 
 // ─── Card do Lead ────────────────────────────────────────────
 function LeadCard({ lead, onClick }: { lead: CRMLead; onClick: () => void }) {
-  const urg = URGENCIA_CONFIG[lead.urgencia]
+  const urg = URGENCIA_CONFIG[lead.urgencia] ?? URGENCIA_DEFAULT
   return (
     <div
       onClick={onClick}
@@ -876,7 +884,7 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
   const [lead, setLead] = useState(initialLead)
   const [abaAtiva, setAbaAtiva] = useState<'conversa' | 'dados' | 'acoes' | 'historico'>('conversa')
   const [modalAberto, setModalAberto] = useState<'agenda' | 'contrato' | 'cobranca' | null>(null)
-  const urg = URGENCIA_CONFIG[lead.urgencia]
+  const urg = URGENCIA_CONFIG[lead.urgencia] ?? URGENCIA_DEFAULT
 
   const handleReuniaoConfirmada = (reuniao: ReuniaoAgendada) => {
     const atualizado = { ...lead, reunioes: [...(lead.reunioes || []), reuniao] }
@@ -1502,7 +1510,7 @@ export default function CRM() {
             </thead>
             <tbody>
               {leads.map(lead => {
-                const urg = URGENCIA_CONFIG[lead.urgencia]
+                const urg = URGENCIA_CONFIG[lead.urgencia] ?? URGENCIA_DEFAULT
                 return (
                   <tr key={lead.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setFichaAberta(lead)}>
                     <td className="px-4 py-3">
