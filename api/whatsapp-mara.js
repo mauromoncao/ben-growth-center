@@ -538,13 +538,44 @@ export default async function handler(req, res) {
   console.log(`[MARA] 🛡️ Modo ausente ativo (${motivoAusente}) — respondendo terceiro ${senderName} (${numero}): "${text.slice(0, 80)}"`)
 
   try {
-    // 1. Verificar se é comando especial (apenas Dr. Mauro pode — mas já foi bloqueado acima)
+    // 1. Verificar se é o PRIMEIRO contato deste número
+    const contexto = getContexto(numero)
+    const isPrimeiroContato = contexto.totalMensagens === 0
+
+    // 2. Se primeiro contato — enviar apresentação personalizada primeiro
+    if (isPrimeiroContato) {
+      const motivoTexto = {
+        audiencia:    'em audiência',
+        reuniao:      'em reunião',
+        doente:       'indisposto',
+        viagem:       'em viagem',
+        ferias:       'em período de férias',
+        fora_horario: 'fora do horário de atendimento',
+      }[motivoAusente] || 'momentaneamente indisponível'
+
+      const nomeExibir = senderName && senderName !== 'Visitante' ? `, ${senderName.split(' ')[0]}` : ''
+      const apresentacao =
+        `👩🏻‍💼 *MARA* | Secretária Executiva\n` +
+        `_Escritório Dr. Mauro Monção Advogados_\n\n` +
+        `Olá${nomeExibir}! 😊\n\n` +
+        `Sou *MARA*, Secretária Executiva do *Dr. Mauro Monção*.\n` +
+        `O Dr. Mauro está ${motivoTexto} no momento, mas retornará em breve.\n\n` +
+        `Posso registrar sua mensagem e garantir que ele entre em contato assim que possível.\n\n` +
+        `Como posso ajudá-lo(a)?`
+
+      await enviarMensagem(numero, apresentacao)
+      addHistorico(numero, 'assistant', apresentacao)
+      contexto.totalMensagens++
+
+      return res.status(200).json({ ok: true, respondido: true, numero, tipo: 'apresentacao' })
+    }
+
+    // 3. Verificar se é comando especial
     const respostaComando = await processarComando(text, numero)
 
     let respostaFinal
 
     if (respostaComando) {
-      // É um comando — resposta direta
       respostaFinal = respostaComando
       addHistorico(numero, 'user',      text)
       addHistorico(numero, 'assistant', respostaComando)
