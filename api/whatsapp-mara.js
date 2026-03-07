@@ -14,6 +14,8 @@
 
 export const config = { maxDuration: 30 }
 
+import { MARA_APRESENTACAO_B64 } from './imagens-b64.js'
+
 // ── Variáveis de ambiente ────────────────────────────────────
 const OPENAI_KEY           = process.env.OPENAI_API_KEY         || ''
 const MARA_INSTANCE_ID     = process.env.MARA_ZAPI_INSTANCE_ID  || process.env.ZAPI_INSTANCE_ID  || ''
@@ -187,6 +189,41 @@ async function enviarMensagem(numero, texto) {
     return data
   } catch (e) {
     console.error('[MARA] fetch error:', e.message)
+  }
+}
+
+// ============================================================
+// ENVIAR IMAGEM VIA Z-API (instância MARA)
+// ============================================================
+async function enviarImagemMara(numero, caption) {
+  if (!MARA_INSTANCE_ID || !MARA_TOKEN) {
+    console.error('[MARA] Credenciais Z-API não configuradas para envio de imagem')
+    return false
+  }
+  try {
+    const headers = { 'Content-Type': 'application/json' }
+    if (MARA_CLIENT_TOKEN) headers['Client-Token'] = MARA_CLIENT_TOKEN
+
+    const res = await fetch(`${MARA_BASE}/send-image`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        phone:   numero,
+        image:   MARA_APRESENTACAO_B64,
+        caption: caption || '',
+      }),
+      signal: AbortSignal.timeout(15000),
+    })
+    const data = await res.json()
+    if (res.ok) {
+      console.log(`[MARA] 🖼️ Foto de apresentação enviada para ${numero}`)
+      return true
+    }
+    console.error(`[MARA] ❌ Erro ao enviar imagem:`, JSON.stringify(data).slice(0, 200))
+    return false
+  } catch (e) {
+    console.error('[MARA] fetch error (imagem):', e.message)
+    return false
   }
 }
 
@@ -570,7 +607,7 @@ export default async function handler(req, res) {
     const contexto = getContexto(numero)
     const isPrimeiroContato = contexto.totalMensagens === 0
 
-    // 2. Se primeiro contato — enviar apresentação personalizada primeiro
+    // 2. Se primeiro contato — enviar foto + texto de apresentação
     if (isPrimeiroContato) {
       const motivoTexto = {
         audiencia:    'em audiência',
@@ -582,17 +619,27 @@ export default async function handler(req, res) {
       }[motivoAusente] || 'momentaneamente indisponível'
 
       const nomeExibir = senderName && senderName !== 'Visitante' ? `, ${senderName.split(' ')[0]}` : ''
-      const apresentacao =
-        `👩🏻‍💼 *MARA* | Secretária Executiva\n` +
-        `_Escritório Dr. Mauro Monção Advogados_\n\n` +
+
+      // 2a. Enviar FOTO com caption de identificação (substitui o emoji 👩🏻‍💼)
+      const captionFoto =
+        `*MARA* | Secretária Executiva\n` +
+        `_Escritório Dr. Mauro Monção Advogados_`
+
+      await enviarImagemMara(numero, captionFoto)
+
+      // 2b. Enviar texto de boas-vindas logo em seguida
+      const boasVindas =
         `Olá${nomeExibir}! 😊\n\n` +
         `Sou *MARA*, Secretária Executiva do *Dr. Mauro Monção*.\n` +
         `O Dr. Mauro está ${motivoTexto} no momento, mas retornará em breve.\n\n` +
         `Posso registrar sua mensagem e garantir que ele entre em contato assim que possível.\n\n` +
         `Como posso ajudá-lo(a)?`
 
-      await enviarMensagem(numero, apresentacao)
-      addHistorico(numero, 'assistant', apresentacao)
+      await enviarMensagem(numero, boasVindas)
+
+      // Registrar no histórico como uma única interação
+      const apresentacaoCompleta = `${captionFoto}\n\n${boasVindas}`
+      addHistorico(numero, 'assistant', apresentacaoCompleta)
       contexto.totalMensagens++
 
       return res.status(200).json({ ok: true, respondido: true, numero, tipo: 'apresentacao' })
