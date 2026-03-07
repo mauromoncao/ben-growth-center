@@ -103,9 +103,20 @@ async function ativarModoAusente(motivo) {
 async function desativarModoAusente(estadoAtual) {
   const resultados = {}
 
-  // 1. Restaurar foto original do Dr. Mauro
-  // (Z-API não tem endpoint para restaurar foto — usuário precisa restaurar manualmente)
-  // resultados.foto = 'restauração manual necessária'
+  // 1. Restaurar foto original do Dr. Mauro (se estiver salva no repositório)
+  const fotoOriginalUrl = 'https://ben-growth-center.vercel.app/dr-mauro-avatar.jpg'
+  try {
+    const testar = await fetch(fotoOriginalUrl, { method: 'HEAD', signal: AbortSignal.timeout(3000) })
+    if (testar.ok) {
+      resultados.foto = await zapiPut('/profile-picture', { value: fotoOriginalUrl })
+      console.log('[MARA] ✅ Foto do Dr. Mauro restaurada')
+    } else {
+      console.log('[MARA] ⚠️ Foto do Dr. Mauro não encontrada — perfil mantido')
+      resultados.foto = 'aguardando_foto_dr_mauro'
+    }
+  } catch (e) {
+    console.log('[MARA] ⚠️ Erro ao restaurar foto:', e.message)
+  }
 
   // 2. Calcular resumo
   const inicio = estadoAtual?.inicio ? new Date(estadoAtual.inicio) : null
