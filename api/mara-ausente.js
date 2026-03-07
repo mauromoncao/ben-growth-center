@@ -13,7 +13,7 @@ const MARA_TOKEN       = process.env.MARA_ZAPI_TOKEN       || ''
 const CLIENT_TOKEN     = process.env.MARA_ZAPI_CLIENT_TOKEN || process.env.ZAPI_CLIENT_TOKEN || ''
 const DR_MAURO_NUMERO  = process.env.PLANTONISTA_WHATSAPP  || ''
 const VPS_URL          = process.env.VPS_LEADS_URL         || 'http://181.215.135.202:3001'
-const MARA_AVATAR_URL  = 'https://ben-growth-center.vercel.app/mara-avatar-circle.png'
+const MARA_AVATAR_URL  = 'https://ben-growth-center.vercel.app/mara-zapi.jpg'
 
 const MARA_BASE = `https://api.z-api.io/instances/${MARA_INSTANCE_ID}/token/${MARA_TOKEN}`
 
@@ -104,7 +104,7 @@ async function desativarModoAusente(estadoAtual) {
   const resultados = {}
 
   // 1. Restaurar foto original do Dr. Mauro
-  const fotoOriginalUrl = 'https://ben-growth-center.vercel.app/dr-mauro-avatar.jpg'
+  const fotoOriginalUrl = 'https://ben-growth-center.vercel.app/mauro-zapi.jpg'
   try {
     const testar = await fetch(fotoOriginalUrl, { method: 'HEAD', signal: AbortSignal.timeout(5000) })
     const contentType = testar.headers.get('content-type') || ''
