@@ -781,6 +781,24 @@ export default async function handler(req, res) {
     if (numero.includes('@g') || numero.endsWith('@broadcast')) return res.status(200).json({ ok: true })
     if (!numero || numero.length < 8) return res.status(200).json({ ok: true })
 
+    // ── ANTI-LOOP: bloquear mensagens vindas das próprias instâncias ──
+    // Instância Dr. Ben não processa mensagens enviadas pela instância MARA e vice-versa
+    const numerosInstancias = [
+      ZAPI_INSTANCE_ID,   // não é número, mas registrar para log
+      MARA_INSTANCE_ID,
+    ]
+    // Bloqueio pelo connectedPhone — Z-API envia o número conectado da instância remetente
+    const connectedPhone = (body?.connectedPhone || '').replace(/\D/g, '')
+    const mauroNorm      = DR_MAURO_WHATSAPP.replace(/\D/g, '')
+
+    // Se a mensagem veio de outra instância nossa (connectedPhone ≠ número do Dr. Mauro e ≠ cliente)
+    // O campo connectedPhone identifica de qual instância Z-API saiu a mensagem
+    if (connectedPhone && connectedPhone !== mauroNorm) {
+      // É mensagem de saída de outra instância — ignorar para evitar loop
+      console.log(`[Anti-Loop] ⛔ Ignorando mensagem de instância própria: connectedPhone=${connectedPhone}`)
+      return res.status(200).json({ ok: true, ignorado: 'anti_loop_instancia' })
+    }
+
     // ── Detectar tipo de mensagem ─────────────────────────
     // Texto direto
     let texto = body?.text?.message || body?.text || body?.message || ''

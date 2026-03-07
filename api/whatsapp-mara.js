@@ -463,10 +463,10 @@ export default async function handler(req, res) {
   // ── Extrair dados da mensagem ──────────────────────────
   const phone      = body?.phone      || body?.from      || ''
   const text       = body?.text?.message || body?.message || body?.text || ''
-  const senderName = body?.senderName  || body?.pushName  || 'Dr. Mauro'
+  const senderName = body?.senderName  || body?.pushName  || ''
   const fromMe     = body?.fromMe      || false
 
-  // Ignorar mensagens enviadas pela própria MARA
+  // Ignorar mensagens enviadas pela própria instância
   if (fromMe) return res.json({ ok: true, ignorado: 'mensagem_propria' })
 
   // Ignorar grupos e broadcasts
@@ -481,8 +481,16 @@ export default async function handler(req, res) {
 
   // Extrair número limpo
   const numero = phone.replace('@s.whatsapp.net', '').replace(/\D/g, '')
-
   if (!numero) return res.json({ ok: true, ignorado: 'numero_invalido' })
+
+  // ── ANTI-LOOP: ignorar mensagens da instância Dr. Ben ──────
+  // connectedPhone identifica de qual instância Z-API a mensagem veio
+  const connectedPhone = (body?.connectedPhone || '').replace(/\D/g, '')
+  const mauroNorm      = DR_MAURO_NUM
+  if (connectedPhone && connectedPhone !== mauroNorm) {
+    console.log(`[MARA Anti-Loop] ⛔ Ignorando msg de outra instância: connectedPhone=${connectedPhone}`)
+    return res.json({ ok: true, ignorado: 'anti_loop_instancia' })
+  }
 
   // Detectar se é o Dr. Mauro ou terceiro
   const ehMauro = ehDrMauro(numero)
