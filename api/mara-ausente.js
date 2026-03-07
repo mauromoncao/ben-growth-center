@@ -17,9 +17,9 @@ const MARA_AVATAR_URL   = 'https://www.genspark.ai/api/files/s/qiD4oS1k'
 
 const MARA_BASE = `https://api.z-api.io/instances/${MARA_INSTANCE_ID}/token/${MARA_TOKEN}`
 
-// Estado em memória (persiste enquanto a função Vercel estiver quente)
-// Para produção robusta, usar Supabase/DB
+// Estado em memória
 let modoAusente = false
+let motivoAusente = 'ausente'
 let perfilOriginal = null
 let conversasNoAusente = []
 let inicioAusente = null
@@ -74,30 +74,22 @@ async function enviarMensagem(phone, message) {
   return zapiPost('/send-text', { phone, message })
 }
 
-async function ativarModoAusente() {
+async function ativarModoAusente(motivo) {
   const resultados = {}
 
-  // 1. Salvar perfil atual (buscar dados atuais)
+  // 1. Salvar perfil atual
   const profileName = await zapiGet('/profile-name').catch(() => null)
-  const profileStatus = await zapiGet('/profile-status').catch(() => null)
-
   perfilOriginal = {
     nome: profileName?.name || profileName?.value || 'Dr. Mauro Monção',
-    status: profileStatus?.status || profileStatus?.value || 'Advogado | OAB/PI · CE · MA',
-    foto: null, // Z-API não permite recuperar a foto atual facilmente
     salvadoEm: new Date().toISOString(),
   }
 
-  // 2. Trocar para perfil MARA
+  // 2. Trocar nome para MARA
   resultados.nome = await zapiPut('/profile-name', {
     value: 'MARA — Assistente Dr. Mauro'
   })
 
-  resultados.status = await zapiPut('/profile-status', {
-    value: '🤖 Assistente do Dr. Mauro Monção | Respondendo por ele'
-  })
-
-  // 3. Atualizar foto para avatar MARA
+  // 3. Atualizar foto para avatar MARA (PUT com URL)
   resultados.foto = await zapiPut('/profile-picture', { value: MARA_AVATAR_URL })
 
   // 4. Marcar como ativo
@@ -112,28 +104,13 @@ async function desativarModoAusente() {
   const resultados = {}
 
   if (!perfilOriginal) {
-    perfilOriginal = {
-      nome: 'Dr. Mauro Monção',
-      status: 'Advogado | OAB/PI · CE · MA',
-    }
+    perfilOriginal = { nome: 'Dr. Mauro Monção' }
   }
 
   // 1. Restaurar nome original
-  resultados.nome = await zapiPut('/profile-name', {
-    value: perfilOriginal.nome
-  })
+  resultados.nome = await zapiPut('/profile-name', { value: perfilOriginal.nome })
 
-  // 2. Restaurar status original
-  resultados.status = await zapiPut('/profile-status', {
-    value: perfilOriginal.status
-  })
-
-  // 3. Restaurar foto original (se tiver salvo)
-  if (perfilOriginal.foto) {
-    resultados.foto = await zapiPut('/profile-picture', { value: perfilOriginal.foto })
-  }
-
-  // 3. Calcular resumo do período ausente
+  // 2. Calcular resumo
   const totalConversas = conversasNoAusente.length
   const minutosAusente = inicioAusente
     ? Math.round((Date.now() - new Date(inicioAusente).getTime()) / 60000)
@@ -147,7 +124,7 @@ async function desativarModoAusente() {
       `\n\n_Total: ${totalConversas} conversa(s) atendida(s) por MARA_`
     : `✅ Nenhuma mensagem recebida durante sua ausência (${minutosAusente} min).`
 
-  // 4. Desativar
+  // 3. Desativar
   modoAusente = false
   const conversasSalvas = [...conversasNoAusente]
   conversasNoAusente = []
@@ -167,15 +144,11 @@ export default async function handler(req, res) {
     return res.json({
       ok: true,
       modo_ausente: modoAusente,
+      motivo: motivoAusente,
       inicio_ausente: inicioAusente,
       conversas_atendidas: conversasNoAusente.length,
       perfil_original_salvo: !!perfilOriginal,
       instancia_configurada: !!(MARA_INSTANCE_ID && MARA_TOKEN),
-      instrucoes: {
-        ativar: 'Envie /ausente pelo WhatsApp para MARA',
-        desativar: 'Envie /presente pelo WhatsApp para MARA',
-        direto: 'POST /api/mara-ausente com {"action": "ausente"} ou {"action": "presente"}',
-      },
     })
   }
 
@@ -213,17 +186,21 @@ export default async function handler(req, res) {
         })
       }
 
-      const resultado = await ativarModoAusente()
+      const motivo = body?.motivo || 'ausente'
+      const resultado = await ativarModoAusente(motivo)
+      motivoAusente = motivo
 
       // Notificar Dr. Mauro
-      await enviarMensagem(numero,
-        `🤖 *Modo AUSENTE Ativado*\n\n` +
-        `Estou no controle agora, Dr. Mauro.\n\n` +
-        `✅ Perfil atualizado para MARA\n` +
-        `📱 Respondendo como sua assistente\n` +
-        `🔄 Para retornar: envie */presente*\n\n` +
-        `_— MARA IA 🌟_`
-      )
+      if (numero) {
+        await enviarMensagem(numero,
+          `🤖 *Modo AUSENTE Ativado*\n\n` +
+          `Estou no controle agora, Dr. Mauro.\n\n` +
+          `✅ Perfil atualizado para MARA\n` +
+          `📱 Respondendo como sua assistente\n` +
+          `🔄 Para retornar: envie */presente* ou use o app\n\n` +
+          `_— MARA IA 🌟_`
+        )
+      }
 
       return res.json({
         ok: true,

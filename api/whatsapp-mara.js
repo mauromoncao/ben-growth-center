@@ -347,9 +347,43 @@ async function processarComando(comando, numero) {
 }
 
 // ============================================================
+// Prompt para atender terceiros em modo ausente
+function buildPromptTerceiro(nomeContato, motivo) {
+  const h = parseInt(new Date().toLocaleString('pt-BR', { timeZone: 'America/Fortaleza', hour: 'numeric', hour12: false }))
+  const saudacao = h >= 6 && h < 12 ? 'Bom dia' : h >= 12 && h < 18 ? 'Boa tarde' : 'Boa noite'
+  const motivoTexto = {
+    audiencia:    'em audiência',
+    reuniao:      'em reunião',
+    doente:       'indisposto',
+    viagem:       'em viagem',
+    ferias:       'em período de férias',
+    fora_horario: 'fora do horário de atendimento',
+  }[motivo] || 'momentaneamente indisponível'
+
+  return `Você é MARA, Assistente Executiva do Dr. Mauro Monção (Mauro Monção Advogados Associados — OAB/PI · CE · MA).
+Saudação atual: ${saudacao}. O Dr. Mauro está ${motivoTexto}.
+Você está respondendo pelo WhatsApp pessoal dele.
+${nomeContato ? `Nome da pessoa: "${nomeContato}"` : 'Nome da pessoa: ainda não identificado'}
+
+MISSÃO:
+1. Cumprimentar com elegância usando o nome se disponível
+2. Informar com naturalidade que o Dr. Mauro está indisponível
+3. Perguntar o nome se não souber
+4. Coletar assunto e urgência
+5. Confirmar que o Dr. Mauro retornará o contato
+
+REGRAS:
+- NUNCA trate como "Dr. Mauro" — é um contato externo
+- NUNCA forneça informações jurídicas
+- NUNCA revele que é IA a menos que perguntado diretamente
+- Respostas curtas e objetivas (máx. 3-4 linhas)
+- Sempre em português brasileiro
+- Assine: "— MARA 🌟 | Escritório Dr. Mauro Monção"`
+}
+
 // RESPOSTA VIA GPT-4o-mini COM HISTÓRICO COMPLETO
 // ============================================================
-async function gerarRespostaMara(numero, mensagem, nomeDrMauro) {
+async function gerarRespostaMara(numero, mensagem, nomeContato, motivo) {
   const historico = getHistorico(numero)
   const contexto  = getContexto(numero)
 
@@ -357,9 +391,12 @@ async function gerarRespostaMara(numero, mensagem, nomeDrMauro) {
   contexto.totalMensagens++
   contexto.ultimaInteracao = new Date().toISOString()
 
+  // Prompt correto: terceiros recebem o prompt de secretária em modo ausente
+  const systemPrompt = buildPromptTerceiro(nomeContato, motivo)
+
   // Montar mensagens para a API
   const mensagensAPI = [
-    { role: 'system', content: MARA_SYSTEM_PROMPT },
+    { role: 'system', content: systemPrompt },
     ...historico.map(h => ({ role: h.role, content: h.content })),
     { role: 'user', content: mensagem },
   ]
@@ -385,7 +422,7 @@ async function gerarRespostaMara(numero, mensagem, nomeDrMauro) {
 
     if (!resposta) {
       console.error('[MARA] OpenAI sem resposta:', JSON.stringify(data).slice(0, 300))
-      return 'Desculpe, Dr. Mauro — tive um momento de instabilidade. Pode repetir?'
+      return 'Olá! Tive uma instabilidade momentânea. Por favor, tente novamente em instantes. — MARA 🌟'
     }
 
     // Salvar no histórico
@@ -395,7 +432,7 @@ async function gerarRespostaMara(numero, mensagem, nomeDrMauro) {
     return resposta
   } catch (e) {
     console.error('[MARA] GPT error:', e.message)
-    return 'Desculpe, Dr. Mauro — erro de conexão. Tente novamente em instantes.'
+    return 'Olá! Houve um erro momentâneo. Por favor, tente novamente em instantes. — MARA 🌟'
   }
 }
 
@@ -415,7 +452,7 @@ export default async function handler(req, res) {
     // Teste de envio
     if (action === 'testar') {
       await enviarMensagem(DR_MAURO_NUM,
-        `🌟 *MARA IA — Teste de Conexão*\n\nOlá, Dr. Mauro! Estou online e pronta para servi-lo.\n\nSeu número dedicado (85) 99143-0969 está configurado com sucesso! ✅\n\n_— MARA IA_`
+        `🌟 *MARA IA — Teste de Conexão*\n\nInstância Z-API da MARA online! ✅\n\n_— MARA IA_`
       )
       return res.json({ ok: true, acao: 'mensagem_teste_enviada', numero: DR_MAURO_NUM })
     }
@@ -511,7 +548,7 @@ export default async function handler(req, res) {
       addHistorico(numero, 'assistant', respostaComando)
     } else {
       // Gerar resposta com GPT + histórico completo
-      respostaFinal = await gerarRespostaMara(numero, text, senderName)
+      respostaFinal = await gerarRespostaMara(numero, text, senderName, motivoAusente)
     }
 
     // 2. Enviar resposta via Z-API
