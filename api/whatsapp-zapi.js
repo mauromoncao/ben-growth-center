@@ -31,14 +31,6 @@ const VOICE_MARA   = 'EST9Ui6982FZPSi7gCHi'   // Voz da MARA IA
 
 const ZAPI_BASE = `https://api.z-api.io/instances/${ZAPI_INSTANCE_ID}/token/${ZAPI_TOKEN}`
 
-// ── Instância MARA (para responder ao Dr. Mauro) ─────────────
-const MARA_INSTANCE_ID  = process.env.MARA_ZAPI_INSTANCE_ID || ''
-const MARA_TOKEN        = process.env.MARA_ZAPI_TOKEN       || ''
-const MARA_CLIENT_TOKEN = process.env.MARA_ZAPI_CLIENT_TOKEN || ZAPI_CLIENT_TOKEN
-const MARA_BASE = MARA_INSTANCE_ID
-  ? `https://api.z-api.io/instances/${MARA_INSTANCE_ID}/token/${MARA_TOKEN}`
-  : ZAPI_BASE
-
 // ── Fuso horário Brasil (Fortaleza = UTC-3 sem horário de verão) ──
 const FUSO_BR = 'America/Fortaleza'
 
@@ -339,20 +331,6 @@ async function enviarResposta(numero, texto, voiceId) {
   return 'texto'
 }
 
-// Resposta via instância MARA (para o Dr. Mauro não enviar para si mesmo)
-async function enviarRespostaMara(numero, texto, voiceId) {
-  const pref = global.__audioPreferencias.get(numero)
-  if (pref === 'audio' && ELEVENLABS_KEY && voiceId) {
-    const audio = await gerarAudio(texto, voiceId)
-    if (audio) {
-      await enviarAudio(numero, audio)
-      return 'audio'
-    }
-  }
-  await enviarMensagemMara(numero, texto)
-  return 'texto'
-}
-
 // ============================================================
 // Z-API — ENVIAR MENSAGEM DE TEXTO
 // ============================================================
@@ -376,26 +354,6 @@ async function enviarMensagem(numero, texto) {
     return data
   } catch (e) {
     console.error('[Z-API] fetch error:', e.message)
-  }
-}
-
-// Enviar mensagem VIA INSTÂNCIA MARA (para responder ao Dr. Mauro)
-async function enviarMensagemMara(numero, texto) {
-  try {
-    const headers = { 'Content-Type': 'application/json' }
-    if (MARA_CLIENT_TOKEN) headers['Client-Token'] = MARA_CLIENT_TOKEN
-    const res = await fetch(`${MARA_BASE}/send-text`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ phone: numero, message: texto }),
-      signal: AbortSignal.timeout(10000),
-    })
-    const data = await res.json()
-    if (res.ok) console.log('[MARA→Dr.Mauro] ✅ Msg enviada para', numero)
-    else console.error('[MARA→Dr.Mauro] ❌ Erro:', JSON.stringify(data).slice(0, 200))
-    return data
-  } catch (e) {
-    console.error('[MARA→Dr.Mauro] fetch error:', e.message)
   }
 }
 
@@ -472,46 +430,29 @@ async function maraAvisarDrMauro({ nome, telefone, numero, area, urgencia, resum
   console.log(`[MARA IA] ✅ Dr. Mauro avisado — ${nomeExibir}`)
 }
 
-// Processar comandos do Dr. Mauro (suporta linguagem natural E comandos com /)
+// Processar comandos do Dr. Mauro
 async function processarComandoMara(texto, numero) {
   const cmd = texto.trim().toLowerCase()
 
-  // ── MODO AUSENTE ─────────────────────────────────────────────
-  // Aceita: /ausente, "vou para audiência", "estou em reunião", "estou de férias", etc.
-  const padraoAusente = cmd.startsWith('/ausente') ||
-    /\b(vou para|estou em|entrei em|saindo para|iniciando)\b.*(audiência|audiencia|reunião|reuniao|ferias|férias|viagem|hospital|almoço|almoco)/i.test(texto) ||
-    /\b(modo ausente|ativar ausente|ficar ausente)\b/i.test(texto)
-
-  if (padraoAusente) {
-    const partes = texto.trim().split(/\s+/)
-    // Detectar motivo
-    let motivo = 'ferias'
-    if (/audien/i.test(texto)) motivo = 'audiencia'
-    else if (/reuni/i.test(texto)) motivo = 'reuniao'
-    else if (/doente|hospital|sick/i.test(texto)) motivo = 'doente'
-    else if (/viagem|viajando/i.test(texto)) motivo = 'viagem'
-    else if (partes[1] && !partes[1].startsWith('/')) motivo = partes[1]
-    // Detectar horário/data de retorno
-    const retornoMatch = texto.match(/(\d{1,2}[h:]\d{0,2}|\d{1,2}\/\d{1,2}(?:\/\d{2,4})?)/i)
-    const retorno = retornoMatch ? retornoMatch[0] : null
+  // /ausente [motivo] [retorno]
+  if (cmd.startsWith('/ausente') || cmd.startsWith('ausente')) {
+    const partes = texto.trim().split(' ')
+    const motivo  = partes[1] || 'ferias'
+    const retorno = partes.slice(2).join(' ') || null
     global.__modoAusente = { ativo: true, motivo, retorno, mensagem: null }
-    const labels = { ferias: '🏖️ Férias', doente: '🤒 Doente', audiencia: '⚖️ Audiência', viagem: '✈️ Viagem', reuniao: '🤝 Reunião', fora_horario: '😴 Fora do horário' }
+    const labels = { ferias: '🏖️ Férias', doente: '🤒 Doente', audiencia: '⚖️ Audiência', viagem: '✈️ Viagem', reuniao: '🤝 Reunião' }
     const label = labels[motivo] || '😴 Ausente'
-    return `✅ *Modo Ausente ativado!*\n\n${label}${retorno ? ` — Retorno: ${retorno}` : ''}\n\nEstou respondendo por você agora. Vou te alertar se chegar algo urgente. 🛡️\n\n_Quando voltar, diga "já voltei" ou envie /presente_`
+    return `✅ *Modo Ausente ativado!*\n\n${label}${retorno ? ` — Retorno: ${retorno}` : ''}\n\nEstou respondendo por você agora, Dr. Mauro. Vou te alertar se chegar algo urgente. 🛡️\n\n_Use /presente para desativar._`
   }
 
-  // ── MODO PRESENTE ─────────────────────────────────────────────
-  // Aceita: /presente, "já voltei", "estou de volta", "pode parar"
-  const padraoPresentePreciso = cmd === '/presente' || cmd === 'presente'
-  const padraoPresenteNatural = /\b(já voltei|estou de volta|voltei|retornei|pode parar|para de responder|desativar ausente)\b/i.test(texto)
-
-  if (padraoPresentePreciso || padraoPresenteNatural) {
+  // /presente
+  if (cmd === '/presente' || cmd === 'presente') {
     global.__modoAusente = { ativo: false, motivo: null, retorno: null, mensagem: null }
-    return `✅ *Bem-vindo de volta, Dr. Mauro!* 🎉\n\nModo ausente desativado. Você está respondendo normalmente agora.\n\n_MARA em standby — disponível quando precisar._`
+    return `✅ *Modo Ausente desativado!*\n\nBem-vindo de volta, Dr. Mauro! 🎉\nVocê está respondendo normalmente agora.`
   }
 
-  // ── LEADS ─────────────────────────────────────────────────────
-  if (cmd.includes('/leads') || /\b(leads? de hoje|leads? (chegaram|vieram)|quais (leads?|clientes?) (hoje|chegaram))\b/i.test(texto)) {
+  // /leads
+  if (cmd.includes('/leads') || cmd.includes('leads de hoje') || cmd.includes('quais leads')) {
     try {
       const res = await fetch(`${VPS_LEADS_URL}/leads`, { signal: AbortSignal.timeout(5000) })
       const data = await res.json()
@@ -530,8 +471,8 @@ async function processarComandoMara(texto, numero) {
     }
   }
 
-  // ── URGENTES ─────────────────────────────────────────────────
-  if (cmd.includes('/urgentes') || /\b(casos? urgentes?|urgência|alguém urgente|algo urgente)\b/i.test(texto)) {
+  // /urgentes
+  if (cmd.includes('/urgentes') || cmd.includes('casos urgentes') || cmd.includes('urgência')) {
     try {
       const res = await fetch(`${VPS_LEADS_URL}/leads`, { signal: AbortSignal.timeout(5000) })
       const data = await res.json()
@@ -547,8 +488,8 @@ async function processarComandoMara(texto, numero) {
     }
   }
 
-  // ── RESUMO ────────────────────────────────────────────────────
-  if (cmd.includes('/resumo') || /\b(resumo (do dia|de hoje)|relatório|como foi o dia|balanço)\b/i.test(texto)) {
+  // /resumo
+  if (cmd.includes('/resumo') || cmd.includes('resumo do dia') || cmd.includes('relatório')) {
     try {
       const res = await fetch(`${VPS_LEADS_URL}/leads`, { signal: AbortSignal.timeout(5000) })
       const data = await res.json()
@@ -564,17 +505,17 @@ async function processarComandoMara(texto, numero) {
     }
   }
 
-  // ── STATUS ────────────────────────────────────────────────────
-  if (cmd.includes('/status') || /\b(status (dos? sistemas?|geral)|como (estão|está) os sistemas|tudo (ok|bem|funcionando))\b/i.test(texto)) {
+  // /status
+  if (cmd.includes('/status') || cmd.includes('status do sistema')) {
     const ausente = global.__modoAusente.ativo
       ? `🔴 Ausente — ${global.__modoAusente.motivo}${global.__modoAusente.retorno ? ` até ${global.__modoAusente.retorno}` : ''}`
       : '🟢 Dr. Mauro presente'
     return `⚙️ *Status dos Sistemas*\n\n🤖 OpenAI GPT-4o-mini: ✅ Online\n📱 Z-API WhatsApp: ✅ Conectado\n🔊 ElevenLabs TTS: ${ELEVENLABS_KEY ? '✅ Ativo' : '⚠️ Sem chave'}\n🗃️ CRM VPS: ✅ Online\n🛡️ ${ausente}\n\n_— MARA IA 🌟_`
   }
 
-  // ── AJUDA ─────────────────────────────────────────────────────
-  if (cmd.includes('/ajuda') || /\b(o que (você|vc) faz|como (você|vc) funciona|me ajuda|comandos disponíveis|o que (posso|pode) (fazer|pedir))\b/i.test(texto)) {
-    return `🤖 *Olá, Dr. Mauro! Sou a MARA, sua secretária executiva IA.*\n\n*O que posso fazer por você:*\n\n📋 Listar seus leads de hoje\n🚨 Mostrar casos urgentes\n📊 Relatório executivo do dia\n⚙️ Status dos sistemas\n🛡️ Ativar/desativar modo ausente\n💬 Conversar sobre qualquer assunto\n\n*Como me acionar:*\nFale naturalmente! Exemplos:\n• "Quais leads chegaram hoje?"\n• "Tem algum caso urgente?"\n• "Vou para audiência, volto às 15h"\n• "Já voltei"\n• "Me dá um resumo do dia"\n\nOu use: /leads /urgentes /resumo /status /ausente /presente\n\n_Estou sempre aqui! 🌟_`
+  // /ajuda
+  if (cmd.includes('/ajuda') || cmd.includes('comandos') || cmd.includes('o que você faz')) {
+    return `📖 *Comandos da MARA IA:*\n\n📋 */leads* — Leads de hoje\n🚨 */urgentes* — Casos críticos\n📊 */resumo* — Relatório do dia\n⚙️ */status* — Status dos sistemas\n🏖️ */ausente ferias 15/03* — Ativar modo ausente\n✅ */presente* — Desativar modo ausente\n\nOu fale naturalmente comigo! 😊\n\n_— MARA IA 🌟_`
   }
 
   return null // Não é comando — processar com GPT
@@ -620,7 +561,7 @@ async function gerarRespostaModoAusente(mensagem, numero, pushName) {
   const ehUrgente = palavrasUrgentes.some(p => mensagem.toLowerCase().includes(p))
 
   if (ehUrgente) {
-    // Alertar Dr. Mauro mesmo ausente — usar instância Dr. Ben
+    // Alertar Dr. Mauro mesmo ausente
     const mauroNum = DR_MAURO_WHATSAPP.replace(/\D/g, '')
     const hora = horaAtual()
     await enviarMensagem(mauroNum,
@@ -798,12 +739,6 @@ export default async function handler(req, res) {
     if (numero.includes('@g') || numero.endsWith('@broadcast')) return res.status(200).json({ ok: true })
     if (!numero || numero.length < 8) return res.status(200).json({ ok: true })
 
-    // ── ANTI-LOOP: somente bloquear mensagens de saída (fromMe já foi tratado acima) ──
-    // connectedPhone = número da NOSSA instância (Dr. Ben = 86-994820054)
-    // phone/from     = quem enviou a mensagem (pode ser Dr. Mauro ou cliente)
-    // NÃO bloquear com base no connectedPhone — isso bloqueava TUDO
-    const mauroNorm = DR_MAURO_WHATSAPP.replace(/\D/g, '')
-
     // ── Detectar tipo de mensagem ─────────────────────────
     // Texto direto
     let texto = body?.text?.message || body?.text || body?.message || ''
@@ -831,6 +766,7 @@ export default async function handler(req, res) {
     console.log(`[Webhook] Mensagem de ${pushName} (${numero}): "${texto.slice(0, 100)}"`)
 
     // ── Detectar se é o Dr. Mauro ────────────────────────
+    const mauroNorm = DR_MAURO_WHATSAPP.replace(/\D/g, '')
     const ehDrMauro = mauroNorm && numero.endsWith(mauroNorm.slice(-10))
 
     // ════════════════════════════════════════════════════
@@ -864,8 +800,7 @@ export default async function handler(req, res) {
         respostaFinal = await gerarRespostaMara(numero, texto)
       }
 
-      // Enviar resposta da MARA pelo mesmo canal (instância Dr. Ben → número do Dr. Mauro)
-      // A instância MARA está no número do Dr. Mauro (86-999484761), não pode enviar para si mesmo
+      // Enviar com voz MARA ou texto
       await enviarResposta(numero, respostaFinal, VOICE_MARA)
 
       console.log(`[MARA IA] ✅ Respondido Dr. Mauro`)

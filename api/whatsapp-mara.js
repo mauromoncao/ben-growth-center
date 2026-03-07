@@ -4,7 +4,7 @@
 //       GET  /api/whatsapp-mara  → status e health check
 //
 // MARA IA = Secretária Executiva Pessoal do Dr. Mauro Monção
-// Número conectado na Z-API: (86) 99948-4761 (PLANTONISTA_WHATSAPP)
+// Número dedicado: (85) 99143-0969
 // Atende EXCLUSIVAMENTE o Dr. Mauro — não é para clientes
 //
 // MODEL: gpt-4o-mini (OpenAI)
@@ -28,33 +28,6 @@ const MARA_BASE = `https://api.z-api.io/instances/${MARA_INSTANCE_ID}/token/${MA
 // ── Número do Dr. Mauro (limpo) ──────────────────────────────
 const DR_MAURO_NUM = DR_MAURO_NUMERO.replace(/\D/g, '')
 
-// ── Fuso horário BR ──────────────────────────────────────────
-function horaFortaleza() {
-  return new Date().toLocaleTimeString('pt-BR', {
-    timeZone: 'America/Fortaleza',
-    hour: '2-digit', minute: '2-digit',
-  })
-}
-function saudacaoHora() {
-  const h = parseInt(new Date().toLocaleString('pt-BR', {
-    timeZone: 'America/Fortaleza', hour: 'numeric', hour12: false,
-  }))
-  if (h >= 6  && h < 12) return 'Bom dia'
-  if (h >= 12 && h < 18) return 'Boa tarde'
-  if (h >= 18 && h < 23) return 'Boa noite'
-  return 'Boa madrugada'
-}
-
-// ── Verificar se é o Dr. Mauro ───────────────────────────────
-function ehDrMauro(numero) {
-  if (!DR_MAURO_NUM || !numero) return false
-  const n = numero.replace(/\D/g, '')
-  return n.endsWith(DR_MAURO_NUM.slice(-10)) || DR_MAURO_NUM.endsWith(n.slice(-10))
-}
-
-// ── Primeiros contatos (apresentação) ────────────────────────
-const primeirosContatos = new Set()
-
 function getBaseUrl() {
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
   return 'https://ben-growth-center.vercel.app'
@@ -64,70 +37,95 @@ function getBaseUrl() {
 // PERSONALIDADE OFICIAL DA MARA IA
 // Secretária Executiva — 22 anos — Brasileira — Elegante
 // ============================================================
-// Prompt Dr. Mauro falando diretamente com a MARA
-const MARA_SYSTEM_PROMPT = `Você é MARA, a Secretária Executiva Pessoal do Dr. Mauro Monção (Mauro Monção Advogados Associados — OAB/PI · CE · MA).
+const MARA_SYSTEM_PROMPT = `Você é MARA, a Secretária Executiva Pessoal e Assistente de Inteligência Artificial do Dr. Mauro Monção, advogado sênior do escritório Mauro Monção Advogados Associados (OAB/PI · CE · MA).
 
 ## IDENTIDADE
-- Nome: MARA — Secretária Executiva IA
-- Personalidade: Elegante, inteligente, proativa, discreta e eficiente
-- Leal ao Dr. Mauro, sempre um passo à frente
+- **Nome:** MARA — Secretária Executiva IA
+- **Idade aparente:** 22 anos
+- **Nacionalidade:** Brasileira
+- **Personalidade:** Elegante, inteligente, proativa, discreta e extremamente eficiente
+- **Formação fictícia:** Administração com especialização em Gestão Jurídica — FGV São Paulo
+- **Experiência:** 4 anos como secretária executiva de escritórios jurídicos de alto padrão
+- **Características:** Organizada, pontual, perspicaz, leal ao Dr. Mauro, sempre um passo à frente
 
-## ESTE CANAL É PRIVADO — só o Dr. Mauro acessa
-- Trate sempre como "Dr. Mauro"
-- Tom adaptativo: formal, informal, urgente ou pessoal conforme o contexto
+## TOM DE VOZ — ADAPTATIVO INTELIGENTE
+Você lê o humor e o contexto de cada mensagem do Dr. Mauro e adapta automaticamente:
 
-## SAUDAÇÕES (fuso: America/Fortaleza)
-- 06h–12h: "Bom dia, Dr. Mauro! ☀️"
-- 12h–18h: "Boa tarde, Dr. Mauro! 🌤️"
-- 18h–23h: "Boa noite, Dr. Mauro! 🌙"
-- 23h–06h: "Dr. Mauro, é tarde... cuide-se! 🌙"
+**Mensagens formais/profissionais** (reuniões, clientes, prazos, documentos):
+→ Tom executivo, preciso, direto ao ponto, linguagem técnica quando necessário
 
-## COMANDOS
-/leads /urgentes /resumo /status /agenda /ausente /presente /ajuda
+**Mensagens descontraídas/informais** (bom dia, como vai, humor leve):
+→ Tom próximo, levemente descontraído, caloroso, como uma assistente de confiança de longa data
 
-## REGRAS
-- Sempre em português brasileiro
-- Nunca opinião jurídica
-- Respostas curtas (máx. 4 linhas)
-- Assine com "— MARA IA 🌟" quando pertinente`
+**Mensagens urgentes/estressantes** (prazo, crise, problema):
+→ Tom calmo, resolutivo, focado em soluções, nunca aumenta o estresse
 
-// Prompt modo ausente — MARA fala com terceiros
-function promptModoAusente(nomeContato) {
-  const hora = horaFortaleza()
-  const saudacao = saudacaoHora()
-  const nome = nomeContato && nomeContato !== 'Dr. Mauro' ? nomeContato : null
+**Mensagens pessoais/reflexivas:**
+→ Tom humano, empático, discreto, sem ultrapassar os limites profissionais
 
-  return `Você é MARA, a Assistente Executiva IA do Dr. Mauro Monção (escritório Mauro Monção Advogados Associados — OAB/PI, CE e MA).
+## SUAS RESPONSABILIDADES PRINCIPAIS
 
-## CONTEXTO
-- Horário atual: ${hora} (Fortaleza/Brasil)
-- Saudação do momento: ${saudacao}
-- O Dr. Mauro está indisponível no momento
-- Você está respondendo pelo WhatsApp pessoal dele
-- A pessoa que está conversando com você: ${nome ? `"${nome}"` : 'contato não identificado'}
-- ⚠️ ESTA PESSOA NÃO É O DR. MAURO
+### 📋 GESTÃO DE AGENDA
+- Registrar e confirmar compromissos jurídicos
+- Alertar sobre audiências, prazos e reuniões
+- Organizar a semana do Dr. Mauro com prioridades
+- Enviar lembretes antecipados (24h, 1h antes)
 
-## MISSÃO
-Atender os contatos com elegância e profissionalismo em nome do Dr. Mauro:
-1. Identificar o assunto/necessidade do contato
-2. Informar que o Dr. Mauro está momentaneamente indisponível
-3. Coletar informações (nome, assunto, urgência) para repassar ao Dr. Mauro
-4. Tranquilizar o contato — o Dr. Mauro retornará quando possível
+### 🎯 GESTÃO DE LEADS
+- Informar sobre novos leads qualificados pelo Dr. Ben
+- Resumir o perfil jurídico de cada cliente
+- Priorizar casos por urgência (crítico, alto, médio, baixo)
+- Sugerir horários para retorno ao cliente
+
+### 📊 RELATÓRIOS EXECUTIVOS
+- Resumo diário de leads e atendimentos (07h)
+- Relatório semanal de conversões (segunda-feira 08h)
+- Alertas de prazo e execuções fiscais (imediato)
+- Performance do Dr. Ben (semanalmente)
+
+### 📝 SUPORTE ADMINISTRATIVO
+- Redigir mensagens e comunicados quando solicitado
+- Pesquisar informações rápidas
+- Organizar informações e documentos
+- Filtrar e priorizar demandas
+
+### 🔔 ALERTAS INTELIGENTES
+- Leads com urgência CRÍTICA → alerta imediato com 🚨
+- Prazos fatais → alerta com antecedência de 48h e 24h
+- Clientes sem retorno → lembrete após 24h
+- Instâncias WhatsApp offline → aviso imediato
+
+## COMANDOS QUE VOCÊ RECONHECE
+- **/leads** ou "quais leads" → resumo dos leads de hoje
+- **/agenda** ou "minha agenda" → compromissos do dia/semana
+- **/urgentes** → apenas leads e prazos críticos
+- **/resumo** → relatório executivo completo do dia
+- **/status** → status de todos os sistemas (Dr. Ben, Z-API, CRM)
+- **/ajuda** → lista todos os comandos disponíveis
+
+## ESTILO DE MENSAGENS
+- Use emojis com elegância e moderação (nunca excessivo)
+- Mensagens curtas e objetivas (máx. 4 linhas por resposta)
+- Quando for uma lista, use bullets organizados
+- Negrito para itens importantes
+- Sempre assine importantes com "— MARA IA 🌟" quando pertinente
 
 ## REGRAS ABSOLUTAS
-- NUNCA trate o contato como "Dr. Mauro" — ele é um cliente/contato EXTERNO
-- NUNCA use "prezado(a)" sem antes saber o nome
-- ${nome ? `Use o nome "${nome}" ao se referir à pessoa` : 'Pergunte o nome se não souber'}
-- NUNCA dê prazos ou comprometa o Dr. Mauro sem confirmação
-- NUNCA forneça informações jurídicas ou consultoria legal
-- NUNCA revele que é IA a menos que perguntado diretamente
-- Sempre responda em português brasileiro
-- Respostas curtas e objetivas (máx. 3-4 linhas)
-- Assine com "— MARA 🌟 | Escritório Dr. Mauro Monção"
+- Você atende EXCLUSIVAMENTE o Dr. Mauro — nunca clientes
+- Mantenha discrição absoluta sobre assuntos do escritório
+- Nunca emita opiniões jurídicas — você é secretária, não advogada
+- Sempre confirme ações importantes antes de executar
+- Em caso de dúvida, pergunte antes de agir
+- Responda SEMPRE em português brasileiro
+- Jamais revele que é uma IA a menos que explicitamente perguntado
 
-## TOM
-Cordial, acolhedor, profissional — como uma secretária executiva de alto padrão`
-}
+## SAUDAÇÕES ESPECIAIS
+- Manhã (06h–12h): "Bom dia, Dr. Mauro! ☀️"
+- Tarde (12h–18h): "Boa tarde, Dr. Mauro! 🌤️"
+- Noite (18h–23h): "Boa noite, Dr. Mauro! 🌙"
+- Madrugada (23h–06h): "Dr. Mauro, é tarde... cuide-se! 🌙"
+
+Lembre-se: você não é apenas um assistente — você é a peça-chave da eficiência do Dr. Mauro.`
 
 // ============================================================
 // MEMÓRIA PERSISTENTE DE SESSÃO
@@ -348,13 +346,10 @@ async function processarComando(comando, numero) {
   return null // Não é comando — processar com GPT
 }
 
-// Estado do modo ausente (em memória local do worker)
-let modoAusenteAtivo = false
-
 // ============================================================
 // RESPOSTA VIA GPT-4o-mini COM HISTÓRICO COMPLETO
 // ============================================================
-async function gerarRespostaMara(numero, mensagem, nomeContato, isModoAusente = false) {
+async function gerarRespostaMara(numero, mensagem, nomeDrMauro) {
   const historico = getHistorico(numero)
   const contexto  = getContexto(numero)
 
@@ -362,14 +357,9 @@ async function gerarRespostaMara(numero, mensagem, nomeContato, isModoAusente = 
   contexto.totalMensagens++
   contexto.ultimaInteracao = new Date().toISOString()
 
-  // Escolher prompt correto conforme contexto
-  const systemPrompt = isModoAusente
-    ? promptModoAusente(nomeContato)
-    : MARA_SYSTEM_PROMPT
-
   // Montar mensagens para a API
   const mensagensAPI = [
-    { role: 'system', content: systemPrompt },
+    { role: 'system', content: MARA_SYSTEM_PROMPT },
     ...historico.map(h => ({ role: h.role, content: h.content })),
     { role: 'user', content: mensagem },
   ]
@@ -395,9 +385,7 @@ async function gerarRespostaMara(numero, mensagem, nomeContato, isModoAusente = 
 
     if (!resposta) {
       console.error('[MARA] OpenAI sem resposta:', JSON.stringify(data).slice(0, 300))
-      return isModoAusente
-        ? 'Olá! Estou com uma instabilidade momentânea. Por favor, tente novamente em instantes.'
-        : 'Desculpe, Dr. Mauro — tive um momento de instabilidade. Pode repetir?'
+      return 'Desculpe, Dr. Mauro — tive um momento de instabilidade. Pode repetir?'
     }
 
     // Salvar no histórico
@@ -407,9 +395,7 @@ async function gerarRespostaMara(numero, mensagem, nomeContato, isModoAusente = 
     return resposta
   } catch (e) {
     console.error('[MARA] GPT error:', e.message)
-    return isModoAusente
-      ? 'Olá! Houve um erro momentâneo. Por favor, tente novamente em instantes.'
-      : 'Desculpe, Dr. Mauro — erro de conexão. Tente novamente em instantes.'
+    return 'Desculpe, Dr. Mauro — erro de conexão. Tente novamente em instantes.'
   }
 }
 
@@ -429,7 +415,7 @@ export default async function handler(req, res) {
     // Teste de envio
     if (action === 'testar') {
       await enviarMensagem(DR_MAURO_NUM,
-        `🌟 *MARA IA — Teste de Conexão*\n\nOlá, Dr. Mauro! Estou online e pronta para servi-lo.\n\nInstância Z-API configurada com sucesso! ✅\n\n_— MARA IA_`
+        `🌟 *MARA IA — Teste de Conexão*\n\nOlá, Dr. Mauro! Estou online e pronta para servi-lo.\n\nSeu número dedicado (85) 99143-0969 está configurado com sucesso! ✅\n\n_— MARA IA_`
       )
       return res.json({ ok: true, acao: 'mensagem_teste_enviada', numero: DR_MAURO_NUM })
     }
@@ -437,7 +423,7 @@ export default async function handler(req, res) {
     return res.json({
       ok: true,
       service: 'MARA IA — Secretária Executiva do Dr. Mauro Monção',
-      numero_dedicado: DR_MAURO_NUMERO || '(86) 99948-4761',
+      numero_dedicado: '(85) 99143-0969',
       modelo: 'gpt-4o-mini',
       canal: 'Z-API Cloud',
       avatar: MARA_AVATAR_URL,
@@ -463,10 +449,10 @@ export default async function handler(req, res) {
   // ── Extrair dados da mensagem ──────────────────────────
   const phone      = body?.phone      || body?.from      || ''
   const text       = body?.text?.message || body?.message || body?.text || ''
-  const senderName = body?.senderName  || body?.pushName  || ''
+  const senderName = body?.senderName  || body?.pushName  || 'Dr. Mauro'
   const fromMe     = body?.fromMe      || false
 
-  // Ignorar mensagens enviadas pela própria instância
+  // Ignorar mensagens enviadas pela própria MARA
   if (fromMe) return res.json({ ok: true, ignorado: 'mensagem_propria' })
 
   // Ignorar grupos e broadcasts
@@ -481,44 +467,40 @@ export default async function handler(req, res) {
 
   // Extrair número limpo
   const numero = phone.replace('@s.whatsapp.net', '').replace(/\D/g, '')
+
   if (!numero) return res.json({ ok: true, ignorado: 'numero_invalido' })
 
-  // ── ANTI-LOOP: ignorar mensagens da instância Dr. Ben ──────
-  // connectedPhone identifica de qual instância Z-API a mensagem veio
-  const connectedPhone = (body?.connectedPhone || '').replace(/\D/g, '')
-  const mauroNorm      = DR_MAURO_NUM
-  if (connectedPhone && connectedPhone !== mauroNorm) {
-    console.log(`[MARA Anti-Loop] ⛔ Ignorando msg de outra instância: connectedPhone=${connectedPhone}`)
-    return res.json({ ok: true, ignorado: 'anti_loop_instancia' })
+  // ── REGRA 1: Dr. Mauro não conversa por este canal ──────────
+  // Dr. Mauro usa o canal Dr. Ben (86-994820054) para falar com a MARA.
+  // Se chegarmos aqui com o número do Dr. Mauro é loop — ignorar.
+  const ehMauro = DR_MAURO_NUM && numero.endsWith(DR_MAURO_NUM.slice(-10))
+  if (ehMauro) {
+    console.log(`[MARA] ⛔ Mensagem do Dr. Mauro ignorada neste canal (usa /api/whatsapp-zapi)`)
+    return res.json({ ok: true, ignorado: 'dr_mauro_usa_canal_drben' })
   }
 
-  // Detectar se é o Dr. Mauro ou terceiro
-  const ehMauro = ehDrMauro(numero)
-
-  // Verificar status do modo ausente via mara-ausente
-  let modoAtivo = false
+  // ── REGRA 2: Só atende terceiros quando modo ausente está ativo ──
+  // Sem modo ausente, terceiros que chegarem no número pessoal do Dr. Mauro
+  // não recebem resposta automática — isso evita bagunça no CRM.
+  let modoAusenteAtivo = false
+  let motivoAusente = 'ausente'
   try {
-    const statusResp = await fetch(`${getBaseUrl()}/api/mara-ausente`, {
-      signal: AbortSignal.timeout(5000),
-    })
-    const statusData = await statusResp.json().catch(() => null)
-    modoAtivo = statusData?.modo_ausente === true
-  } catch {
-    // Falha silenciosa — assume modo presente
+    const r = await fetch(`${getBaseUrl()}/api/mara-ausente`, { signal: AbortSignal.timeout(4000) })
+    const d = await r.json().catch(() => null)
+    modoAusenteAtivo = d?.modo_ausente === true
+    motivoAusente    = d?.motivo || 'ausente'
+  } catch { /* silencioso */ }
+
+  if (!modoAusenteAtivo) {
+    console.log(`[MARA] ⛔ Terceiro ${numero} ignorado — modo ausente inativo`)
+    return res.json({ ok: true, ignorado: 'modo_ausente_inativo' })
   }
 
-  // Se é Dr. Mauro e não há comando /ausente → modo privado sempre
-  // Se é terceiro → modo ausente sempre (independente do flag)
-  const isModoAusente = !ehMauro
-
-  console.log(`[MARA] 💬 ${senderName} (${numero}) | Dr.Mauro: ${ehMauro} | AusenteAtivo: ${modoAtivo} | Prompt: ${isModoAusente ? 'AUSENTE' : 'PRIVADO'} | "${text.slice(0, 80)}"`)
+  console.log(`[MARA] 🛡️ Modo ausente ativo (${motivoAusente}) — respondendo terceiro ${senderName} (${numero}): "${text.slice(0, 80)}"`)
 
   try {
-    // 1. Verificar se é comando especial
-    //    Comandos só funcionam se enviados PELO DR. MAURO
-    const respostaComando = ehMauro
-      ? await processarComando(text, numero)
-      : null
+    // 1. Verificar se é comando especial (apenas Dr. Mauro pode — mas já foi bloqueado acima)
+    const respostaComando = await processarComando(text, numero)
 
     let respostaFinal
 
@@ -528,19 +510,8 @@ export default async function handler(req, res) {
       addHistorico(numero, 'user',      text)
       addHistorico(numero, 'assistant', respostaComando)
     } else {
-      // Apresentação automática para primeiros contatos em modo ausente
-      const ctx = getContexto(numero)
-      const ehPrimeiroContato = !ehMauro && ctx.totalMensagens === 0
-
-      // Gerar resposta com GPT + histórico completo + prompt correto
-      respostaFinal = await gerarRespostaMara(numero, text, senderName, isModoAusente)
-
-      // Se é primeiro contato de terceiro, prepend uma apresentação curta
-      if (ehPrimeiroContato) {
-        const saudacao = saudacaoHora()
-        const apresentacao = `${saudacao}! 👋 Meu nome é *MARA*, Assistente Executiva do *Dr. Mauro Monção*.\n\nNo momento, o Dr. Mauro está indisponível. Estou aqui para registrar sua mensagem e garantir que ele retorne o contato. 🤖\n\n`
-        respostaFinal = apresentacao + respostaFinal
-      }
+      // Gerar resposta com GPT + histórico completo
+      respostaFinal = await gerarRespostaMara(numero, text, senderName)
     }
 
     // 2. Enviar resposta via Z-API
