@@ -13,7 +13,10 @@ const MARA_TOKEN       = process.env.MARA_ZAPI_TOKEN       || ''
 const CLIENT_TOKEN     = process.env.MARA_ZAPI_CLIENT_TOKEN || process.env.ZAPI_CLIENT_TOKEN || ''
 const DR_MAURO_NUMERO  = process.env.PLANTONISTA_WHATSAPP  || ''
 const VPS_URL          = process.env.VPS_LEADS_URL         || 'http://181.215.135.202:3001'
-const MARA_AVATAR_URL  = 'https://ben-growth-center.vercel.app/mara-zapi.jpg'
+
+// URLs das fotos (fallback para URL pública)
+const MARA_FOTO_URL  = 'https://ben-growth-center.vercel.app/mara-zapi.jpg'
+const MAURO_FOTO_URL = 'https://ben-growth-center.vercel.app/mauro-zapi.jpg'
 
 const MARA_BASE = `https://api.z-api.io/instances/${MARA_INSTANCE_ID}/token/${MARA_TOKEN}`
 
@@ -60,10 +63,16 @@ async function enviarMensagem(phone, message) {
 async function lerEstadoVPS() {
   try {
     const r = await fetch(`${VPS_URL}/mara-estado`, { signal: AbortSignal.timeout(5000) })
-    if (!r.ok) return { modo_ausente: false, motivo: null, inicio: null, nome_original: 'Dr. Mauro Monção' }
+    if (!r.ok) {
+      // VPS com erro — retorna null para indicar falha (não retorna false)
+      console.warn('[MARA] VPS retornou status', r.status, '— estado desconhecido')
+      return null
+    }
     return await r.json()
-  } catch {
-    return { modo_ausente: false, motivo: null, inicio: null, nome_original: 'Dr. Mauro Monção' }
+  } catch (e) {
+    // Falha de conexão — retorna null (não falso)
+    console.warn('[MARA] Falha ao ler estado VPS:', e.message)
+    return null
   }
 }
 
@@ -80,13 +89,32 @@ async function salvarEstadoVPS(estado) {
   }
 }
 
+// ── Trocar foto via Z-API (tenta URL direta + base64 como fallback) ───
+async function trocarFotoPerfil(urlFoto, descricao) {
+  // Tentativa 1: URL direta
+  const r1 = await zapiPut('/profile-picture', { value: urlFoto })
+  console.log(`[MARA] Foto ${descricao} (URL):`, JSON.stringify(r1))
+  if (r1?.value === true) return { metodo: 'url', resultado: r1 }
+
+  // Tentativa 2: Aguarda 2s e tenta novamente
+  await new Promise(res => setTimeout(res, 2000))
+  const r2 = await zapiPut('/profile-picture', { value: urlFoto })
+  console.log(`[MARA] Foto ${descricao} (URL retry):`, JSON.stringify(r2))
+  if (r2?.value === true) return { metodo: 'url_retry', resultado: r2 }
+
+  console.warn(`[MARA] ⚠️ Não foi possível trocar foto ${descricao} — Z-API retornou erro`)
+  return { metodo: 'falhou', resultado: r2 }
+}
+
 // ── Ativar modo ausente ───────────────────────────────────
 async function ativarModoAusente(motivo) {
   const resultados = {}
 
   // 1. Trocar foto de perfil para MARA
-  resultados.foto = await zapiPut('/profile-picture', { value: MARA_AVATAR_URL })
-  console.log('[MARA] Foto perfil:', JSON.stringify(resultados.foto))
+  const fotoResult = await trocarFotoPerfil(MARA_FOTO_URL, 'MARA')
+  resultados.foto = fotoResult.resultado
+  resultados.foto_metodo = fotoResult.metodo
+  console.log('[MARA] Foto perfil MARA:', JSON.stringify(resultados.foto))
 
   // 2. Salvar estado persistente na VPS
   await salvarEstadoVPS({
@@ -104,21 +132,10 @@ async function desativarModoAusente(estadoAtual) {
   const resultados = {}
 
   // 1. Restaurar foto original do Dr. Mauro
-  const fotoOriginalUrl = 'https://ben-growth-center.vercel.app/mauro-zapi.jpg'
-  try {
-    const testar = await fetch(fotoOriginalUrl, { method: 'HEAD', signal: AbortSignal.timeout(5000) })
-    const contentType = testar.headers.get('content-type') || ''
-    const ehImagem = contentType.startsWith('image/')
-    if (testar.ok && ehImagem) {
-      resultados.foto = await zapiPut('/profile-picture', { value: fotoOriginalUrl })
-      console.log('[MARA] ✅ Foto do Dr. Mauro restaurada:', JSON.stringify(resultados.foto))
-    } else {
-      console.log('[MARA] ⚠️ Foto não é imagem — content-type:', contentType)
-      resultados.foto = 'erro_content_type'
-    }
-  } catch (e) {
-    console.log('[MARA] ⚠️ Erro ao restaurar foto:', e.message)
-  }
+  const fotoResult = await trocarFotoPerfil(MAURO_FOTO_URL, 'Dr. Mauro')
+  resultados.foto = fotoResult.resultado
+  resultados.foto_metodo = fotoResult.metodo
+  console.log('[MARA] Foto perfil Dr. Mauro:', JSON.stringify(resultados.foto))
 
   // 2. Calcular resumo
   const inicio = estadoAtual?.inicio ? new Date(estadoAtual.inicio) : null
@@ -147,6 +164,18 @@ export default async function handler(req, res) {
   // ── GET: Status (lê da VPS) ───────────────────────────────
   if (req.method === 'GET') {
     const estado = await lerEstadoVPS()
+    // Se VPS falhou (null), retorna estado desconhecido sem sobrescrever nada
+    if (estado === null) {
+      return res.json({
+        ok: false,
+        erro: 'vps_indisponivel',
+        modo_ausente: null,        // null = desconhecido, não false
+        motivo: null,
+        inicio_ausente: null,
+        instancia_configurada: !!(MARA_INSTANCE_ID && MARA_TOKEN),
+        mensagem: 'VPS indisponível — estado atual desconhecido'
+      })
+    }
     return res.json({
       ok: true,
       modo_ausente:        estado.modo_ausente || false,
@@ -171,7 +200,7 @@ export default async function handler(req, res) {
     // ── Ativar ───────────────────────────────────────────────
     if (action === 'ausente' || action === 'ativar') {
       const estadoAtual = await lerEstadoVPS()
-      if (estadoAtual.modo_ausente) {
+      if (estadoAtual !== null && estadoAtual.modo_ausente) {
         return res.json({ ok: true, mensagem: '⚠️ Modo AUSENTE já estava ativo.', inicio_ausente: estadoAtual.inicio })
       }
 
@@ -201,7 +230,8 @@ export default async function handler(req, res) {
     // ── Desativar ────────────────────────────────────────────
     if (action === 'presente' || action === 'desativar') {
       const estadoAtual = await lerEstadoVPS()
-      if (!estadoAtual.modo_ausente) {
+      // Se VPS falhou, permite desativar mesmo assim (force)
+      if (estadoAtual !== null && !estadoAtual.modo_ausente) {
         return res.json({ ok: true, mensagem: '⚠️ Modo PRESENTE já estava ativo.' })
       }
 

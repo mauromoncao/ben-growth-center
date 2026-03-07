@@ -243,8 +243,19 @@ export default function MaraIA() {
   const verificarModoAusente = async () => {
     try {
       const d = await fetch('/api/mara-ausente').then(r => r.json())
-      setModoAusenteStatus({ ativo: d.modo_ausente, motivo: d.motivo, retorno: null, mensagem: null })
-    } catch {}
+      // Se VPS indisponível (ok: false ou modo_ausente: null), NÃO sobrescreve o estado atual
+      // Isso evita que falha de rede desative o modo ausente sozinho
+      if (!d.ok && d.modo_ausente === null) {
+        console.warn('[MARA] VPS indisponível — mantendo estado atual')
+        return
+      }
+      if (typeof d.modo_ausente === 'boolean') {
+        setModoAusenteStatus({ ativo: d.modo_ausente, motivo: d.motivo, retorno: null, mensagem: null })
+      }
+    } catch {
+      // Em caso de erro de rede, mantém estado atual (não altera)
+      console.warn('[MARA] Erro ao verificar estado — mantendo estado atual')
+    }
   }
 
   // ── Ativar / Desativar Modo Ausente ───────────────────────

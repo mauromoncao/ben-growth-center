@@ -535,16 +535,32 @@ export default async function handler(req, res) {
   // não recebem resposta automática — isso evita bagunça no CRM.
   let modoAusenteAtivo = false
   let motivoAusente = 'ausente'
+  let vpsErro = false
   try {
     const r = await fetch(`${VPS_LEADS_URL}/mara-estado`, { signal: AbortSignal.timeout(4000) })
-    const d = await r.json().catch(() => null)
-    modoAusenteAtivo = d?.modo_ausente === true
-    motivoAusente    = d?.motivo || 'ausente'
-  } catch { /* silencioso */ }
+    if (r.ok) {
+      const d = await r.json().catch(() => null)
+      modoAusenteAtivo = d?.modo_ausente === true
+      motivoAusente    = d?.motivo || 'ausente'
+    } else {
+      vpsErro = true
+      console.warn(`[MARA] VPS retornou ${r.status} — modo ausente desconhecido`)
+    }
+  } catch (e) {
+    vpsErro = true
+    console.warn(`[MARA] Falha ao consultar VPS: ${e.message} — modo ausente desconhecido`)
+  }
 
-  if (!modoAusenteAtivo) {
+  // Se VPS falhou, não ignora mensagem (assume que modo ausente pode estar ativo)
+  // Isso evita que falha de rede deixe terceiros sem resposta durante ausência real
+  if (!modoAusenteAtivo && !vpsErro) {
     console.log(`[MARA] ⛔ Terceiro ${numero} ignorado — modo ausente inativo`)
     return res.json({ ok: true, ignorado: 'modo_ausente_inativo' })
+  }
+
+  if (vpsErro && !modoAusenteAtivo) {
+    console.log(`[MARA] ⚠️ VPS indisponível — ignorando terceiro ${numero} por segurança`)
+    return res.json({ ok: true, ignorado: 'vps_indisponivel' })
   }
 
   console.log(`[MARA] 🛡️ Modo ausente ativo (${motivoAusente}) — respondendo terceiro ${senderName} (${numero}): "${text.slice(0, 80)}"`)
