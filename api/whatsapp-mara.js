@@ -522,7 +522,7 @@ export default async function handler(req, res) {
   let modoAusenteAtivo = false
   let motivoAusente = 'ausente'
   try {
-    const r = await fetch(`${getBaseUrl()}/api/mara-ausente`, { signal: AbortSignal.timeout(4000) })
+    const r = await fetch(`${VPS_LEADS_URL}/mara-estado`, { signal: AbortSignal.timeout(4000) })
     const d = await r.json().catch(() => null)
     modoAusenteAtivo = d?.modo_ausente === true
     motivoAusente    = d?.motivo || 'ausente'

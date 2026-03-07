@@ -56,6 +56,12 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_leads_telefone  ON leads(telefone);
   CREATE INDEX IF NOT EXISTS idx_leads_numero    ON leads(numero);
   CREATE INDEX IF NOT EXISTS idx_leads_status    ON leads(status);
+
+  CREATE TABLE IF NOT EXISTS config (
+    chave TEXT PRIMARY KEY,
+    valor TEXT NOT NULL,
+    atualizado_em TEXT
+  );
 `)
 
 console.log(`[DB] SQLite pronto: ${DB_PATH}`)
@@ -344,6 +350,33 @@ app.delete('/leads/limpar/invalidos', (req, res) => {
 
   const total = db.prepare('SELECT COUNT(*) as n FROM leads').get().n
   res.json({ ok: true, removidos, total_restante: total })
+})
+
+// ── GET /mara-estado — ler estado da MARA (modo ausente) ─
+app.get('/mara-estado', (req, res) => {
+  try {
+    const row = db.prepare('SELECT valor FROM config WHERE chave = ?').get('mara_estado')
+    if (!row) return res.json({ modo_ausente: false, motivo: null, inicio: null })
+    return res.json(JSON.parse(row.valor))
+  } catch (e) {
+    return res.status(500).json({ error: e.message })
+  }
+})
+
+// ── POST /mara-estado — salvar estado da MARA (modo ausente) ─
+app.post('/mara-estado', express.json(), (req, res) => {
+  try {
+    const estado = req.body || {}
+    const valor  = JSON.stringify({ ...estado, atualizado_em: new Date().toISOString() })
+    db.prepare(`
+      INSERT INTO config (chave, valor, atualizado_em)
+      VALUES ('mara_estado', ?, ?)
+      ON CONFLICT(chave) DO UPDATE SET valor = excluded.valor, atualizado_em = excluded.atualizado_em
+    `).run(valor, new Date().toISOString())
+    return res.json({ ok: true })
+  } catch (e) {
+    return res.status(500).json({ error: e.message })
+  }
 })
 
 // ── Iniciar servidor ─────────────────────────────────────
