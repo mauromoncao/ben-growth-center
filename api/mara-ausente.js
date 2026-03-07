@@ -103,16 +103,18 @@ async function ativarModoAusente(motivo) {
 async function desativarModoAusente(estadoAtual) {
   const resultados = {}
 
-  // 1. Restaurar foto original do Dr. Mauro (se estiver salva no repositório)
+  // 1. Restaurar foto original do Dr. Mauro
   const fotoOriginalUrl = 'https://ben-growth-center.vercel.app/dr-mauro-avatar.jpg'
   try {
-    const testar = await fetch(fotoOriginalUrl, { method: 'HEAD', signal: AbortSignal.timeout(3000) })
-    if (testar.ok) {
+    const testar = await fetch(fotoOriginalUrl, { method: 'HEAD', signal: AbortSignal.timeout(5000) })
+    const contentType = testar.headers.get('content-type') || ''
+    const ehImagem = contentType.startsWith('image/')
+    if (testar.ok && ehImagem) {
       resultados.foto = await zapiPut('/profile-picture', { value: fotoOriginalUrl })
-      console.log('[MARA] ✅ Foto do Dr. Mauro restaurada')
+      console.log('[MARA] ✅ Foto do Dr. Mauro restaurada:', JSON.stringify(resultados.foto))
     } else {
-      console.log('[MARA] ⚠️ Foto do Dr. Mauro não encontrada — perfil mantido')
-      resultados.foto = 'aguardando_foto_dr_mauro'
+      console.log('[MARA] ⚠️ Foto não é imagem — content-type:', contentType)
+      resultados.foto = 'erro_content_type'
     }
   } catch (e) {
     console.log('[MARA] ⚠️ Erro ao restaurar foto:', e.message)
