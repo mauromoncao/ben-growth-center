@@ -21,7 +21,7 @@ const MARA_TOKEN           = process.env.MARA_ZAPI_TOKEN        || process.env.Z
 const MARA_CLIENT_TOKEN    = process.env.MARA_ZAPI_CLIENT_TOKEN || process.env.ZAPI_CLIENT_TOKEN || ''
 const DR_MAURO_NUMERO      = process.env.PLANTONISTA_WHATSAPP   || ''
 const VPS_LEADS_URL        = process.env.VPS_LEADS_URL          || 'http://181.215.135.202:3001'
-const MARA_AVATAR_URL      = 'https://www.genspark.ai/api/files/s/qiD4oS1k'
+const MARA_AVATAR_URL      = 'https://ben-growth-center.vercel.app/mara-avatar-circle.png'
 
 const MARA_BASE = `https://api.z-api.io/instances/${MARA_INSTANCE_ID}/token/${MARA_TOKEN}`
 

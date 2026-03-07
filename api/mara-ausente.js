@@ -13,7 +13,7 @@ const MARA_INSTANCE_ID  = process.env.MARA_ZAPI_INSTANCE_ID  || ''
 const MARA_TOKEN        = process.env.MARA_ZAPI_TOKEN        || ''
 const CLIENT_TOKEN      = process.env.MARA_ZAPI_CLIENT_TOKEN || process.env.ZAPI_CLIENT_TOKEN || ''
 const DR_MAURO_NUMERO   = process.env.PLANTONISTA_WHATSAPP   || ''
-const MARA_AVATAR_URL   = 'https://www.genspark.ai/api/files/s/qiD4oS1k'
+const MARA_AVATAR_URL   = 'https://ben-growth-center.vercel.app/mara-avatar-circle.png'
 
 const MARA_BASE = `https://api.z-api.io/instances/${MARA_INSTANCE_ID}/token/${MARA_TOKEN}`
 
