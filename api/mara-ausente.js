@@ -7,8 +7,6 @@
 // Foto do perfil: SEMPRE a do Dr. Mauro Monção (fixa, nunca alterna)
 // ============================================================
 
-import { MAURO_PERFIL_B64 } from './imagens-b64.js'
-
 export const config = { maxDuration: 30 }
 
 const MARA_INSTANCE_ID = process.env.MARA_ZAPI_INSTANCE_ID || ''
@@ -16,6 +14,9 @@ const MARA_TOKEN       = process.env.MARA_ZAPI_TOKEN       || ''
 const CLIENT_TOKEN     = process.env.MARA_ZAPI_CLIENT_TOKEN || process.env.ZAPI_CLIENT_TOKEN || ''
 const DR_MAURO_NUMERO  = process.env.PLANTONISTA_WHATSAPP  || ''
 const VPS_URL          = process.env.VPS_LEADS_URL         || 'http://181.215.135.202:3001'
+
+// Foto de perfil do Dr. Mauro hospedada no próprio site (URL pública acessível pela Z-API)
+const MAURO_FOTO_URL = 'https://ben-growth-center.vercel.app/mauro-zapi.jpg'
 
 const MARA_BASE = `https://api.z-api.io/instances/${MARA_INSTANCE_ID}/token/${MARA_TOKEN}`
 
@@ -59,21 +60,17 @@ async function enviarMensagem(phone, message) {
 }
 
 // ── Foto de perfil fixa: Dr. Mauro Monção ────────────────
-// Garante que a foto do Dr. Mauro está definida via base64 (sem dependência de URL externa)
+// Usa URL pública hospedada no Vercel — Z-API aceita apenas URL para /profile-picture
 async function definirFotoPerfilDrMauro() {
-  // Extrai apenas o base64 puro (sem o prefixo "data:image/jpeg;base64,")
-  const base64Pure = MAURO_PERFIL_B64.replace(/^data:image\/\w+;base64,/, '')
-
-  // Z-API aceita base64 puro no campo "value" para profile-picture
-  const r1 = await zapiPut('/profile-picture', { value: base64Pure })
-  console.log('[MARA] Foto perfil Dr. Mauro (base64):', JSON.stringify(r1))
-  if (r1?.value === true) return { metodo: 'base64', resultado: r1 }
+  const r1 = await zapiPut('/profile-picture', { value: MAURO_FOTO_URL })
+  console.log('[MARA] Foto perfil Dr. Mauro (URL):', JSON.stringify(r1))
+  if (r1?.value === true) return { metodo: 'url', resultado: r1 }
 
   // Aguarda 2s e tenta novamente
   await new Promise(res => setTimeout(res, 2000))
-  const r2 = await zapiPut('/profile-picture', { value: base64Pure })
-  console.log('[MARA] Foto perfil Dr. Mauro (base64 retry):', JSON.stringify(r2))
-  if (r2?.value === true) return { metodo: 'base64_retry', resultado: r2 }
+  const r2 = await zapiPut('/profile-picture', { value: MAURO_FOTO_URL })
+  console.log('[MARA] Foto perfil Dr. Mauro (URL retry):', JSON.stringify(r2))
+  if (r2?.value === true) return { metodo: 'url_retry', resultado: r2 }
 
   console.warn('[MARA] ⚠️ Não foi possível definir foto Dr. Mauro — Z-API retornou erro')
   return { metodo: 'falhou', resultado: r2 }
