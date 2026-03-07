@@ -4,7 +4,7 @@
 //       GET  /api/whatsapp-mara  → status e health check
 //
 // MARA IA = Secretária Executiva Pessoal do Dr. Mauro Monção
-// Número dedicado: (85) 99143-0969
+// Número conectado na Z-API: (86) 99948-4761 (PLANTONISTA_WHATSAPP)
 // Atende EXCLUSIVAMENTE o Dr. Mauro — não é para clientes
 //
 // MODEL: gpt-4o-mini (OpenAI)
@@ -429,7 +429,7 @@ export default async function handler(req, res) {
     // Teste de envio
     if (action === 'testar') {
       await enviarMensagem(DR_MAURO_NUM,
-        `🌟 *MARA IA — Teste de Conexão*\n\nOlá, Dr. Mauro! Estou online e pronta para servi-lo.\n\nSeu número dedicado (85) 99143-0969 está configurado com sucesso! ✅\n\n_— MARA IA_`
+        `🌟 *MARA IA — Teste de Conexão*\n\nOlá, Dr. Mauro! Estou online e pronta para servi-lo.\n\nInstância Z-API configurada com sucesso! ✅\n\n_— MARA IA_`
       )
       return res.json({ ok: true, acao: 'mensagem_teste_enviada', numero: DR_MAURO_NUM })
     }
@@ -437,7 +437,7 @@ export default async function handler(req, res) {
     return res.json({
       ok: true,
       service: 'MARA IA — Secretária Executiva do Dr. Mauro Monção',
-      numero_dedicado: '(85) 99143-0969',
+      numero_dedicado: DR_MAURO_NUMERO || '(86) 99948-4761',
       modelo: 'gpt-4o-mini',
       canal: 'Z-API Cloud',
       avatar: MARA_AVATAR_URL,

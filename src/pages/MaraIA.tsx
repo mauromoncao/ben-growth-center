@@ -98,7 +98,7 @@ const CONFIG_PADRAO: ConfigMara = {
   tempoEspera: 30,
   ativo: true,
   modoManutencao: false,
-  mensagemManutencao: 'Estamos em manutenção no momento. Retornaremos em breve. Para urgências, ligue: (86) 99948-4761.',
+  mensagemManutencao: 'Estamos em manutenção no momento. Retornaremos em breve. Para urgências, ligue: via WhatsApp pessoal.',
   notificacaoSonora: true,
   alertaUrgente: true,
   resumoAutomatico: true,
@@ -456,8 +456,8 @@ export default function MaraIA() {
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="bg-white/10 rounded-xl p-3 border border-white/20">
                 <p className="text-white/60 text-xs mb-1">📱 Número Dedicado</p>
-                <p className="text-white font-bold text-lg">(85) 99143-0969</p>
-                <p className="text-[#D4A017] text-xs">Exclusivo MARA IA</p>
+                <p className="text-white font-bold text-lg">(86) 99948-4761</p>
+                <p className="text-[#D4A017] text-xs">Número conectado Z-API</p>
               </div>
               <div className="bg-white/10 rounded-xl p-3 border border-white/20">
                 <p className="text-white/60 text-xs mb-1">🎙️ Voz ElevenLabs</p>
@@ -843,7 +843,7 @@ export default function MaraIA() {
             </div>
           </div>
           <p className="text-sm text-gray-600 leading-relaxed">
-            Secretária pessoal no WhatsApp <strong>(86) 99948-4761</strong>.
+            Secretária pessoal no WhatsApp <strong>via WhatsApp pessoal</strong>.
             Notifica leads, gerencia o modo ausente, executa comandos e responde com personalidade.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -1088,7 +1088,7 @@ export default function MaraIA() {
               <div>
                 <label className="text-sm font-semibold text-gray-700">Mensagens até a triagem completa</label>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Após este número de trocas, Dr. Ben finaliza a triagem e a MARA IA avisa o Dr. Mauro no <strong>(86) 99948-4761</strong>
+                  Após este número de trocas, Dr. Ben finaliza a triagem e a MARA IA avisa o Dr. Mauro no <strong>via WhatsApp pessoal</strong>
                 </p>
               </div>
               <span className="text-[#0f2044] font-bold text-3xl w-14 text-center">{config.mensagensParaTriagem}</span>
@@ -1295,7 +1295,7 @@ export default function MaraIA() {
                     { campo: 'Instance ID',   valor: '3EFBA328D48CC11FFCB66237BF5854B6', status: 'ok' },
                     { campo: 'Token',         valor: 'EAC44AD0F0FF58FCD5A23C3B',         status: 'ok' },
                     { campo: 'Client Token',  valor: '(mesmo do Dr. Ben — ZAPI_CLIENT_TOKEN)', status: 'reuso' },
-                    { campo: 'Número',        valor: '(86) 9948-4761 — Pessoal Dr. Mauro', status: 'ok' },
+                    { campo: 'Número',        valor: 'Número configurado via Env Variable', status: 'ok' },
                     { campo: 'Webhook URL',   valor: 'ben-growth-center.vercel.app/api/whatsapp-mara', status: 'ok' },
                   ].map((row, i) => (
                     <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
@@ -1543,7 +1543,7 @@ export default function MaraIA() {
                     { key: 'ZAPI_INSTANCE_ID',     desc: 'ID da instância Z-API Dr. Ben — (86) 9482-0054',      status: 'ok' },
                     { key: 'ZAPI_TOKEN',           desc: 'Token de autenticação Z-API Dr. Ben',                  status: 'ok' },
                     { key: 'ZAPI_CLIENT_TOKEN',    desc: 'Client-Token de segurança — mesmo para todas as contas', status: 'ok' },
-                    { key: 'PLANTONISTA_WHATSAPP', desc: 'Número Dr. Mauro para alertas (+5586999484761)',       status: 'ok' },
+                    { key: 'PLANTONISTA_WHATSAPP', desc: 'Número Dr. Mauro para alertas (via variável de ambiente)',       status: 'ok' },
                     { key: 'VPS_LEADS_URL',        desc: 'URL do CRM/VPS (http://181.215.135.202:3001)',        status: 'ok' },
                     { key: 'ELEVENLABS_API_KEY',   desc: 'ElevenLabs TTS — voz Dr. Ben + MARA',                 status: 'ok' },
                   ].map((v, i) => (
