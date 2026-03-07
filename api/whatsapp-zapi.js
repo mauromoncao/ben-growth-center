@@ -699,40 +699,14 @@ export default async function handler(req, res) {
       const retorno = req.query.retorno || null
       const labels  = { ferias: '🏖️ Férias', doente: '🤒 Indisposto', audiencia: '⚖️ Audiência', viagem: '✈️ Viagem', reuniao: '🤝 Reunião', fora_horario: '😴 Fora do horário' }
       global.__modoAusente = { ativo: true, motivo, retorno, mensagem: null }
-      console.log(`[MARA] 🛡️ Modo Ausente ativado via dashboard: ${motivo}${retorno ? ` até ${retorno}` : ''}`)
-      // Sincronizar com instância MARA (whatsapp-mara.js)
-      try {
-        const base = getBaseUrl()
-        await fetch(`${base}/api/mara-ausente`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'ausente', motivo }),
-          signal: AbortSignal.timeout(8000),
-        })
-        console.log('[MARA] ✅ Instância MARA sincronizada — modo ausente ativo')
-      } catch (e) {
-        console.error('[MARA] ⚠️ Falha ao sincronizar instância MARA:', e.message)
-      }
+      console.log(`[DR_BEN] 🛡️ Modo Ausente ativado via dashboard: ${motivo}${retorno ? ` até ${retorno}` : ''}`)
       return res.json({ ok: true, ativo: true, motivo, retorno, label: labels[motivo] || motivo })
     }
 
     // Desativar modo ausente via dashboard
     if (action === 'desativar-ausente') {
       global.__modoAusente = { ativo: false, motivo: null, retorno: null, mensagem: null }
-      console.log('[MARA] ✅ Modo Ausente desativado via dashboard')
-      // Sincronizar com instância MARA (whatsapp-mara.js)
-      try {
-        const base = getBaseUrl()
-        await fetch(`${base}/api/mara-ausente`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'presente' }),
-          signal: AbortSignal.timeout(8000),
-        })
-        console.log('[MARA] ✅ Instância MARA sincronizada — modo presente ativo')
-      } catch (e) {
-        console.error('[MARA] ⚠️ Falha ao sincronizar instância MARA:', e.message)
-      }
+      console.log('[DR_BEN] ✅ Modo Ausente desativado via dashboard')
       return res.json({ ok: true, ativo: false })
     }
 

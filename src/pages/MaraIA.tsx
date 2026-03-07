@@ -242,8 +242,8 @@ export default function MaraIA() {
 
   const verificarModoAusente = async () => {
     try {
-      const d = await fetch('/api/whatsapp-zapi?action=modo-ausente').then(r => r.json())
-      setModoAusenteStatus(d)
+      const d = await fetch('/api/mara-ausente').then(r => r.json())
+      setModoAusenteStatus({ ativo: d.modo_ausente, motivo: d.motivo, retorno: null, mensagem: null })
     } catch {}
   }
 
@@ -253,9 +253,11 @@ export default function MaraIA() {
     try {
       const motivo  = config.modoAusente.motivo
       const retorno = config.modoAusente.retorno
-      const params  = new URLSearchParams({ action: 'ativar-ausente', motivo })
-      if (retorno) params.set('retorno', retorno)
-      const res = await fetch(`/api/whatsapp-zapi?${params.toString()}`)
+      const res = await fetch('/api/mara-ausente', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'ausente', motivo, retorno }),
+      })
       const data = await res.json()
       if (data.ok) {
         setModoAusenteStatus({ ativo: true, motivo, retorno: retorno || null, mensagem: null })
@@ -272,7 +274,11 @@ export default function MaraIA() {
   const desativarModoAusente = async () => {
     setAtivandoAusente(true)
     try {
-      const res = await fetch('/api/whatsapp-zapi?action=desativar-ausente')
+      const res = await fetch('/api/mara-ausente', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'presente' }),
+      })
       const data = await res.json()
       if (data.ok) {
         setModoAusenteStatus({ ativo: false, motivo: null, retorno: null, mensagem: null })
