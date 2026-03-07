@@ -710,43 +710,6 @@ export default async function handler(req, res) {
       return res.json({ ok: true, ativo: false })
     }
 
-    // Definir foto de perfil do Dr. Mauro Monção na instância principal
-    if (action === 'definir-foto') {
-      const MAURO_FOTO_URL = 'https://ben-growth-center.vercel.app/mauro-zapi.jpg'
-      try {
-        const headers = { 'Content-Type': 'application/json' }
-        if (ZAPI_CLIENT_TOKEN) headers['Client-Token'] = ZAPI_CLIENT_TOKEN
-        const r1 = await fetch(`${ZAPI_BASE}/profile-picture`, {
-          method: 'PUT',
-          headers,
-          body: JSON.stringify({ value: MAURO_FOTO_URL }),
-          signal: AbortSignal.timeout(10000),
-        })
-        const d1 = await r1.json().catch(() => ({ error: 'resposta inválida' }))
-        console.log('[DR_BEN] Foto perfil Dr. Mauro (URL):', JSON.stringify(d1))
-        if (d1?.value === true) {
-          return res.json({ ok: true, mensagem: '✅ Foto do Dr. Mauro Monção definida na instância principal.', resultado: d1 })
-        }
-        // Retry após 2s
-        await new Promise(r => setTimeout(r, 2000))
-        const r2 = await fetch(`${ZAPI_BASE}/profile-picture`, {
-          method: 'PUT',
-          headers,
-          body: JSON.stringify({ value: MAURO_FOTO_URL }),
-          signal: AbortSignal.timeout(10000),
-        })
-        const d2 = await r2.json().catch(() => ({ error: 'resposta inválida' }))
-        console.log('[DR_BEN] Foto perfil Dr. Mauro (retry):', JSON.stringify(d2))
-        return res.json({
-          ok: d2?.value === true,
-          mensagem: d2?.value === true ? '✅ Foto definida (retry).' : '⚠️ Não foi possível definir a foto.',
-          resultado: d2,
-        })
-      } catch (e) {
-        return res.json({ ok: false, mensagem: '❌ Erro ao definir foto.', erro: e.message })
-      }
-    }
-
     return res.status(200).json({
       status:           'ok',
       service:          'Dr. Ben + MARA IA via Z-API WhatsApp',

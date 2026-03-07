@@ -15,9 +15,6 @@ const CLIENT_TOKEN     = process.env.MARA_ZAPI_CLIENT_TOKEN || process.env.ZAPI_
 const DR_MAURO_NUMERO  = process.env.PLANTONISTA_WHATSAPP  || ''
 const VPS_URL          = process.env.VPS_LEADS_URL         || 'http://181.215.135.202:3001'
 
-// Foto de perfil do Dr. Mauro hospedada no próprio site (URL pública acessível pela Z-API)
-const MAURO_FOTO_URL = 'https://ben-growth-center.vercel.app/mauro-zapi.jpg'
-
 const MARA_BASE = `https://api.z-api.io/instances/${MARA_INSTANCE_ID}/token/${MARA_TOKEN}`
 
 // ── Helpers Z-API ─────────────────────────────────────────
@@ -25,20 +22,6 @@ function zapiHeaders() {
   const h = { 'Content-Type': 'application/json' }
   if (CLIENT_TOKEN) h['Client-Token'] = CLIENT_TOKEN
   return h
-}
-
-async function zapiPut(path, body) {
-  try {
-    const r = await fetch(`${MARA_BASE}${path}`, {
-      method: 'PUT',
-      headers: zapiHeaders(),
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(10000),
-    })
-    return await r.json().catch(() => ({ error: 'resposta inválida' }))
-  } catch (e) {
-    return { error: e.message }
-  }
 }
 
 async function zapiPost(path, body) {
@@ -57,23 +40,6 @@ async function zapiPost(path, body) {
 
 async function enviarMensagem(phone, message) {
   return zapiPost('/send-text', { phone, message })
-}
-
-// ── Foto de perfil fixa: Dr. Mauro Monção ────────────────
-// Usa URL pública hospedada no Vercel — Z-API aceita apenas URL para /profile-picture
-async function definirFotoPerfilDrMauro() {
-  const r1 = await zapiPut('/profile-picture', { value: MAURO_FOTO_URL })
-  console.log('[MARA] Foto perfil Dr. Mauro (URL):', JSON.stringify(r1))
-  if (r1?.value === true) return { metodo: 'url', resultado: r1 }
-
-  // Aguarda 2s e tenta novamente
-  await new Promise(res => setTimeout(res, 2000))
-  const r2 = await zapiPut('/profile-picture', { value: MAURO_FOTO_URL })
-  console.log('[MARA] Foto perfil Dr. Mauro (URL retry):', JSON.stringify(r2))
-  if (r2?.value === true) return { metodo: 'url_retry', resultado: r2 }
-
-  console.warn('[MARA] ⚠️ Não foi possível definir foto Dr. Mauro — Z-API retornou erro')
-  return { metodo: 'falhou', resultado: r2 }
 }
 
 // ── Persistência na VPS ───────────────────────────────────
@@ -180,19 +146,6 @@ export default async function handler(req, res) {
     const action = body?.action || ''
     const numero = DR_MAURO_NUMERO.replace(/\D/g, '')
 
-    // ── Definir foto do Dr. Mauro (ação manual, quando necessário) ─
-    if (action === 'definir_foto') {
-      const fotoResult = await definirFotoPerfilDrMauro()
-      return res.json({
-        ok: fotoResult.metodo !== 'falhou',
-        mensagem: fotoResult.metodo !== 'falhou'
-          ? '✅ Foto do Dr. Mauro Monção definida no perfil.'
-          : '⚠️ Não foi possível definir a foto.',
-        metodo: fotoResult.metodo,
-        resultado: fotoResult.resultado,
-      })
-    }
-
     // ── Ativar ───────────────────────────────────────────────
     if (action === 'ausente' || action === 'ativar') {
       const estadoAtual = await lerEstadoVPS()
@@ -251,7 +204,7 @@ export default async function handler(req, res) {
 
     return res.status(400).json({
       error: 'Action inválida',
-      actions_validas: ['ausente', 'presente', 'definir_foto'],
+      actions_validas: ['ausente', 'presente'],
     })
   }
 
