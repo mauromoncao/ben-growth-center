@@ -481,15 +481,17 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'JSON inválido' })
   }
 
-  console.log('[MARA] Webhook recebido:', JSON.stringify(body).slice(0, 300))
+  console.log('[MARA] Webhook recebido COMPLETO:', JSON.stringify(body).slice(0, 500))
 
   // ── Extrair dados da mensagem ──────────────────────────
-  const phone      = body?.phone      || body?.from      || ''
-  const text       = body?.text?.message || body?.message || body?.text || ''
-  const senderName = body?.senderName  || body?.pushName  || 'Dr. Mauro'
-  const fromMe     = body?.fromMe      || false
+  // No Z-API: phone = quem enviou, connectedPhone = número da instância (destino)
+  const phone          = body?.phone      || body?.from      || ''
+  const connectedPhone = (body?.connectedPhone || '').replace(/\D/g, '')
+  const text           = body?.text?.message || body?.message || body?.text || ''
+  const senderName     = body?.senderName  || body?.pushName  || 'Visitante'
+  const fromMe         = body?.fromMe      || false
 
-  // Ignorar mensagens enviadas pela própria MARA
+  // Ignorar mensagens enviadas pela própria instância MARA
   if (fromMe) return res.json({ ok: true, ignorado: 'mensagem_propria' })
 
   // Ignorar grupos e broadcasts
@@ -502,18 +504,18 @@ export default async function handler(req, res) {
     return res.json({ ok: true, ignorado: 'sem_texto' })
   }
 
-  // Extrair número limpo
+  // Extrair número limpo do REMETENTE
   const numero = phone.replace('@s.whatsapp.net', '').replace(/\D/g, '')
 
   if (!numero) return res.json({ ok: true, ignorado: 'numero_invalido' })
 
-  // ── REGRA 1: Dr. Mauro não conversa por este canal ──────────
-  // Dr. Mauro usa o canal Dr. Ben (86-994820054) para falar com a MARA.
-  // Se chegarmos aqui com o número do Dr. Mauro é loop — ignorar.
-  const ehMauro = DR_MAURO_NUM && numero.endsWith(DR_MAURO_NUM.slice(-10))
-  if (ehMauro) {
-    console.log(`[MARA] ⛔ Mensagem do Dr. Mauro ignorada neste canal (usa /api/whatsapp-zapi)`)
-    return res.json({ ok: true, ignorado: 'dr_mauro_usa_canal_drben' })
+  // ── REGRA 1: Ignorar se remetente = instância MARA (loop) ───
+  // connectedPhone é o número da instância (86-999484761)
+  // Se phone == connectedPhone significa mensagem da própria instância
+  const instanciaNum = DR_MAURO_NUM.replace(/\D/g, '')
+  if (numero === instanciaNum || numero === connectedPhone) {
+    console.log(`[MARA] ⛔ Loop detectado — remetente é a própria instância`)
+    return res.json({ ok: true, ignorado: 'loop_instancia' })
   }
 
   // ── REGRA 2: Só atende terceiros quando modo ausente está ativo ──
