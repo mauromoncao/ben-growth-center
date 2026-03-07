@@ -4,8 +4,8 @@
 //       GET  /api/whatsapp-mara  → status e health check
 //
 // MARA IA = Secretária Executiva Pessoal do Dr. Mauro Monção
-// Número dedicado: (85) 99143-0969
-// Atende EXCLUSIVAMENTE o Dr. Mauro — não é para clientes
+// Número do Dr. Mauro: (86) 99948-4761  ← MARA atende terceiros neste número quando ausente
+// Atende terceiros que chegam no WhatsApp do Dr. Mauro quando ele ativa o modo ausente
 //
 // MODEL: gpt-4o-mini (OpenAI)
 // CANAL: Z-API Cloud (instância separada)
@@ -500,7 +500,7 @@ export default async function handler(req, res) {
     return res.json({
       ok: true,
       service: 'MARA IA — Secretária Executiva do Dr. Mauro Monção',
-      numero_dedicado: '(85) 99143-0969',
+      numero_dr_mauro: '(86) 99948-4761',
       modelo: 'gpt-4o-mini',
       canal: 'Z-API Cloud',
       avatar: MARA_AVATAR_URL,
