@@ -4,7 +4,10 @@
 //       GET  /api/mara-ausente  → status atual
 //
 // Estado persistido na VPS (SQLite) — não perde com serverless
+// Foto do perfil: SEMPRE a do Dr. Mauro Monção (fixa, nunca alterna)
 // ============================================================
+
+import { MAURO_PERFIL_B64 } from './imagens-b64.js'
 
 export const config = { maxDuration: 30 }
 
@@ -13,10 +16,6 @@ const MARA_TOKEN       = process.env.MARA_ZAPI_TOKEN       || ''
 const CLIENT_TOKEN     = process.env.MARA_ZAPI_CLIENT_TOKEN || process.env.ZAPI_CLIENT_TOKEN || ''
 const DR_MAURO_NUMERO  = process.env.PLANTONISTA_WHATSAPP  || ''
 const VPS_URL          = process.env.VPS_LEADS_URL         || 'http://181.215.135.202:3001'
-
-// URLs das fotos (fallback para URL pública)
-const MARA_FOTO_URL  = 'https://ben-growth-center.vercel.app/mara-zapi.jpg'
-const MAURO_FOTO_URL = 'https://ben-growth-center.vercel.app/mauro-zapi.jpg'
 
 const MARA_BASE = `https://api.z-api.io/instances/${MARA_INSTANCE_ID}/token/${MARA_TOKEN}`
 
@@ -59,18 +58,37 @@ async function enviarMensagem(phone, message) {
   return zapiPost('/send-text', { phone, message })
 }
 
+// ── Foto de perfil fixa: Dr. Mauro Monção ────────────────
+// Garante que a foto do Dr. Mauro está definida via base64 (sem dependência de URL externa)
+async function definirFotoPerfilDrMauro() {
+  // Extrai apenas o base64 puro (sem o prefixo "data:image/jpeg;base64,")
+  const base64Pure = MAURO_PERFIL_B64.replace(/^data:image\/\w+;base64,/, '')
+
+  // Z-API aceita base64 puro no campo "value" para profile-picture
+  const r1 = await zapiPut('/profile-picture', { value: base64Pure })
+  console.log('[MARA] Foto perfil Dr. Mauro (base64):', JSON.stringify(r1))
+  if (r1?.value === true) return { metodo: 'base64', resultado: r1 }
+
+  // Aguarda 2s e tenta novamente
+  await new Promise(res => setTimeout(res, 2000))
+  const r2 = await zapiPut('/profile-picture', { value: base64Pure })
+  console.log('[MARA] Foto perfil Dr. Mauro (base64 retry):', JSON.stringify(r2))
+  if (r2?.value === true) return { metodo: 'base64_retry', resultado: r2 }
+
+  console.warn('[MARA] ⚠️ Não foi possível definir foto Dr. Mauro — Z-API retornou erro')
+  return { metodo: 'falhou', resultado: r2 }
+}
+
 // ── Persistência na VPS ───────────────────────────────────
 async function lerEstadoVPS() {
   try {
     const r = await fetch(`${VPS_URL}/mara-estado`, { signal: AbortSignal.timeout(5000) })
     if (!r.ok) {
-      // VPS com erro — retorna null para indicar falha (não retorna false)
       console.warn('[MARA] VPS retornou status', r.status, '— estado desconhecido')
       return null
     }
     return await r.json()
   } catch (e) {
-    // Falha de conexão — retorna null (não falso)
     console.warn('[MARA] Falha ao ler estado VPS:', e.message)
     return null
   }
@@ -89,34 +107,10 @@ async function salvarEstadoVPS(estado) {
   }
 }
 
-// ── Trocar foto via Z-API (tenta URL direta + base64 como fallback) ───
-async function trocarFotoPerfil(urlFoto, descricao) {
-  // Tentativa 1: URL direta
-  const r1 = await zapiPut('/profile-picture', { value: urlFoto })
-  console.log(`[MARA] Foto ${descricao} (URL):`, JSON.stringify(r1))
-  if (r1?.value === true) return { metodo: 'url', resultado: r1 }
-
-  // Tentativa 2: Aguarda 2s e tenta novamente
-  await new Promise(res => setTimeout(res, 2000))
-  const r2 = await zapiPut('/profile-picture', { value: urlFoto })
-  console.log(`[MARA] Foto ${descricao} (URL retry):`, JSON.stringify(r2))
-  if (r2?.value === true) return { metodo: 'url_retry', resultado: r2 }
-
-  console.warn(`[MARA] ⚠️ Não foi possível trocar foto ${descricao} — Z-API retornou erro`)
-  return { metodo: 'falhou', resultado: r2 }
-}
-
 // ── Ativar modo ausente ───────────────────────────────────
+// Foto NÃO muda — Dr. Mauro permanece no perfil
 async function ativarModoAusente(motivo) {
-  const resultados = {}
-
-  // 1. Trocar foto de perfil para MARA
-  const fotoResult = await trocarFotoPerfil(MARA_FOTO_URL, 'MARA')
-  resultados.foto = fotoResult.resultado
-  resultados.foto_metodo = fotoResult.metodo
-  console.log('[MARA] Foto perfil MARA:', JSON.stringify(resultados.foto))
-
-  // 2. Salvar estado persistente na VPS
+  // Salvar estado persistente na VPS
   await salvarEstadoVPS({
     modo_ausente: true,
     motivo,
@@ -124,26 +118,19 @@ async function ativarModoAusente(motivo) {
     nome_original: 'Dr. Mauro Monção',
   })
 
-  return resultados
+  return {}
 }
 
 // ── Desativar modo ausente ────────────────────────────────
+// Foto NÃO muda — Dr. Mauro permanece no perfil
 async function desativarModoAusente(estadoAtual) {
-  const resultados = {}
-
-  // 1. Restaurar foto original do Dr. Mauro
-  const fotoResult = await trocarFotoPerfil(MAURO_FOTO_URL, 'Dr. Mauro')
-  resultados.foto = fotoResult.resultado
-  resultados.foto_metodo = fotoResult.metodo
-  console.log('[MARA] Foto perfil Dr. Mauro:', JSON.stringify(resultados.foto))
-
-  // 2. Calcular resumo
+  // Calcular resumo
   const inicio = estadoAtual?.inicio ? new Date(estadoAtual.inicio) : null
   const minutosAusente = inicio
     ? Math.round((Date.now() - inicio.getTime()) / 60000)
     : 0
 
-  // 3. Salvar estado desativado na VPS
+  // Salvar estado desativado na VPS
   await salvarEstadoVPS({
     modo_ausente: false,
     motivo: null,
@@ -151,7 +138,7 @@ async function desativarModoAusente(estadoAtual) {
     nome_original: 'Dr. Mauro Monção',
   })
 
-  return { resultados, minutosAusente }
+  return { minutosAusente }
 }
 
 // ── Handler principal ─────────────────────────────────────
@@ -164,12 +151,11 @@ export default async function handler(req, res) {
   // ── GET: Status (lê da VPS) ───────────────────────────────
   if (req.method === 'GET') {
     const estado = await lerEstadoVPS()
-    // Se VPS falhou (null), retorna estado desconhecido sem sobrescrever nada
     if (estado === null) {
       return res.json({
         ok: false,
         erro: 'vps_indisponivel',
-        modo_ausente: null,        // null = desconhecido, não false
+        modo_ausente: null,
         motivo: null,
         inicio_ausente: null,
         instancia_configurada: !!(MARA_INSTANCE_ID && MARA_TOKEN),
@@ -197,6 +183,19 @@ export default async function handler(req, res) {
     const action = body?.action || ''
     const numero = DR_MAURO_NUMERO.replace(/\D/g, '')
 
+    // ── Definir foto do Dr. Mauro (ação manual, quando necessário) ─
+    if (action === 'definir_foto') {
+      const fotoResult = await definirFotoPerfilDrMauro()
+      return res.json({
+        ok: fotoResult.metodo !== 'falhou',
+        mensagem: fotoResult.metodo !== 'falhou'
+          ? '✅ Foto do Dr. Mauro Monção definida no perfil.'
+          : '⚠️ Não foi possível definir a foto.',
+        metodo: fotoResult.metodo,
+        resultado: fotoResult.resultado,
+      })
+    }
+
     // ── Ativar ───────────────────────────────────────────────
     if (action === 'ausente' || action === 'ativar') {
       const estadoAtual = await lerEstadoVPS()
@@ -205,7 +204,7 @@ export default async function handler(req, res) {
       }
 
       const motivo = body?.motivo || 'ausente'
-      const resultado = await ativarModoAusente(motivo)
+      await ativarModoAusente(motivo)
 
       // Notificar Dr. Mauro no WhatsApp
       if (numero) {
@@ -222,7 +221,6 @@ export default async function handler(req, res) {
       return res.json({
         ok: true,
         mensagem: '✅ Modo AUSENTE ativado! MARA está respondendo.',
-        foto_resultado: resultado.foto,
         inicio: new Date().toISOString(),
       })
     }
@@ -230,7 +228,6 @@ export default async function handler(req, res) {
     // ── Desativar ────────────────────────────────────────────
     if (action === 'presente' || action === 'desativar') {
       const estadoAtual = await lerEstadoVPS()
-      // Se VPS falhou, permite desativar mesmo assim (force)
       if (estadoAtual !== null && !estadoAtual.modo_ausente) {
         return res.json({ ok: true, mensagem: '⚠️ Modo PRESENTE já estava ativo.' })
       }
@@ -257,7 +254,7 @@ export default async function handler(req, res) {
 
     return res.status(400).json({
       error: 'Action inválida',
-      actions_validas: ['ausente', 'presente'],
+      actions_validas: ['ausente', 'presente', 'definir_foto'],
     })
   }
 

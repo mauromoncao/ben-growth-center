@@ -1465,8 +1465,8 @@ export default function MaraIA() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {[
-                    { cmd: '/ausente',  desc: 'MARA assume o número do Dr. Mauro',          efeito: 'Troca perfil WhatsApp → MARA responde por você' },
-                    { cmd: '/presente', desc: 'Restaura perfil original do Dr. Mauro',       efeito: 'Perfil restaurado + resumo das conversas recebidas' },
+                    { cmd: '/ausente',  desc: 'MARA assume o número do Dr. Mauro',          efeito: 'Ativa modo ausente → MARA responde por você (foto Dr. Mauro permanece)' },
+                    { cmd: '/presente', desc: 'Desativa modo ausente do Dr. Mauro',          efeito: 'MARA para de responder + resumo das conversas recebidas' },
                     { cmd: '/leads',    desc: 'Lista leads captados hoje',                    efeito: 'Mostra nome, telefone e área de cada lead' },
                     { cmd: '/urgentes', desc: 'Lista casos marcados como urgentes/críticos',  efeito: 'Filtra leads com urgência high ou critical' },
                     { cmd: '/resumo',   desc: 'Relatório executivo do dia',                   efeito: 'Total leads, urgentes, status dos sistemas' },
