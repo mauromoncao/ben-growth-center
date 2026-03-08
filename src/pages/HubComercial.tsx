@@ -194,10 +194,10 @@ export default function HubComercial() {
           </div>
           <div className="space-y-2">
             {[
-              { nome: 'Lex Conteúdo', icone: '📝', status: 'active', ultima: 'Hoje 07:00', modelo: 'Gemini 2.5 Pro' },
+              { nome: 'Lex Conteúdo', icone: '📝', status: 'active', ultima: 'Hoje 07:00', modelo: 'GPT-4o' },
               { nome: 'Lex Campanhas', icone: '🎯', status: 'active', ultima: 'Hoje 08:47', modelo: 'GPT-5' },
               { nome: 'Lex Marketing', icone: '📱', status: 'active', ultima: 'Hoje 07:05', modelo: 'Claude Opus' },
-              { nome: 'Lex Monitor', icone: '🔔', status: 'active', ultima: 'Hoje 14:22', modelo: 'Gemini Flash' },
+              { nome: 'Lex Monitor', icone: '🔔', status: 'active', ultima: 'Hoje 14:22', modelo: 'GPT-4o Mini' },
             ].map(ag => (
               <div key={ag.nome} className="flex items-center justify-between p-3 rounded-xl" style={{background:"#F9FAFB",border:"1px solid #F3F4F6"}}>
                 <div className="flex items-center gap-3">

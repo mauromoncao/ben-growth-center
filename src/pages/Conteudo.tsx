@@ -22,7 +22,7 @@ export default function Conteudo() {
     await new Promise(r => setTimeout(r, 2000))
     setGeneratedPreview(`# Como a Defesa Administrativa Pode Salvar Sua Empresa do Fisco
 
-**Área:** Direito Tributário | **Gerado por:** Lex Conteúdo (Gemini 2.5 Pro)
+**Área:** Direito Tributário | **Gerado por:** BEN Conteudista (GPT-4o)
 
 Muitos empresários desconhecem que, antes de recorrer ao Judiciário, existe uma fase administrativa extremamente eficaz para questionar autuações fiscais.
 

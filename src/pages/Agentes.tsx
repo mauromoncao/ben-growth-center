@@ -13,12 +13,11 @@ import { getStatusColor, getStatusLabel } from '../lib/utils'
 
 // ─── Modelos disponíveis para seleção ────────────────────────
 const MODELOS_DISPONIVEIS = [
-  { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', badge: 'bg-[#e8edf7] text-[#0f2044]',    custo: 'Gratuito',        forca: 'Velocidade' },
-  { value: 'gemini-2.5-pro',   label: 'Gemini 2.5 Pro',   badge: 'bg-indigo-100 text-indigo-700', custo: 'R$ 0,10/1M tok', forca: 'Contexto longo' },
-  { value: 'gpt-5',            label: 'GPT-5',             badge: 'bg-green-100 text-green-700',   custo: 'Genspark ✅',      forca: 'Criatividade' },
-  { value: 'claude-opus-4',    label: 'Claude Opus 4',     badge: 'bg-orange-100 text-orange-700', custo: 'Genspark ✅',      forca: 'Escrita longa' },
-  { value: 'genspark-agent',   label: 'Genspark Agent',    badge: 'bg-amber-100 text-amber-700',   custo: 'Créditos ✅',      forca: 'Deep Research' },
-  { value: 'flux-2-pro',       label: 'Flux 2 Pro',        badge: 'bg-pink-100 text-pink-700',     custo: 'Créditos ✅',      forca: 'Imagens ads' },
+  { value: 'gpt-4o-mini',      label: 'GPT-4o Mini',      badge: 'bg-emerald-100 text-emerald-700', custo: 'R$ 0,15/1M tok', forca: 'Velocidade' },
+  { value: 'gpt-4o',          label: 'GPT-4o',            badge: 'bg-green-100 text-green-700',    custo: 'R$ 2,50/1M tok', forca: 'Copywriting' },
+  { value: 'claude-haiku-4-5',label: 'Claude Haiku 4.5',  badge: 'bg-orange-100 text-orange-700',  custo: 'R$ 0,80/1M tok', forca: 'Jurídico' },
+  { value: 'claude-sonnet',   label: 'Claude Sonnet 4.5', badge: 'bg-yellow-100 text-yellow-700',  custo: 'R$ 3,00/1M tok', forca: 'Complexo' },
+  { value: 'dall-e-3',        label: 'DALL-E 3',          badge: 'bg-pink-100 text-pink-700',      custo: 'R$ 0,10/img',    forca: 'Imagens ads' },
 ]
 
 // ─── Card de Agente ──────────────────────────────────────────
@@ -213,7 +212,7 @@ export default function Agentes() {
       'ben-estrategista-campanhas': `✅ Análise concluída:\n• Pausou keyword "advogado gratuito" (CTR 0.2% — abaixo do mínimo 1%)\n• Aumentou lance +15% em "recuperação tributária piauí" (conv. 5.2%)\n• Sugestão: criar campanha Display para Previdenciário (oportunidade baixa concorrência)\n• CPL médio hoje: R$ 38.40 ✅`,
       'ben-estrategista-marketing': `✅ 3 posts criados e agendados:\n• Instagram Reels (18:00): "3 sinais que sua empresa paga imposto a mais"\n• Facebook (20:00): Artigo sobre recuperação tributária\n• LinkedIn (12:00): "Tributário em 2026: O que mudou para empresas"\n🔍 Filtro OAB: APROVADO ✅`,
       'ben-analista-monitoramento': `🟢 Sistema saudável:\n• Todos os sites: HTTP 200 ✅\n• Dr. Ben: respondendo < 1s ✅\n• CPL Google: R$ 42 (dentro da meta) ✅\n• Leads hoje: 7 ✅\n• 1 lead aguardando > 15min ⚠️ (José Alves — notificação enviada)`,
-      'ben-atendente': `✅ Dr. Ben operacional:\n• 12 conversas hoje\n• 4 leads qualificados (score ≥ 70)\n• 2 repassados para plantonista\n• Tempo médio de qualificação: 4.2 min\n• Modelo ativo: Gemini 2.5 Flash ⚡`,
+      'ben-atendente': `✅ BEN Atendente operacional:\n• 12 conversas hoje\n• 4 leads qualificados (score ≥ 70)\n• 2 repassados para plantonista\n• Tempo médio de qualificação: 4.2 min\n• Modelo ativo: GPT-4o Mini ⚡`,
       'ben-analista-relatorios': `📊 Relatório semanal gerado:\n• 89 leads | 17 conversões | R$ 34.800 receita\n• ROAS médio: 4.8x ✅\n• Melhor campanha: Retargeting Meta (ROAS 8.2x)\n• PDF gerado e enviado via WhatsApp ✅`,
     }
 
@@ -251,8 +250,8 @@ export default function Agentes() {
         </h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-            { modelo: 'Gemini 2.5 Flash', agentes: ['Dr. Ben', 'Lex Monitor'], cor: 'bg-[#0f2044]/30 border-[#2d4a8a]/40', desc: 'Velocidade · 24/7' },
-            { modelo: 'Gemini 2.5 Pro',   agentes: ['Lex Conteúdo', 'Lex Relatório'], cor: 'bg-indigo-500/30 border-indigo-400/40', desc: 'Contexto longo' },
+            { modelo: 'GPT-4o Mini',   agentes: ['BEN Atendente', 'BEN Monitor'],    cor: 'bg-emerald-500/30 border-emerald-400/40', desc: 'Velocidade · 24/7' },
+            { modelo: 'GPT-4o',       agentes: ['BEN Campanhas', 'BEN Marketing'],  cor: 'bg-green-500/30 border-green-400/40',   desc: 'Copywriting · Ads' },
             { modelo: 'GPT-5',            agentes: ['Lex Campanhas', 'Lex Marketing'], cor: 'bg-green-500/30 border-green-400/40', desc: 'via Genspark ✅' },
             { modelo: 'Claude Opus 4',    agentes: ['Lex Petições', 'Lex Jurídico'], cor: 'bg-orange-500/30 border-orange-400/40', desc: 'via Genspark ✅' },
           ].map(item => (

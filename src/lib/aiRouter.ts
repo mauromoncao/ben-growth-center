@@ -4,14 +4,13 @@
 // ============================================================
 
 export type AIModel =
-  | 'gemini-2.5-flash'    // Dr. Ben + Lex Monitor: chat rápido, gratuito
-  | 'gemini-2.5-pro'      // Lex Conteúdo + Lex Relatório: contexto longo
-  | 'gpt-4o'              // Lex Campanhas + Lex Marketing: melhor copywriting
-  | 'gpt-4o-mini'         // Fallback OpenAI econômico
-  | 'claude-haiku-3-5'    // Lex Jurídico + Lex Petições: textos jurídicos
+  | 'gpt-4o-mini'         // BEN Atendente + BEN Monitor: velocidade 24/7
+  | 'gpt-4o'              // BEN Campanhas + BEN Marketing: melhor copywriting
+  | 'claude-haiku-4-5'    // BEN Relatorios + BEN Revisor + BEN Peticionista
+  | 'claude-haiku-3-5'    // Fallback Claude
   | 'perplexity'          // Pesquisa jurídica em tempo real STJ/STF
   | 'elevenlabs'          // Dr. Ben voz — ElevenLabs clonada
-  | 'dall-e-3'            // Lex Criativo: imagens para anúncios
+  | 'dall-e-3'            // BEN Criativo: imagens para anúncios
 
 export type AgentID =
   | 'ben-atendente'
@@ -68,8 +67,8 @@ export const AGENTS: Record<AgentID, AgentConfig> = {
     nome: 'BEN Atendente Jurídico',
     emoji: '🤖',
     descricao: 'BEN Atendente Jurídico — Qualificação de leads e triagem inteligente via chat e WhatsApp. Opera 24/7.',
-    modelo: 'gemini-2.5-flash',
-    modeloFallback: 'gpt-4o-mini',
+    modelo: 'gpt-4o-mini',
+    modeloFallback: 'gpt-4o',
     temperatura: 0.7,
     maxTokens: 800,
     area: 'crm',
@@ -106,8 +105,8 @@ ESTILO: Mensagens curtas (máx. 3 linhas), empático, sem juridiquês.`,
     nome: 'BEN Conteudista Jurídico',
     emoji: '📝',
     descricao: 'BEN Conteudista Jurídico — Gera artigos de blog SEO-otimizados, newsletters e conteúdo jurídico orgânico diariamente.',
-    modelo: 'gemini-2.5-pro',
-    modeloFallback: 'gpt-4o',
+    modelo: 'gpt-4o',
+    modeloFallback: 'claude-haiku-4-5',
     temperatura: 0.6,
     maxTokens: 2500,
     area: 'marketing',
@@ -147,7 +146,7 @@ TAMANHO: 1.000 a 1.500 palavras.`,
     emoji: '🎯',
     descricao: 'Otimiza campanhas no Google Ads e Meta Ads. Ajusta lances, pausa keywords ruins e escala o que converte.',
     modelo: 'gpt-4o',
-    modeloFallback: 'gemini-2.5-pro',
+    modeloFallback: 'gpt-4o-mini',
     temperatura: 0.3,
     maxTokens: 1200,
     area: 'marketing',
@@ -190,7 +189,7 @@ LINGUAGEM: Objetiva, baseada em dados, sem rodeios.`,
     emoji: '📱',
     descricao: 'Cria posts para Instagram, Facebook, LinkedIn e copies para anúncios pagos.',
     modelo: 'gpt-4o',
-    modeloFallback: 'gemini-2.5-flash',
+    modeloFallback: 'gpt-4o-mini',
     temperatura: 0.8,
     maxTokens: 1500,
     area: 'marketing',
@@ -234,7 +233,7 @@ NUNCA incluir: Valores de honorários, promessa de resultado, comparações`,
     nome: 'BEN Analista de Relatórios',
     emoji: '📊',
     descricao: 'Gera relatórios semanais de performance com análise profunda e recomendações estratégicas.',
-    modelo: 'gemini-2.5-pro',
+    modelo: 'claude-haiku-4-5',
     modeloFallback: 'gpt-4o',
     temperatura: 0.2,
     maxTokens: 3000,
@@ -319,8 +318,8 @@ FORMATO: Prompt em inglês para geração de imagem + script em português para 
     nome: 'BEN Analista de Monitoramento',
     emoji: '🔔',
     descricao: 'Monitora KPIs 24/7 e dispara alertas quando métricas saem do padrão esperado.',
-    modelo: 'gemini-2.5-flash',
-    modeloFallback: 'gpt-4o-mini',
+    modelo: 'gpt-4o-mini',
+    modeloFallback: 'gpt-4o',
     temperatura: 0.1,
     maxTokens: 400,
     area: 'sistema',
@@ -365,8 +364,8 @@ LINGUAGEM: Ultra-concisa. Máximo 2 linhas por alerta.`,
     nome: 'BEN Revisor Jurídico',
     emoji: '⚖️',
     descricao: 'Analisa casos recebidos no CRM, sugere estratégia e estima chances de êxito. (Fase 2)',
-    modelo: 'claude-haiku-3-5',
-    modeloFallback: 'gemini-2.5-pro',
+    modelo: 'claude-haiku-4-5',
+    modeloFallback: 'gpt-4o',
     temperatura: 0.2,
     maxTokens: 2000,
     area: 'juridico',
@@ -402,8 +401,8 @@ Sempre finalizar com: "Análise preliminar — sujeita à revisão do Dr. Mauro 
     nome: 'BEN Peticionista',
     emoji: '📄',
     descricao: 'Gera minutas de petições, recursos e peças processuais. (Fase 2)',
-    modelo: 'claude-haiku-3-5',
-    modeloFallback: 'gemini-2.5-pro',
+    modelo: 'claude-haiku-4-5',
+    modeloFallback: 'gpt-4o',
     temperatura: 0.15,
     maxTokens: 4000,
     area: 'juridico',
@@ -458,38 +457,35 @@ export function getActiveAgents(): AgentConfig[] {
 
 export function getModelLabel(model: AIModel): string {
   const labels: Record<AIModel, string> = {
-    'gemini-2.5-flash': 'Gemini 2.5 Flash',
-    'gemini-2.5-pro':   'Gemini 2.5 Pro',
     'gpt-4o':           'GPT-4o (OpenAI)',
     'gpt-4o-mini':      'GPT-4o Mini (OpenAI)',
+    'claude-haiku-4-5': 'Claude Haiku 4.5 (Anthropic)',
     'claude-haiku-3-5': 'Claude Haiku 3.5 (Anthropic)',
     'perplexity':       'Perplexity Sonar (Tempo Real)',
     'elevenlabs':       'ElevenLabs (Voz Clonada)',
     'dall-e-3':         'DALL-E 3 (OpenAI Imagens)',
   }
-  return labels[model]
+  return labels[model] || model
 }
 
 export function getModelColor(model: AIModel): string {
   const colors: Record<AIModel, string> = {
-    'gemini-2.5-flash': 'bg-blue-100 text-blue-700',
-    'gemini-2.5-pro':   'bg-indigo-100 text-indigo-700',
     'gpt-4o':           'bg-green-100 text-green-700',
     'gpt-4o-mini':      'bg-emerald-100 text-emerald-700',
+    'claude-haiku-4-5': 'bg-orange-100 text-orange-700',
     'claude-haiku-3-5': 'bg-orange-100 text-orange-700',
     'perplexity':       'bg-purple-100 text-purple-700',
     'elevenlabs':       'bg-pink-100 text-pink-700',
     'dall-e-3':         'bg-amber-100 text-amber-700',
   }
-  return colors[model]
+  return colors[model] || 'bg-gray-100 text-gray-700'
 }
 
 // ─── Mapa de custo por token (referência) ────────────────────
 export const MODEL_COST_INFO: Record<AIModel, string> = {
-  'gemini-2.5-flash': 'R$ 0,00 — gratuito até 1M req/dia',
-  'gemini-2.5-pro':   'R$ 0,10 por 1M tokens input',
   'gpt-4o':           'R$ 2,50 por 1M tokens (OpenAI)',
   'gpt-4o-mini':      'R$ 0,15 por 1M tokens (OpenAI)',
+  'claude-haiku-4-5': 'R$ 0,80 por 1M tokens (Anthropic)',
   'claude-haiku-3-5': 'R$ 0,80 por 1M tokens (Anthropic)',
   'perplexity':       'R$ 5,00/mês (Perplexity API)',
   'elevenlabs':       'Incluso no plano Pro (ElevenLabs)',

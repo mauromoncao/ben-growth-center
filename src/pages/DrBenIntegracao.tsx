@@ -112,7 +112,7 @@ export default function DrBenIntegracao() {
               <h2 className="font-semibold text-gray-900">Dr. Ben — Chat ao Vivo</h2>
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                <span className="text-green-600 text-xs">Online · Gemini 2.5 Flash</span>
+                <span className="text-green-600 text-xs">Online · GPT-4o Mini</span>
               </div>
             </div>
             {alertaRepasse && (

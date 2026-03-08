@@ -680,7 +680,7 @@ export default function FlowBuilder() {
               <h3 className="font-bold text-white mb-4">💰 Custo Zero — Como é Possível?</h3>
               <div className="space-y-3">
                 {[
-                  { icone: '🤖', titulo: 'Dr. Ben é o motor', desc: 'A IA já está no projeto. O fluxo usa Gemini Flash (gratuito até 1M req/dia) para qualificar leads.' },
+                  { icone: '🤖', titulo: 'Dr. Ben é o motor', desc: 'A IA já está no projeto. O fluxo usa GPT-4o Mini (velocidade 24/7) para qualificar leads.' },
                   { icone: '📡', titulo: 'API oficial do WhatsApp', desc: 'A Meta oferece a API de WhatsApp Business gratuitamente. Você paga apenas por conversas iniciadas pelo negócio (conversas de serviço são grátis).' },
                   { icone: '⚡', titulo: 'Serverless na Vercel', desc: 'A API /api/flow/whatsapp roda como função serverless. No plano gratuito da Vercel: 100k execuções/mês — mais do que suficiente.' },
                   { icone: '🔧', titulo: 'Sem intermediário', desc: 'ManyChat cobra por ser intermediário. Removendo ele, você vai direto: WhatsApp → Ben Growth Center → CRM.' },

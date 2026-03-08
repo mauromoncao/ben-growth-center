@@ -57,9 +57,9 @@ const configSections = [
   },
   {
     title: '🤖 Inteligência Artificial — Stack Enterprise',
-    description: 'Gemini · OpenAI GPT-4o · Claude Haiku · Perplexity — cada agente usa o modelo ideal.',
+    description: 'OpenAI GPT-4o · Claude Haiku 4.5 · Perplexity — cada agente usa o modelo ideal. — cada agente usa o modelo ideal.',
     fields: [
-      { key: 'GEMINI_API_KEY',     label: 'Gemini API Key (Google)',        placeholder: 'AIza...',       type: 'password', status: 'configured', hint: 'Dr. Ben + Lex Monitor + Lex Relatório + Lex Conteúdo — aistudio.google.com ✅' },
+      { key: 'OPENAI_API_KEY', label: 'OpenAI API Key', placeholder: 'sk-...', type: 'password', status: 'configured', hint: 'GPT-4o + GPT-4o Mini — todos os agentes Growth' },
       { key: 'OPENAI_API_KEY',     label: 'OpenAI API Key (GPT-4o)',        placeholder: 'sk-...',        type: 'password', status: 'pending',    hint: 'Lex Campanhas + Lex Marketing + Lex Criativo — platform.openai.com' },
       { key: 'ANTHROPIC_API_KEY',  label: 'Anthropic API Key (Claude)',     placeholder: 'sk-ant-...',    type: 'password', status: 'pending',    hint: 'Lex Jurídico + Lex Petições — console.anthropic.com' },
       { key: 'PERPLEXITY_API_KEY', label: 'Perplexity API Key',             placeholder: 'pplx-...',      type: 'password', status: 'pending',    hint: 'Pesquisa jurisprudência STJ/STF em tempo real — perplexity.ai/api' },
@@ -351,7 +351,7 @@ GOOGLE_ADS_REFRESH_TOKEN=
 # ZapSign ✅ já configurado
 ZAPSIGN_TOKEN=426e787a-3446-4341-bbd2-2b88e544ad39
 
-# IA ✅ Gemini já configurado
+# IA ✅ Stack GPT-4o + Claude Haiku configurado
 GEMINI_API_KEY=
 GENSPARK_API_KEY=
 
