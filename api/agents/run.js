@@ -1,7 +1,7 @@
 // ============================================================
-// BEN GROWTH CENTER — LEX OS Agents API v3.0 ENTERPRISE
-// Stack: Gemini 2.5 · OpenAI GPT-4o · Claude Haiku · Perplexity
-//        ElevenLabs Voice · Pinecone Memory · Resend Email
+// BEN GROWTH CENTER — LEX OS Agents API v4.0
+// Stack: OpenAI GPT-4o · Claude Haiku 4.5 · Perplexity
+//        Pinecone Memory (OpenAI embeddings)
 // Rota: POST /api/agents/run
 // ============================================================
 
@@ -9,21 +9,19 @@ export const config = { maxDuration: 60 }
 
 // ─── Roteamento de modelos ────────────────────────────────────
 const MODEL_ENDPOINTS = {
-  'gemini-2.5-flash': 'gemini',
-  'gemini-2.5-pro':   'gemini',
   'gpt-4o':           'openai',
   'gpt-4o-mini':      'openai',
-  'claude-haiku-3-5': 'claude',
-  'claude-sonnet-4':  'claude',
+  'claude-haiku':     'claude',
+  'claude-sonnet':    'claude',
   'perplexity':       'perplexity',
 }
 
-// ─── Configuração dos Agentes — Stack Enterprise ──────────────
+// ─── Configuração dos Agentes ─────────────────────────────────
 const AGENT_PROMPTS = {
 
-  // ── Dr. Ben — Gemini Flash (velocidade 24/7) ─────────────────
+  // ── Dr. Ben — GPT-4o-mini (velocidade 24/7) ──────────────────
   'dr-ben': {
-    model: 'gemini-2.5-flash',
+    model: 'gpt-4o-mini',
     system: `Você é o Dr. Ben, assistente jurídico digital do escritório Mauro Monção Advogados em Teresina, Piauí.
 Especialidades: Direito Tributário, Previdenciário e Bancário.
 
@@ -52,9 +50,9 @@ ESTILO: Mensagens curtas (máx. 3 linhas), empático, sem juridiquês.`,
     maxTokens: 500,
   },
 
-  // ── Lex Conteúdo — Gemini Pro (contexto longo + SEO) ─────────
+  // ── Lex Conteúdo — GPT-4o (SEO + contexto longo) ─────────────
   'lex-conteudo': {
-    model: 'gemini-2.5-pro',
+    model: 'gpt-4o',
     system: `Você é o Lex Conteúdo, especialista em marketing de conteúdo jurídico.
 Escritório Mauro Monção — Teresina/PI — Tributário, Previdenciário, Bancário.
 
@@ -82,7 +80,7 @@ TAMANHO: 1.000 a 1.500 palavras.`,
     maxTokens: 3000,
   },
 
-  // ── Lex Campanhas — GPT-4o (melhor para dados + otimização) ──
+  // ── Lex Campanhas — GPT-4o (dados + otimização) ──────────────
   'lex-campanhas': {
     model: 'gpt-4o',
     system: `Você é o Lex Campanhas, especialista em tráfego pago jurídico.
@@ -111,7 +109,7 @@ FORMATO: Lista numerada de ações com impacto estimado. Linguagem objetiva, bas
     maxTokens: 1200,
   },
 
-  // ── Lex Marketing — GPT-4o (melhor copywriting) ──────────────
+  // ── Lex Marketing — GPT-4o (copywriting redes sociais) ───────
   'lex-marketing': {
     model: 'gpt-4o',
     system: `Você é o Lex Marketing, especialista em marketing jurídico para redes sociais.
@@ -137,9 +135,9 @@ SEMPRE incluir CTA suave: "Saiba mais", "Consulte", "Entre em contato".`,
     maxTokens: 1500,
   },
 
-  // ── Lex Relatório — Gemini Pro (análise longa + estrutura) ────
+  // ── Lex Relatório — Claude Haiku (análise estruturada) ───────
   'lex-relatorio': {
-    model: 'gemini-2.5-pro',
+    model: 'claude-haiku',
     system: `Você é o Lex Relatório, analista de performance do escritório Mauro Monção.
 
 MISSÃO: Gerar relatório semanal completo com análise honesta e recomendações acionáveis.
@@ -182,9 +180,9 @@ FORMATO: Prompt em inglês para imagem + script em português para vídeo.`,
     maxTokens: 1000,
   },
 
-  // ── Lex Monitor — Gemini Flash (velocidade + alertas) ────────
+  // ── Lex Monitor — GPT-4o-mini (velocidade + alertas) ─────────
   'lex-monitor': {
-    model: 'gemini-2.5-flash',
+    model: 'gpt-4o-mini',
     system: `Você é o Lex Monitor, sistema de vigilância de KPIs do escritório Mauro Monção.
 
 MISSÃO: Monitorar métricas e gerar alertas curtos e acionáveis.
@@ -201,7 +199,7 @@ FORMATO: emoji + situação + número + ação sugerida. Máximo 2 linhas por al
 
   // ── Lex Jurídico — Claude Haiku (preciso + jurídico) ─────────
   'lex-juridico': {
-    model: 'claude-haiku-3-5',
+    model: 'claude-haiku',
     system: `Você é o Lex Jurídico, assistente de análise jurídica especializado.
 Escritório Mauro Monção — Teresina/PI.
 Especialidades: Direito Tributário (ICMS, PIS/COFINS, IRPJ), Previdenciário, Bancário.
@@ -224,7 +222,7 @@ FINALIZAR SEMPRE COM: "Análise preliminar — sujeita à revisão do Dr. Mauro 
 
   // ── Lex Petições — Claude Haiku (redação jurídica formal) ────
   'lex-peticoes': {
-    model: 'claude-haiku-3-5',
+    model: 'claude-haiku',
     system: `Você é o Lex Petições, especialista em redação jurídica processual.
 Escritório Mauro Monção — Teresina/PI.
 
@@ -249,39 +247,14 @@ FINALIZAR: "MINUTA — Revisão obrigatória pelo Dr. Mauro Monção (OAB/PI)"`,
 }
 
 // ════════════════════════════════════════════════════════════
-// ─── CALL FUNCTIONS — Cada provider com fallback ─────────────
+// ─── CALL FUNCTIONS ──────────────────────────────────────────
 // ════════════════════════════════════════════════════════════
 
-// ── Gemini ──────────────────────────────────────────────────
-async function callGemini(model, systemPrompt, userMessage, temperature, maxTokens) {
-  const apiKey = process.env.GEMINI_API_KEY
-  if (!apiKey) throw new Error('GEMINI_API_KEY não configurada')
-
-  const modelName = model === 'gemini-2.5-flash'
-    ? 'gemini-2.0-flash-exp'
-    : 'gemini-2.5-pro-exp-03-25'
-
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: 'user', parts: [{ text: userMessage }] }],
-        generationConfig: { temperature, maxOutputTokens: maxTokens },
-      }),
-    }
-  )
-  if (!res.ok) throw new Error(`Gemini error: ${await res.text()}`)
-  const data = await res.json()
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sem resposta'
-}
-
-// ── OpenAI GPT-4o ────────────────────────────────────────────
 async function callOpenAI(model, systemPrompt, userMessage, temperature, maxTokens) {
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) throw new Error('OPENAI_API_KEY não configurada')
+
+  const modelName = model === 'gpt-4o-mini' ? 'gpt-4o-mini' : 'gpt-4o'
 
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -290,7 +263,7 @@ async function callOpenAI(model, systemPrompt, userMessage, temperature, maxToke
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: model === 'gpt-4o' ? 'gpt-4o' : 'gpt-4o-mini',
+      model: modelName,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userMessage },
@@ -299,13 +272,12 @@ async function callOpenAI(model, systemPrompt, userMessage, temperature, maxToke
       max_tokens: maxTokens,
     }),
   })
-  if (!res.ok) throw new Error(`OpenAI error: ${await res.text()}`)
+  if (!res.ok) throw new Error(`OpenAI error ${res.status}: ${await res.text()}`)
   const data = await res.json()
   return data.choices?.[0]?.message?.content || 'Sem resposta'
 }
 
-// ── Anthropic Claude Haiku ───────────────────────────────────
-async function callClaude(model, systemPrompt, userMessage, temperature, maxTokens) {
+async function callClaude(systemPrompt, userMessage, temperature, maxTokens) {
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY não configurada')
 
@@ -324,12 +296,11 @@ async function callClaude(model, systemPrompt, userMessage, temperature, maxToke
       max_tokens: maxTokens,
     }),
   })
-  if (!res.ok) throw new Error(`Claude error: ${await res.text()}`)
+  if (!res.ok) throw new Error(`Claude error ${res.status}: ${await res.text()}`)
   const data = await res.json()
   return data.content?.[0]?.text || 'Sem resposta'
 }
 
-// ── Perplexity — Pesquisa jurídica em tempo real ─────────────
 async function callPerplexity(systemPrompt, userMessage) {
   const apiKey = process.env.PERPLEXITY_API_KEY
   if (!apiKey) throw new Error('PERPLEXITY_API_KEY não configurada')
@@ -351,107 +322,91 @@ async function callPerplexity(systemPrompt, userMessage) {
       return_citations: true,
     }),
   })
-  if (!res.ok) throw new Error(`Perplexity error: ${await res.text()}`)
+  if (!res.ok) throw new Error(`Perplexity error ${res.status}: ${await res.text()}`)
   const data = await res.json()
   return data.choices?.[0]?.message?.content || 'Sem resposta'
 }
 
-// ── Pinecone — Buscar memória do cliente ─────────────────────
+// ── Pinecone — embeddings via OpenAI ─────────────────────────
+async function getEmbedding(text) {
+  const apiKey = process.env.OPENAI_API_KEY
+  if (!apiKey) return null
+  try {
+    const res = await fetch('https://api.openai.com/v1/embeddings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({ model: 'text-embedding-3-small', input: text }),
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    return data.data?.[0]?.embedding || null
+  } catch { return null }
+}
+
 async function searchMemory(clientId, query) {
   const apiKey = process.env.PINECONE_API_KEY
   const indexHost = process.env.PINECONE_INDEX_HOST
   if (!apiKey || !indexHost) return null
-
   try {
-    // Gerar embedding com Gemini
-    const embKey = process.env.GEMINI_API_KEY
-    const embRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${embKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: { parts: [{ text: query }] } }),
-      }
-    )
-    if (!embRes.ok) return null
-    const embData = await embRes.json()
-    const vector = embData.embedding?.values
-
-    // Buscar no Pinecone
-    const queryRes = await fetch(`${indexHost}/query`, {
+    const vector = await getEmbedding(query)
+    if (!vector) return null
+    const res = await fetch(`${indexHost}/query`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Api-Key': apiKey,
-      },
-      body: JSON.stringify({
-        vector,
-        topK: 5,
-        includeMetadata: true,
-        filter: { clientId: { '$eq': clientId } },
-      }),
+      headers: { 'Content-Type': 'application/json', 'Api-Key': apiKey },
+      body: JSON.stringify({ vector, topK: 5, includeMetadata: true, filter: { clientId: { '$eq': clientId } } }),
     })
-    if (!queryRes.ok) return null
-    const queryData = await queryRes.json()
-    return queryData.matches?.map(m => m.metadata?.text).join('\n') || null
-  } catch {
-    return null
-  }
+    if (!res.ok) return null
+    const data = await res.json()
+    return data.matches?.map(m => m.metadata?.text).join('\n') || null
+  } catch { return null }
 }
 
-// ── Pinecone — Salvar memória ────────────────────────────────
 async function saveMemory(clientId, text, metadata = {}) {
   const apiKey = process.env.PINECONE_API_KEY
   const indexHost = process.env.PINECONE_INDEX_HOST
   if (!apiKey || !indexHost) return
-
   try {
-    const embKey = process.env.GEMINI_API_KEY
-    const embRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${embKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: { parts: [{ text }] } }),
-      }
-    )
-    if (!embRes.ok) return
-    const embData = await embRes.json()
-    const vector = embData.embedding?.values
-
+    const vector = await getEmbedding(text)
+    if (!vector) return
     await fetch(`${indexHost}/vectors/upsert`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Api-Key': apiKey },
       body: JSON.stringify({
-        vectors: [{
-          id: `mem-${clientId}-${Date.now()}`,
-          values: vector,
-          metadata: { clientId, text, ...metadata, timestamp: new Date().toISOString() },
-        }],
+        vectors: [{ id: `mem-${clientId}-${Date.now()}`, values: vector, metadata: { clientId, text, ...metadata, timestamp: new Date().toISOString() } }],
       }),
     })
-  } catch (e) {
-    console.error('Pinecone save error:', e)
-  }
+  } catch (e) { console.error('Pinecone save error:', e.message) }
 }
 
-// ── Fallback inteligente — tenta modelos em cascata ──────────
+// ── Fallback: primário → Claude → GPT-4o-mini ────────────────
 async function callWithFallback(agentConfig, enrichedInput) {
   const { model, system, temperature, maxTokens } = agentConfig
-  const endpoint = MODEL_ENDPOINTS[model]
+  const endpoint = MODEL_ENDPOINTS[model] || 'openai'
 
-  const attempts = [
-    { fn: () => {
-        if (endpoint === 'gemini') return callGemini(model, system, enrichedInput, temperature, maxTokens)
-        if (endpoint === 'openai') return callOpenAI(model, system, enrichedInput, temperature, maxTokens)
-        if (endpoint === 'claude') return callClaude(model, system, enrichedInput, temperature, maxTokens)
-        if (endpoint === 'perplexity') return callPerplexity(system, enrichedInput)
-      }, label: model },
-    // Fallback 1: Gemini Flash (sempre disponível se key configurada)
-    { fn: () => callGemini('gemini-2.5-flash', system, enrichedInput, temperature, Math.min(maxTokens, 1000)), label: 'gemini-fallback' },
-  ]
+  const chain = []
 
-  for (const attempt of attempts) {
+  // Tentativa primária baseada no modelo configurado
+  if (endpoint === 'openai') {
+    chain.push({ fn: () => callOpenAI(model, system, enrichedInput, temperature, maxTokens), label: model })
+  } else if (endpoint === 'claude') {
+    chain.push({ fn: () => callClaude(system, enrichedInput, temperature, maxTokens), label: 'claude-haiku-4-5' })
+  } else if (endpoint === 'perplexity') {
+    chain.push({ fn: () => callPerplexity(system, enrichedInput), label: 'perplexity' })
+  }
+
+  // Fallback 1: Claude Haiku (se primário não foi Claude)
+  if (endpoint !== 'claude') {
+    chain.push({ fn: () => callClaude(system, enrichedInput, temperature, Math.min(maxTokens, 2000)), label: 'claude-fallback' })
+  }
+
+  // Fallback 2: GPT-4o-mini (sempre disponível)
+  if (endpoint !== 'openai') {
+    chain.push({ fn: () => callOpenAI('gpt-4o-mini', system, enrichedInput, temperature, Math.min(maxTokens, 1000)), label: 'gpt-4o-mini-fallback' })
+  } else if (model !== 'gpt-4o-mini') {
+    chain.push({ fn: () => callOpenAI('gpt-4o-mini', system, enrichedInput, temperature, Math.min(maxTokens, 1000)), label: 'gpt-4o-mini-fallback' })
+  }
+
+  for (const attempt of chain) {
     try {
       const result = await attempt.fn()
       if (result) return { output: result, modelUsed: attempt.label }
@@ -459,7 +414,7 @@ async function callWithFallback(agentConfig, enrichedInput) {
       console.warn(`[Lex OS] Falha em ${attempt.label}:`, err.message)
     }
   }
-  throw new Error('Todos os modelos falharam. Verifique as API Keys no Vercel.')
+  throw new Error('Todos os modelos falharam. Verifique OPENAI_API_KEY e ANTHROPIC_API_KEY no Vercel.')
 }
 
 // ════════════════════════════════════════════════════════════
@@ -549,4 +504,3 @@ export default async function handler(req, res) {
     })
   }
 }
-// 20260308052732
