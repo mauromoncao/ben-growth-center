@@ -5,6 +5,10 @@
   "installCommand": "npm install",
   "rewrites": [
     {
+      "source": "/api/diag",
+      "destination": "/api/diag.js"
+    },
+    {
       "source": "/api/zapsign",
       "destination": "/api/zapsign.js"
     },
