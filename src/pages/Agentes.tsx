@@ -209,12 +209,12 @@ export default function Agentes() {
     await new Promise(r => setTimeout(r, 3000))
 
     const outputs: Partial<Record<AgentID, string>> = {
-      'lex-conteudo': `✅ Artigo gerado: "Como Recuperar Créditos de PIS/COFINS no Piauí em 2026"\n📊 SEO: 1.247 palavras | Keywords: "recuperação PIS COFINS Piauí" (880 vol)\n📅 Publicação agendada: amanhã 08:00 no blog`,
-      'lex-campanhas': `✅ Análise concluída:\n• Pausou keyword "advogado gratuito" (CTR 0.2% — abaixo do mínimo 1%)\n• Aumentou lance +15% em "recuperação tributária piauí" (conv. 5.2%)\n• Sugestão: criar campanha Display para Previdenciário (oportunidade baixa concorrência)\n• CPL médio hoje: R$ 38.40 ✅`,
-      'lex-marketing': `✅ 3 posts criados e agendados:\n• Instagram Reels (18:00): "3 sinais que sua empresa paga imposto a mais"\n• Facebook (20:00): Artigo sobre recuperação tributária\n• LinkedIn (12:00): "Tributário em 2026: O que mudou para empresas"\n🔍 Filtro OAB: APROVADO ✅`,
-      'lex-monitor': `🟢 Sistema saudável:\n• Todos os sites: HTTP 200 ✅\n• Dr. Ben: respondendo < 1s ✅\n• CPL Google: R$ 42 (dentro da meta) ✅\n• Leads hoje: 7 ✅\n• 1 lead aguardando > 15min ⚠️ (José Alves — notificação enviada)`,
-      'dr-ben': `✅ Dr. Ben operacional:\n• 12 conversas hoje\n• 4 leads qualificados (score ≥ 70)\n• 2 repassados para plantonista\n• Tempo médio de qualificação: 4.2 min\n• Modelo ativo: Gemini 2.5 Flash ⚡`,
-      'lex-relatorio': `📊 Relatório semanal gerado:\n• 89 leads | 17 conversões | R$ 34.800 receita\n• ROAS médio: 4.8x ✅\n• Melhor campanha: Retargeting Meta (ROAS 8.2x)\n• PDF gerado e enviado via WhatsApp ✅`,
+      'ben-conteudista': `✅ Artigo gerado: "Como Recuperar Créditos de PIS/COFINS no Piauí em 2026"\n📊 SEO: 1.247 palavras | Keywords: "recuperação PIS COFINS Piauí" (880 vol)\n📅 Publicação agendada: amanhã 08:00 no blog`,
+      'ben-estrategista-campanhas': `✅ Análise concluída:\n• Pausou keyword "advogado gratuito" (CTR 0.2% — abaixo do mínimo 1%)\n• Aumentou lance +15% em "recuperação tributária piauí" (conv. 5.2%)\n• Sugestão: criar campanha Display para Previdenciário (oportunidade baixa concorrência)\n• CPL médio hoje: R$ 38.40 ✅`,
+      'ben-estrategista-marketing': `✅ 3 posts criados e agendados:\n• Instagram Reels (18:00): "3 sinais que sua empresa paga imposto a mais"\n• Facebook (20:00): Artigo sobre recuperação tributária\n• LinkedIn (12:00): "Tributário em 2026: O que mudou para empresas"\n🔍 Filtro OAB: APROVADO ✅`,
+      'ben-analista-monitoramento': `🟢 Sistema saudável:\n• Todos os sites: HTTP 200 ✅\n• Dr. Ben: respondendo < 1s ✅\n• CPL Google: R$ 42 (dentro da meta) ✅\n• Leads hoje: 7 ✅\n• 1 lead aguardando > 15min ⚠️ (José Alves — notificação enviada)`,
+      'ben-atendente': `✅ Dr. Ben operacional:\n• 12 conversas hoje\n• 4 leads qualificados (score ≥ 70)\n• 2 repassados para plantonista\n• Tempo médio de qualificação: 4.2 min\n• Modelo ativo: Gemini 2.5 Flash ⚡`,
+      'ben-analista-relatorios': `📊 Relatório semanal gerado:\n• 89 leads | 17 conversões | R$ 34.800 receita\n• ROAS médio: 4.8x ✅\n• Melhor campanha: Retargeting Meta (ROAS 8.2x)\n• PDF gerado e enviado via WhatsApp ✅`,
     }
 
     const agent = AGENTS[id]

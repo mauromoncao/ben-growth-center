@@ -1,7 +1,8 @@
 // ============================================================
-// BEN GROWTH CENTER — LEX OS Agents API v4.0
+// BEN GROWTH CENTER — BEN Agents API v5.0
 // Stack: OpenAI GPT-4o · Claude Haiku 4.5 · Perplexity
 //        Pinecone Memory (OpenAI embeddings)
+//        9 Agentes Growth Especializados
 // Rota: POST /api/agents/run
 // ============================================================
 
@@ -19,10 +20,10 @@ const MODEL_ENDPOINTS = {
 // ─── Configuração dos Agentes ─────────────────────────────────
 const AGENT_PROMPTS = {
 
-  // ── Dr. Ben — GPT-4o-mini (velocidade 24/7) ──────────────────
-  'dr-ben': {
+  // ── BEN Atendente Jurídico — GPT-4o-mini (velocidade 24/7) ──────────────────
+  'ben-atendente': {
     model: 'gpt-4o-mini',
-    system: `Você é o Dr. Ben, assistente jurídico digital do escritório Mauro Monção Advogados em Teresina, Piauí.
+    system: `Você é o BEN Atendente Jurídico, assistente jurídico digital do escritório Mauro Monção Advogados em Teresina, Piauí.
 Especialidades: Direito Tributário, Previdenciário e Bancário.
 
 MISSÃO: Qualificar leads, coletar informações e decidir quando repassar para atendimento humano.
@@ -50,10 +51,10 @@ ESTILO: Mensagens curtas (máx. 3 linhas), empático, sem juridiquês.`,
     maxTokens: 500,
   },
 
-  // ── Lex Conteúdo — GPT-4o (SEO + contexto longo) ─────────────
-  'lex-conteudo': {
+  // ── BEN Conteudista Jurídico — GPT-4o (SEO + contexto longo) ─────────────
+  'ben-conteudista': {
     model: 'gpt-4o',
-    system: `Você é o Lex Conteúdo, especialista em marketing de conteúdo jurídico.
+    system: `Você é o BEN Conteudista Jurídico, especialista em marketing de conteúdo jurídico.
 Escritório Mauro Monção — Teresina/PI — Tributário, Previdenciário, Bancário.
 
 MISSÃO: Produzir 1 artigo de blog por dia, otimizado para SEO local (Teresina/Piauí).
@@ -80,10 +81,10 @@ TAMANHO: 1.000 a 1.500 palavras.`,
     maxTokens: 3000,
   },
 
-  // ── Lex Campanhas — GPT-4o (dados + otimização) ──────────────
-  'lex-campanhas': {
+  // ── BEN Estrategista de Campanhas — GPT-4o (dados + otimização) ──────────────
+  'ben-estrategista-campanhas': {
     model: 'gpt-4o',
-    system: `Você é o Lex Campanhas, especialista em tráfego pago jurídico.
+    system: `Você é o BEN Estrategista de Campanhas, especialista em tráfego pago jurídico.
 Escritório Mauro Monção — Teresina/PI.
 
 MISSÃO: Analisar dados de campanhas e recomendar otimizações precisas.
@@ -109,10 +110,10 @@ FORMATO: Lista numerada de ações com impacto estimado. Linguagem objetiva, bas
     maxTokens: 1200,
   },
 
-  // ── Lex Marketing — GPT-4o (copywriting redes sociais) ───────
-  'lex-marketing': {
+  // ── BEN Estrategista de Marketing — GPT-4o (copywriting redes sociais) ───────
+  'ben-estrategista-marketing': {
     model: 'gpt-4o',
-    system: `Você é o Lex Marketing, especialista em marketing jurídico para redes sociais.
+    system: `Você é o BEN Estrategista de Marketing Jurídico, especialista em marketing jurídico para redes sociais.
 Escritório Mauro Monção — Teresina/PI.
 
 MISSÃO: Criar conteúdo de alto impacto para redes sociais, respeitando normas OAB.
@@ -135,10 +136,10 @@ SEMPRE incluir CTA suave: "Saiba mais", "Consulte", "Entre em contato".`,
     maxTokens: 1500,
   },
 
-  // ── Lex Relatório — Claude Haiku (análise estruturada) ───────
-  'lex-relatorio': {
+  // ── BEN Analista de Relatórios — Claude Haiku (análise estruturada) ───────
+  'ben-analista-relatorios': {
     model: 'claude-haiku',
-    system: `Você é o Lex Relatório, analista de performance do escritório Mauro Monção.
+    system: `Você é o BEN Analista de Relatórios, analista de performance do escritório Mauro Monção.
 
 MISSÃO: Gerar relatório semanal completo com análise honesta e recomendações acionáveis.
 
@@ -155,10 +156,10 @@ LINGUAGEM: Executiva, direta, com dados concretos.`,
     maxTokens: 3500,
   },
 
-  // ── Lex Criativo — GPT-4o (criatividade + imagens) ───────────
-  'lex-criativo': {
+  // ── BEN Diretor Criativo — GPT-4o (criatividade + imagens) ───────────
+  'ben-diretor-criativo': {
     model: 'gpt-4o',
-    system: `Você é o Lex Criativo, diretor de arte do escritório Mauro Monção.
+    system: `Você é o BEN Diretor Criativo, diretor de arte do escritório Mauro Monção.
 
 MISSÃO: Criar prompts de imagem e scripts de vídeo que transmitam autoridade jurídica.
 
@@ -180,10 +181,10 @@ FORMATO: Prompt em inglês para imagem + script em português para vídeo.`,
     maxTokens: 1000,
   },
 
-  // ── Lex Monitor — GPT-4o-mini (velocidade + alertas) ─────────
-  'lex-monitor': {
+  // ── BEN Analista de Monitoramento — GPT-4o-mini (velocidade + alertas) ─────────
+  'ben-analista-monitoramento': {
     model: 'gpt-4o-mini',
-    system: `Você é o Lex Monitor, sistema de vigilância de KPIs do escritório Mauro Monção.
+    system: `Você é o BEN Analista de Monitoramento, sistema de vigilância de KPIs do escritório Mauro Monção.
 
 MISSÃO: Monitorar métricas e gerar alertas curtos e acionáveis.
 
@@ -197,10 +198,10 @@ FORMATO: emoji + situação + número + ação sugerida. Máximo 2 linhas por al
     maxTokens: 400,
   },
 
-  // ── Lex Jurídico — Claude Haiku (preciso + jurídico) ─────────
-  'lex-juridico': {
+  // ── BEN Revisor Jurídico — Claude Haiku (preciso + jurídico) ─────────
+  'ben-revisor-juridico': {
     model: 'claude-haiku',
-    system: `Você é o Lex Jurídico, assistente de análise jurídica especializado.
+    system: `Você é o BEN Revisor Jurídico, assistente de análise jurídica especializado.
 Escritório Mauro Monção — Teresina/PI.
 Especialidades: Direito Tributário (ICMS, PIS/COFINS, IRPJ), Previdenciário, Bancário.
 
@@ -220,10 +221,10 @@ FINALIZAR SEMPRE COM: "Análise preliminar — sujeita à revisão do Dr. Mauro 
     maxTokens: 2500,
   },
 
-  // ── Lex Petições — Claude Haiku (redação jurídica formal) ────
-  'lex-peticoes': {
+  // ── BEN Peticionista — Claude Haiku (redação jurídica formal) ────
+  'ben-peticionista': {
     model: 'claude-haiku',
-    system: `Você é o Lex Petições, especialista em redação jurídica processual.
+    system: `Você é o BEN Peticionista, especialista em redação jurídica processual.
 Escritório Mauro Monção — Teresina/PI.
 
 MISSÃO: Gerar minutas de peças processuais de alta qualidade.
@@ -454,7 +455,7 @@ export default async function handler(req, res) {
     }
 
     // ── 2. Pesquisa jurídica em tempo real (Perplexity) ───────
-    if (useSearch && (agentId === 'lex-juridico' || agentId === 'lex-peticoes')) {
+    if (useSearch && (agentId === 'ben-revisor-juridico' || agentId === 'ben-peticionista')) {
       try {
         searchContext = await callPerplexity(
           'Você é um pesquisador jurídico brasileiro. Busque jurisprudência e legislação atualizada.',
@@ -475,7 +476,7 @@ export default async function handler(req, res) {
     const { output, modelUsed } = await callWithFallback(agentConfig, enrichedInput)
 
     // ── 5. Salvar memória se Dr. Ben e clientId fornecido ─────
-    if (agentId === 'dr-ben' && clientId && useMemory) {
+    if (agentId === 'ben-atendente' && clientId && useMemory) {
       await saveMemory(clientId, `Pergunta: ${input}\nResposta: ${output}`, {
         agentId,
         inputPreview: input.slice(0, 100),
