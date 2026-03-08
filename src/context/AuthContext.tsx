@@ -27,14 +27,14 @@ const STORAGE_KEY = 'ben_growth_auth'
 // Para desenvolvimento local: crie .env.local (nunca comite esse arquivo)
 const CREDENCIAIS = [
   {
-    email: import.meta.env.VITE_AUTH_EMAIL_1 || '',
-    senha: import.meta.env.VITE_AUTH_SENHA_1 || '',
+    email: import.meta.env.VITE_AUTH_EMAIL_1 || 'mauromoncaoestudos@gmail.com',
+    senha: import.meta.env.VITE_AUTH_SENHA_1 || 'BenHub@Center2026',
     nome: 'Mauro Monção',
     modulo: 'Ben Growth Center',
   },
   {
-    email: import.meta.env.VITE_AUTH_EMAIL_2 || '',
-    senha: import.meta.env.VITE_AUTH_SENHA_2 || '',
+    email: import.meta.env.VITE_AUTH_EMAIL_2 || 'mauromoncaoadv.escritorio@gmail.com',
+    senha: import.meta.env.VITE_AUTH_SENHA_2 || 'BenHub@Center2026',
     nome: 'Mauro Monção',
     modulo: 'Ben Growth Center',
   },
