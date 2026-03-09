@@ -327,13 +327,13 @@ function TopBar() {
 // ─── Layout ────────────────────────────────────────────────────
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex" style={{ background: '#F7F9FC', minHeight: '100vh' }}>
+    <div className="flex" style={{ background: '#F7F9FC', minHeight: '100vh', overflowX: 'hidden' }}>
       <Sidebar />
       {/* Conteúdo principal deslocado pela sidebar (w-56 = 224px) */}
-      <div className="flex-1" style={{ marginLeft: '224px' }}>
+      <div className="flex-1 min-w-0" style={{ marginLeft: '224px' }}>
         <TopBar />
         <main className="pt-14 min-h-screen" style={{ background: '#F7F9FC' }}>
-          <div className="p-6">{children}</div>
+          <div className="p-6 max-w-full">{children}</div>
         </main>
       </div>
     </div>
