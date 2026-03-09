@@ -153,10 +153,6 @@
       "destination": "/api/cron/agenda-alertas.js"
     },
     {
-      "source": "/api/debug-foto",
-      "destination": "/api/debug-foto.js"
-    },
-    {
       "source": "/api/:path*",
       "destination": "/api/index.js"
     },
