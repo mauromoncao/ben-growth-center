@@ -26,7 +26,7 @@ export default function LoginPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0f2044 50%, #0a1628 100%)' }}
+      style={{ background: 'linear-gradient(135deg, #0f2044 0%, #19385C 50%, #0f2044 100%)' }}
     >
       {/* Efeito de brilho central */}
       <div
@@ -43,12 +43,12 @@ export default function LoginPage() {
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl"
             style={{
-              background: 'linear-gradient(135deg, #1e3470, #0f2044)',
-              border: '1px solid rgba(212,160,23,0.45)',
-              boxShadow: '0 0 32px rgba(212,160,23,0.2)',
+              background: 'linear-gradient(135deg, #19385C, #0f2044)',
+              border: '1px solid rgba(222,192,120,0.45)',
+              boxShadow: '0 0 32px rgba(222,192,120,0.2)',
             }}
           >
-            <TrendingUp size={28} style={{ color: '#D4A017' }} />
+            <TrendingUp size={28} style={{ color: '#DEC078' }} />
           </div>
           <h1
             className="text-2xl font-bold text-white mb-1"
@@ -147,8 +147,8 @@ export default function LoginPage() {
               style={{
                 background: carregando
                   ? 'rgba(212,160,23,0.5)'
-                  : 'linear-gradient(135deg, #D4A017, #F0C040, #C8960E)',
-                color: '#0f2044',
+                  : 'linear-gradient(135deg, #C8A052, #DEC078, #F0D090)',
+                color: '#19385C',
                 boxShadow: carregando ? 'none' : '0 0 20px rgba(212,160,23,0.35)',
               }}
             >

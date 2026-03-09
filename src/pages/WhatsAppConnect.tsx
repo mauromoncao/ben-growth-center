@@ -81,7 +81,7 @@ export default function WhatsAppConnect() {
       {/* ── Header ─────────────────────────────────────────── */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#0f2044]">Dr. Ben — Assistente Jurídico</h1>
+          <h1 className="text-2xl font-bold text-[#19385C]">Dr. Ben — Assistente Jurídico</h1>
           <p className="text-gray-500 text-sm mt-1">
             Número ativo: <strong>(86) 9482-0054</strong> — Dr. Ben atende clientes 24/7 via WhatsApp
           </p>
@@ -107,8 +107,8 @@ export default function WhatsAppConnect() {
         {/* ── Card Status Z-API ──────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-[#0f2044] flex items-center gap-2">
-              <Zap size={20} className="text-[#D4A017]" />
+            <h2 className="text-lg font-bold text-[#19385C] flex items-center gap-2">
+              <Zap size={20} className="text-[#DEC078]" />
               Status da Conexão
             </h2>
             <button
@@ -142,7 +142,7 @@ export default function WhatsAppConnect() {
                 </div>
                 <div className="bg-[#f0f3fa] rounded-xl p-3 text-center">
                   <p className="text-xs text-gray-500">IA</p>
-                  <p className="font-bold text-[#0f2044] text-sm">GPT-4o-mini</p>
+                  <p className="font-bold text-[#19385C] text-sm">GPT-4o-mini</p>
                 </div>
                 <div className="bg-purple-50 rounded-xl p-3 text-center">
                   <p className="text-xs text-gray-500">Sessão ativa</p>
@@ -159,7 +159,7 @@ export default function WhatsAppConnect() {
           {/* Verificando */}
           {status === 'checking' && (
             <div className="text-center py-10 space-y-4">
-              <Loader size={64} className="mx-auto text-[#D4A017] animate-spin" />
+              <Loader size={64} className="mx-auto text-[#DEC078] animate-spin" />
               <p className="text-gray-500">Verificando conexão Z-API...</p>
             </div>
           )}
@@ -178,7 +178,7 @@ export default function WhatsAppConnect() {
                 href="https://app.z-api.io"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#0f2044] text-white font-semibold hover:bg-[#1a3060] transition text-sm"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#19385C] text-white font-semibold hover:bg-[#0f2044] transition text-sm"
               >
                 <Zap size={16} />
                 Acessar Z-API
@@ -189,8 +189,8 @@ export default function WhatsAppConnect() {
 
         {/* ── Card Como funciona ─────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
-          <h2 className="text-lg font-bold text-[#0f2044] flex items-center gap-2">
-            <MessageSquare size={20} className="text-[#D4A017]" />
+          <h2 className="text-lg font-bold text-[#19385C] flex items-center gap-2">
+            <MessageSquare size={20} className="text-[#DEC078]" />
             Como funciona
           </h2>
 
@@ -204,7 +204,7 @@ export default function WhatsAppConnect() {
               <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50">
                 <span className="text-2xl">{item.icon}</span>
                 <div>
-                  <p className="font-semibold text-[#0f2044] text-sm">{item.title}</p>
+                  <p className="font-semibold text-[#19385C] text-sm">{item.title}</p>
                   <p className="text-gray-500 text-xs">{item.desc}</p>
                 </div>
               </div>
@@ -221,8 +221,8 @@ export default function WhatsAppConnect() {
 
           {/* Keepalive info */}
           <div className="flex items-start gap-2 p-3 rounded-xl bg-[#f0f3fa] border border-[#c5d0e8]">
-            <Clock size={16} className="text-[#0f2044] mt-0.5 shrink-0" />
-            <p className="text-xs text-[#0f2044]">
+            <Clock size={16} className="text-[#19385C] mt-0.5 shrink-0" />
+            <p className="text-xs text-[#19385C]">
               Monitoramento automático a cada <strong>5 minutos</strong> — se desconectar, Dr. Mauro é avisado imediatamente.
             </p>
           </div>

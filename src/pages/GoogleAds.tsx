@@ -17,7 +17,7 @@ import {
 
 // ─── KPI Card ────────────────────────────────────────────────
 function KPICard({
-  label, value, sub, icon: Icon, trend, color = '#D4A017'
+  label, value, sub, icon: Icon, trend, color = '#DEC078'
 }: {
   label: string; value: string; sub?: string
   icon: React.ElementType; trend?: number; color?: string
@@ -129,7 +129,7 @@ function PendingCredentials({ account }: { account: string }) {
       {/* Ícone central */}
       <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-5"
         style={{ background: 'linear-gradient(135deg, rgba(212,160,23,0.15), rgba(212,160,23,0.08))', border: '2px solid rgba(212,160,23,0.30)' }}>
-        <Zap size={36} style={{ color: '#D4A017' }} />
+        <Zap size={36} style={{ color: '#DEC078' }} />
       </div>
 
       <h3 className="text-white text-xl font-bold font-sans mb-2">Google Ads — Aguardando Configuração</h3>
@@ -263,7 +263,7 @@ export default function GoogleAds() {
               className="appearance-none font-sans text-sm text-white pl-3 pr-8 py-2 rounded-xl cursor-pointer"
               style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
               {Object.entries(GOOGLE_ADS_ACCOUNTS).map(([key, val]) => (
-                <option key={key} value={key} style={{ background: '#0f2044' }}>
+                <option key={key} value={key} style={{ background: '#19385C' }}>
                   {val.label} ({val.id.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3')})
                 </option>
               ))}
@@ -278,7 +278,7 @@ export default function GoogleAds() {
               <button key={d} onClick={() => setDays(d)}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium font-sans transition-all"
                 style={days === d
-                  ? { background: '#D4A017', color: '#0f2044', fontWeight: 700 }
+                  ? { background: '#DEC078', color: '#19385C', fontWeight: 700 }
                   : { color: 'rgba(159,176,215,0.80)' }}>
                 {d}d
               </button>
@@ -325,7 +325,7 @@ export default function GoogleAds() {
           ) : insights ? (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <KPICard label="Total Investido" value={fmtR(insights.gasto)}
-                sub={`${days} dias`} icon={DollarSign} color="#D4A017" />
+                sub={`${days} dias`} icon={DollarSign} color="#DEC078" />
               <KPICard label="Cliques" value={fmtN(insights.cliques)}
                 sub={`CTR: ${fmtP(insights.ctr)}`} icon={MousePointerClick} color="#3b82f6" />
               <KPICard label="Impressões" value={fmtN(insights.impressoes)}
@@ -346,7 +346,7 @@ export default function GoogleAds() {
               <button key={t.id} onClick={() => setTab(t.id)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium font-sans transition-all"
                 style={tab === t.id
-                  ? { background: '#D4A017', color: '#0f2044', fontWeight: 700 }
+                  ? { background: '#DEC078', color: '#19385C', fontWeight: 700 }
                   : { color: 'rgba(159,176,215,0.80)' }}>
                 <t.icon size={14} />
                 {t.label}
@@ -403,8 +403,8 @@ export default function GoogleAds() {
                     <AreaChart data={diario}>
                       <defs>
                         <linearGradient id="gastoGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#D4A017" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#D4A017" stopOpacity={0} />
+                          <stop offset="5%" stopColor="#DEC078" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#DEC078" stopOpacity={0} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
@@ -416,7 +416,7 @@ export default function GoogleAds() {
                         contentStyle={{ background: '#0a1628', border: '1px solid rgba(212,160,23,0.30)', borderRadius: 8 }}
                         labelStyle={{ color: '#fff' }}
                         formatter={(v: number) => [fmtR(v), 'Gasto']} />
-                      <Area type="monotone" dataKey="gasto" stroke="#D4A017" fill="url(#gastoGrad)" strokeWidth={2} />
+                      <Area type="monotone" dataKey="gasto" stroke="#DEC078" fill="url(#gastoGrad)" strokeWidth={2} />
                     </AreaChart>
                   </ResponsiveContainer>
                 )}
@@ -465,7 +465,7 @@ export default function GoogleAds() {
                     border: `1px solid ${account === key ? 'rgba(212,160,23,0.35)' : 'rgba(255,255,255,0.08)'}`,
                   }}>
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                    style={{ background: account === key ? '#D4A017' : 'rgba(255,255,255,0.08)', color: account === key ? '#0f2044' : 'rgba(159,176,215,0.70)' }}>
+                    style={{ background: account === key ? '#DEC078' : 'rgba(255,255,255,0.08)', color: account === key ? '#19385C' : 'rgba(159,176,215,0.70)' }}>
                     <Users size={14} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -474,7 +474,7 @@ export default function GoogleAds() {
                       {val.id.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3')}
                     </p>
                   </div>
-                  <ArrowUpRight size={14} style={{ color: account === key ? '#D4A017' : 'rgba(159,176,215,0.40)' }} />
+                  <ArrowUpRight size={14} style={{ color: account === key ? '#DEC078' : 'rgba(159,176,215,0.40)' }} />
                 </button>
               ))}
             </div>

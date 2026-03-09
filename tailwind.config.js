@@ -7,31 +7,32 @@ export default {
   theme: {
     extend: {
       colors: {
-        // ── Paleta Principal Ben Growth Center ────────────────────────
+        // ── Paleta Institucional BEN ───────────────────────────────────
         primary: {
-          DEFAULT: '#0f2044',
+          DEFAULT: '#19385C',
           50:  '#e8edf7',
           100: '#c5d0e8',
           200: '#9fb0d7',
           300: '#7890c6',
           400: '#5b78ba',
           500: '#3e60ae',
-          600: '#3858a6',
-          700: '#2f4d9c',
-          800: '#274292',
+          600: '#2d4f8a',
+          700: '#1e3870',
+          800: '#19385C',
           900: '#0f2044',
         },
         navy: {
-          DEFAULT: '#0f2044',
-          deep:    '#07182e',
+          DEFAULT: '#19385C',
+          deep:    '#0f2044',
           mid:     '#1e3470',
           light:   '#2d4a8a',
         },
         gold: {
-          DEFAULT: '#D4A017',
-          light:   '#F0C040',
-          dark:    '#C8960E',
+          DEFAULT: '#DEC078',
+          light:   '#F0D090',
+          dark:    '#C8A052',
         },
+        // ── Semânticos ────────────────────────────────────────────────
         growth: {
           DEFAULT: '#00b37e',
           50:  '#e6f9f3',
@@ -48,8 +49,18 @@ export default {
         cyan:    '#0891b2',
       },
       fontFamily: {
-        sans:  ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
-        serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+        sans:  ['Inter', 'system-ui', 'sans-serif'],
+        serif: ['Inter', 'Georgia', 'serif'],
+        mono:  ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+      },
+      fontSize: {
+        // Base legível 18px conforme padrão institucional
+        'base': ['18px', { lineHeight: '1.6' }],
+        'sm':   ['0.875rem', { lineHeight: '1.5' }],
+        'xs':   ['0.75rem',  { lineHeight: '1.4' }],
+      },
+      lineHeight: {
+        'reading': '1.6',
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',

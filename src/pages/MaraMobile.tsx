@@ -56,9 +56,9 @@ function BannerInstalacao({ onInstalar, onFechar, textoBtn = '⬇️ Instalar Ag
 }) {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[100] p-3 animate-slide-up">
-      <div className="bg-gradient-to-r from-[#0f2044] to-[#1a3a6e] rounded-2xl p-4 shadow-2xl border border-[#D4A017]/40 mx-auto max-w-md">
+      <div className="bg-gradient-to-r from-[#19385C] to-[#1a3a6e] rounded-2xl p-4 shadow-2xl border border-[#DEC078]/40 mx-auto max-w-md">
         <div className="flex items-center gap-3 mb-3">
-          <img src={MARA_AVATAR} alt="MARA" className="w-14 h-14 rounded-2xl border-2 border-[#D4A017] object-cover shrink-0" />
+          <img src={MARA_AVATAR} alt="MARA" className="w-14 h-14 rounded-2xl border-2 border-[#DEC078] object-cover shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="text-white font-bold text-base">📲 Instalar MARA IA</p>
             <p className="text-white/70 text-xs mt-0.5">
@@ -71,7 +71,7 @@ function BannerInstalacao({ onInstalar, onFechar, textoBtn = '⬇️ Instalar Ag
         <div className="flex gap-2">
           <button
             onClick={onInstalar}
-            className="flex-1 bg-[#D4A017] text-white font-bold py-3 rounded-xl text-sm active:scale-95 transition"
+            className="flex-1 bg-[#DEC078] text-white font-bold py-3 rounded-xl text-sm active:scale-95 transition"
           >
             {textoBtn}
           </button>
@@ -96,9 +96,9 @@ function GuiaAndroid({ onFechar }: { onFechar: () => void }) {
       <div className="bg-white rounded-3xl p-6 w-full max-w-md mb-2 animate-slide-up">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <img src={MARA_AVATAR} alt="MARA" className="w-12 h-12 rounded-2xl border-2 border-[#D4A017] object-cover" />
+            <img src={MARA_AVATAR} alt="MARA" className="w-12 h-12 rounded-2xl border-2 border-[#DEC078] object-cover" />
             <div>
-              <p className="font-bold text-[#0f2044]">Instalar MARA IA</p>
+              <p className="font-bold text-[#19385C]">Instalar MARA IA</p>
               <p className="text-xs text-gray-400">Android (Chrome)</p>
             </div>
           </div>
@@ -107,8 +107,8 @@ function GuiaAndroid({ onFechar }: { onFechar: () => void }) {
 
         <div className="space-y-3">
           {[
-            { n: 1, icon: '⋮', txt: 'Toque no menu do Chrome', sub: 'Três pontos no canto superior direito da tela', color: '#0f2044' },
-            { n: 2, icon: '➕', txt: 'Toque em "Adicionar à tela inicial"', sub: 'Role a lista de opções para encontrar esta opção', color: '#0f2044' },
+            { n: 1, icon: '⋮', txt: 'Toque no menu do Chrome', sub: 'Três pontos no canto superior direito da tela', color: '#19385C' },
+            { n: 2, icon: '➕', txt: 'Toque em "Adicionar à tela inicial"', sub: 'Role a lista de opções para encontrar esta opção', color: '#19385C' },
             { n: 3, icon: '✅', txt: 'Confirme tocando em "Adicionar"', sub: 'O ícone da MARA aparece na sua tela inicial', color: '#22c55e' },
           ].map(s => (
             <div key={s.n} className="flex items-start gap-3">
@@ -117,7 +117,7 @@ function GuiaAndroid({ onFechar }: { onFechar: () => void }) {
                 {s.n}
               </div>
               <div>
-                <p className="font-semibold text-sm text-[#0f2044]">{s.icon} {s.txt}</p>
+                <p className="font-semibold text-sm text-[#19385C]">{s.icon} {s.txt}</p>
                 <p className="text-xs text-gray-400 mt-0.5">{s.sub}</p>
               </div>
             </div>
@@ -138,7 +138,7 @@ function GuiaAndroid({ onFechar }: { onFechar: () => void }) {
 
         <button
           onClick={onFechar}
-          className="mt-4 w-full bg-[#0f2044] text-white font-bold py-3 rounded-xl text-sm active:scale-95"
+          className="mt-4 w-full bg-[#19385C] text-white font-bold py-3 rounded-xl text-sm active:scale-95"
         >
           Entendi, vou instalar!
         </button>
@@ -156,9 +156,9 @@ function GuiaIOS({ onFechar }: { onFechar: () => void }) {
       <div className="bg-white rounded-3xl p-6 w-full max-w-md mb-2 animate-slide-up">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <img src={MARA_AVATAR} alt="MARA" className="w-12 h-12 rounded-2xl border-2 border-[#D4A017] object-cover" />
+            <img src={MARA_AVATAR} alt="MARA" className="w-12 h-12 rounded-2xl border-2 border-[#DEC078] object-cover" />
             <div>
-              <p className="font-bold text-[#0f2044]">Instalar MARA IA</p>
+              <p className="font-bold text-[#19385C]">Instalar MARA IA</p>
               <p className="text-xs text-gray-400">iPhone / iPad (Safari)</p>
             </div>
           </div>
@@ -172,11 +172,11 @@ function GuiaIOS({ onFechar }: { onFechar: () => void }) {
             { n: 3, icon: '✅', txt: 'Toque em "Adicionar"', sub: 'O ícone da MARA aparece na sua tela inicial' },
           ].map(s => (
             <div key={s.n} className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-[#0f2044] rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0">
+              <div className="w-8 h-8 bg-[#19385C] rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0">
                 {s.n}
               </div>
               <div>
-                <p className="font-semibold text-sm text-[#0f2044]">{s.icon} {s.txt}</p>
+                <p className="font-semibold text-sm text-[#19385C]">{s.icon} {s.txt}</p>
                 <p className="text-xs text-gray-400 mt-0.5">{s.sub}</p>
               </div>
             </div>
@@ -191,7 +191,7 @@ function GuiaIOS({ onFechar }: { onFechar: () => void }) {
 
         <button
           onClick={onFechar}
-          className="mt-4 w-full bg-[#0f2044] text-white font-bold py-3 rounded-xl text-sm active:scale-95"
+          className="mt-4 w-full bg-[#19385C] text-white font-bold py-3 rounded-xl text-sm active:scale-95"
         >
           Entendi, vou instalar!
         </button>
@@ -228,13 +228,13 @@ function PinScreen({ onSuccess, onMostrarInstall }: {
   const apagar = () => setPin(p => p.slice(0, -1))
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f2044] via-[#1a3a6e] to-[#0f2044] flex flex-col items-center justify-between px-6 py-10">
+    <div className="min-h-screen bg-gradient-to-br from-[#19385C] via-[#1a3a6e] to-[#19385C] flex flex-col items-center justify-between px-6 py-10">
       <div /> {/* spacer */}
 
       {/* Avatar + nome */}
       <div className="text-center">
         <div className="relative inline-block mb-6">
-          <div className="w-28 h-28 rounded-3xl border-4 border-[#D4A017] shadow-2xl overflow-hidden mx-auto bg-[#0f2044]">
+          <div className="w-28 h-28 rounded-3xl border-4 border-[#DEC078] shadow-2xl overflow-hidden mx-auto bg-[#19385C]">
             <img
               src={MARA_AVATAR}
               alt="MARA IA"
@@ -245,20 +245,20 @@ function PinScreen({ onSuccess, onMostrarInstall }: {
               }}
             />
           </div>
-          <span className="absolute -bottom-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-bold border-2 border-[#0f2044] animate-pulse">
+          <span className="absolute -bottom-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-bold border-2 border-[#19385C] animate-pulse">
             ON
           </span>
         </div>
 
         <h1 className="text-white text-3xl font-bold tracking-tight">MARA IA</h1>
-        <p className="text-[#D4A017] text-sm font-medium mt-1">Secretária Executiva · Dr. Mauro Monção</p>
+        <p className="text-[#DEC078] text-sm font-medium mt-1">Secretária Executiva · Dr. Mauro Monção</p>
 
         {/* Dots do PIN */}
         <div className={`flex justify-center gap-5 mt-10 mb-4 ${shake ? 'animate-bounce' : ''}`}>
           {[0, 1, 2, 3].map(i => (
             <div key={i} className={`w-5 h-5 rounded-full border-2 transition-all duration-200 ${
               i < pin.length
-                ? erro ? 'bg-red-400 border-red-400 scale-110' : 'bg-[#D4A017] border-[#D4A017] scale-110'
+                ? erro ? 'bg-red-400 border-red-400 scale-110' : 'bg-[#DEC078] border-[#DEC078] scale-110'
                 : 'border-white/30 bg-transparent'
             }`} />
           ))}
@@ -280,7 +280,7 @@ function PinScreen({ onSuccess, onMostrarInstall }: {
                   ? 'invisible'
                   : d === '⌫'
                   ? 'bg-white/10 border border-white/20 hover:bg-white/20'
-                  : 'bg-white/10 border border-white/20 hover:bg-[#D4A017]/40 hover:border-[#D4A017]/60'
+                  : 'bg-white/10 border border-white/20 hover:bg-[#DEC078]/40 hover:border-[#DEC078]/60'
               }`}
             >
               {d}
@@ -575,27 +575,27 @@ export default function MaraMobile() {
 
       {/* Toast feedback */}
       {feedback && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-[#0f2044] text-white px-5 py-3 rounded-2xl shadow-2xl text-sm font-semibold max-w-xs text-center animate-bounce">
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-[#19385C] text-white px-5 py-3 rounded-2xl shadow-2xl text-sm font-semibold max-w-xs text-center animate-bounce">
           {feedback}
         </div>
       )}
 
       {/* ── HEADER ─────────────────────────────────────────── */}
-      <div className="bg-gradient-to-r from-[#0f2044] to-[#1a3a6e] px-5 pt-12 pb-4 sticky top-0 z-40 shadow-lg">
+      <div className="bg-gradient-to-r from-[#19385C] to-[#1a3a6e] px-5 pt-12 pb-4 sticky top-0 z-40 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="w-11 h-11 rounded-xl border-2 border-[#D4A017] overflow-hidden bg-[#0f2044]">
+              <div className="w-11 h-11 rounded-xl border-2 border-[#DEC078] overflow-hidden bg-[#19385C]">
                 <img src={MARA_AVATAR_HEADER} alt="MARA"
                   className="w-full h-full object-cover"
                   onError={e => { (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=M&background=D4A017&color=fff&size=128&bold=true' }}
                 />
               </div>
-              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0f2044]" />
+              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#19385C]" />
             </div>
             <div>
               <p className="text-white font-bold text-base leading-tight">MARA IA</p>
-              <p className="text-[#D4A017] text-xs">{hora} · Fortaleza</p>
+              <p className="text-[#DEC078] text-xs">{hora} · Fortaleza</p>
             </div>
           </div>
 
@@ -608,7 +608,7 @@ export default function MaraMobile() {
             {/* Botão instalar (se não instalado) */}
             {!isInstalled && (
               <button onClick={mostrarBotaoInstall}
-                className="text-[#D4A017] text-xs border border-[#D4A017]/40 px-2.5 py-1 rounded-full hover:bg-[#D4A017]/10 transition">
+                className="text-[#DEC078] text-xs border border-[#DEC078]/40 px-2.5 py-1 rounded-full hover:bg-[#DEC078]/10 transition">
                 📲
               </button>
             )}
@@ -632,7 +632,7 @@ export default function MaraMobile() {
             <div className={`rounded-3xl p-6 shadow-xl text-white relative overflow-hidden ${
               modoAusente.ativo
                 ? 'bg-gradient-to-br from-amber-500 to-orange-600'
-                : 'bg-gradient-to-br from-[#0f2044] to-[#1a3a6e]'
+                : 'bg-gradient-to-br from-[#19385C] to-[#1a3a6e]'
             }`}>
               <div className="absolute top-0 right-0 w-36 h-36 bg-white/10 rounded-full -translate-y-18 translate-x-18 pointer-events-none" />
 
@@ -669,7 +669,7 @@ export default function MaraMobile() {
             {/* Banner instalação manual se não instalado */}
             {!isInstalled && (
               <button onClick={mostrarBotaoInstall}
-                className="w-full flex items-center gap-3 bg-gradient-to-r from-[#0f2044] to-[#1a3a6e] text-white rounded-2xl p-4 active:scale-95 transition-transform shadow-lg border border-[#D4A017]/30">
+                className="w-full flex items-center gap-3 bg-gradient-to-r from-[#19385C] to-[#1a3a6e] text-white rounded-2xl p-4 active:scale-95 transition-transform shadow-lg border border-[#DEC078]/30">
                 <span className="text-2xl">📲</span>
                 <div className="text-left">
                   <p className="font-bold text-sm">Instalar MARA IA como App</p>
@@ -677,7 +677,7 @@ export default function MaraMobile() {
                     {isIOS ? 'Safari → Compartilhar → Adicionar à Tela' : 'Chrome → Menu ⋮ → Adicionar à tela inicial'}
                   </p>
                 </div>
-                <span className="text-[#D4A017] ml-auto">›</span>
+                <span className="text-[#DEC078] ml-auto">›</span>
               </button>
             )}
 
@@ -701,9 +701,9 @@ export default function MaraMobile() {
             {/* Link dashboard */}
             <a href="https://ben-growth-center.vercel.app/mara-ia" target="_blank" rel="noreferrer"
               className="flex items-center gap-3 bg-white rounded-2xl p-4 shadow-sm border border-gray-100 active:scale-95 transition-transform">
-              <div className="w-10 h-10 bg-[#0f2044] rounded-xl flex items-center justify-center text-xl shrink-0">🖥️</div>
+              <div className="w-10 h-10 bg-[#19385C] rounded-xl flex items-center justify-center text-xl shrink-0">🖥️</div>
               <div>
-                <p className="text-sm font-bold text-[#0f2044]">Dashboard Completo</p>
+                <p className="text-sm font-bold text-[#19385C]">Dashboard Completo</p>
                 <p className="text-xs text-gray-400">Ben Growth Center · Configurações avançadas</p>
               </div>
               <span className="text-gray-300 ml-auto text-lg">›</span>
@@ -715,7 +715,7 @@ export default function MaraMobile() {
         {aba === 'ausente' && (
           <div className="px-4 pt-5 space-y-4">
             <div>
-              <h2 className="text-xl font-bold text-[#0f2044]">🛡️ Modo Ausente</h2>
+              <h2 className="text-xl font-bold text-[#19385C]">🛡️ Modo Ausente</h2>
               <p className="text-gray-500 text-sm">MARA responde por você automaticamente</p>
             </div>
 
@@ -739,13 +739,13 @@ export default function MaraMobile() {
               {MOTIVOS.map(m => (
                 <button key={m.key} onClick={() => setMotivoSel(m.key)}
                   className={`relative p-4 rounded-2xl border-2 text-left transition-all active:scale-95 ${
-                    motivoSel === m.key ? 'border-[#0f2044] bg-[#0f2044]/5 shadow-md' : 'border-gray-100 bg-white hover:border-gray-300'
+                    motivoSel === m.key ? 'border-[#19385C] bg-[#19385C]/5 shadow-md' : 'border-gray-100 bg-white hover:border-gray-300'
                   }`}>
                   {motivoSel === m.key && (
-                    <span className="absolute top-2.5 right-2.5 text-[#D4A017] font-bold text-lg">✦</span>
+                    <span className="absolute top-2.5 right-2.5 text-[#DEC078] font-bold text-lg">✦</span>
                   )}
                   <p className="text-3xl mb-2">{m.emoji}</p>
-                  <p className="font-bold text-sm text-[#0f2044]">{m.label}</p>
+                  <p className="font-bold text-sm text-[#19385C]">{m.label}</p>
                 </button>
               ))}
             </div>
@@ -757,12 +757,12 @@ export default function MaraMobile() {
               </label>
               <input type="text" value={retornoInput} onChange={e => setRetornoInput(e.target.value)}
                 placeholder="Ex: 15/03, amanhã, 14h..."
-                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#D4A017] bg-white" />
+                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#DEC078] bg-white" />
             </div>
 
             {/* Preview */}
-            <div className="bg-[#0f2044]/5 border border-[#0f2044]/15 rounded-2xl p-4">
-              <p className="text-xs font-bold text-[#0f2044] mb-2 uppercase tracking-wide">👁️ MARA responderá assim:</p>
+            <div className="bg-[#19385C]/5 border border-[#19385C]/15 rounded-2xl p-4">
+              <p className="text-xs font-bold text-[#19385C] mb-2 uppercase tracking-wide">👁️ MARA responderá assim:</p>
               <p className="text-sm text-gray-600 italic leading-relaxed">
                 {motivoSel === 'ferias'       && `"Olá! O Dr. Mauro está em férias${retornoInput ? ` e retorna dia ${retornoInput}` : ''}. Posso anotar seu recado?"`}
                 {motivoSel === 'doente'       && `"Olá! O Dr. Mauro está indisposto${retornoInput ? ` e retorna ${retornoInput}` : ' e retorna em breve'}. Posso ajudar?"`}
@@ -788,11 +788,11 @@ export default function MaraMobile() {
           <div className="px-4 pt-5 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-[#0f2044]">📋 Leads do CRM</h2>
+                <h2 className="text-xl font-bold text-[#19385C]">📋 Leads do CRM</h2>
                 <p className="text-gray-500 text-sm">{leads.length} registros</p>
               </div>
               <button onClick={carregarLeads}
-                className="bg-[#0f2044] text-white text-xs px-4 py-2 rounded-xl active:scale-95 transition-transform font-semibold">
+                className="bg-[#19385C] text-white text-xs px-4 py-2 rounded-xl active:scale-95 transition-transform font-semibold">
                 🔄 Atualizar
               </button>
             </div>
@@ -824,7 +824,7 @@ export default function MaraMobile() {
                       style={{ borderLeftWidth: 5, borderLeftColor: urgCor, borderLeftStyle: 'solid' }}>
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-[#0f2044] truncate">{lead.nome || 'Sem nome'}</p>
+                          <p className="font-bold text-[#19385C] truncate">{lead.nome || 'Sem nome'}</p>
                           <p className="text-xs text-gray-400 mt-0.5">{AREA_LABEL[lead.area||'outros']}</p>
                         </div>
                         <div className="flex flex-col items-end gap-1 ml-2 shrink-0">
@@ -858,7 +858,7 @@ export default function MaraMobile() {
         {aba === 'comandos' && (
           <div className="px-4 pt-5 space-y-4">
             <div>
-              <h2 className="text-xl font-bold text-[#0f2044]">⚡ Central MARA</h2>
+              <h2 className="text-xl font-bold text-[#19385C]">⚡ Central MARA</h2>
               <p className="text-gray-500 text-sm">Consultas e comandos em tempo real</p>
             </div>
 
@@ -888,13 +888,13 @@ export default function MaraMobile() {
             {cmdResp && !cmdLoad && (
               <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
                 <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-100">
-                  <div className="w-8 h-8 rounded-xl border-2 border-[#D4A017] overflow-hidden bg-[#0f2044]">
+                  <div className="w-8 h-8 rounded-xl border-2 border-[#DEC078] overflow-hidden bg-[#19385C]">
                     <img src={MARA_AVATAR_HEADER} alt="MARA"
                       className="w-full h-full object-cover"
                       onError={e => { (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=M&background=D4A017&color=fff&size=64&bold=true' }}
                     />
                   </div>
-                  <p className="text-xs font-bold text-[#D4A017] uppercase tracking-wide">MARA IA</p>
+                  <p className="text-xs font-bold text-[#DEC078] uppercase tracking-wide">MARA IA</p>
                 </div>
                 <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">
                   {cmdResp}
@@ -917,7 +917,7 @@ export default function MaraMobile() {
           ] as { tab: Tab; emoji: string; label: string }[]).map(t => (
             <button key={t.tab} onClick={() => setAba(t.tab)}
               className={`flex flex-col items-center justify-center py-2.5 rounded-2xl transition-all active:scale-90 ${
-                aba === t.tab ? 'bg-[#0f2044] text-white shadow-lg' : 'text-gray-400 hover:bg-gray-100'
+                aba === t.tab ? 'bg-[#19385C] text-white shadow-lg' : 'text-gray-400 hover:bg-gray-100'
               }`}>
               <span className="text-xl leading-none mb-0.5">{t.emoji}</span>
               <span className="text-[10px] font-bold">{t.label}</span>

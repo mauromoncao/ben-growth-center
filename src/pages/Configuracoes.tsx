@@ -120,7 +120,7 @@ export default function Configuracoes() {
         </div>
         <button onClick={handleSave}
           className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all"
-          style={{ background: '#D4A017', color: '#0f2044' }}>
+          style={{ background: '#DEC078', color: '#19385C' }}>
           {saved ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
           {saved ? 'Salvo!' : 'Salvar'}
         </button>
@@ -132,7 +132,7 @@ export default function Configuracoes() {
           <button key={aba} onClick={() => setAbaAtiva(aba)}
             className={`px-5 py-2 rounded-xl text-sm font-semibold border capitalize transition-all ${
               abaAtiva === aba
-                ? 'border-[#D4A017] text-[#D4A017] bg-[#D4A017]/10'
+                ? 'border-[#DEC078] text-[#DEC078] bg-[#DEC078]/10'
                 : 'border-gray-200 text-gray-400 hover:border-white/20'
             }`}>
             {aba === 'perfil' ? '🤖 Perfil Dr. Ben' : '🔌 Integrações'}
@@ -147,7 +147,7 @@ export default function Configuracoes() {
           {/* Card principal do perfil */}
           <div className="bg-[#0f1629] border border-gray-200 rounded-2xl overflow-hidden">
             {/* Banner */}
-            <div className="h-24 w-full" style={{ background: 'linear-gradient(135deg, #0f2044, #1e3470, #D4A017)' }} />
+            <div className="h-24 w-full" style={{ background: 'linear-gradient(135deg, #19385C, #1e3470, #DEC078)' }} />
 
             {/* Avatar + Info */}
             <div className="px-6 pb-6">
@@ -181,7 +181,7 @@ export default function Configuracoes() {
                   { icon: <MessageCircle className="w-4 h-4" />,label: 'WABA ID',  value: DR_BEN_PROFILE.whatsappId },
                 ].map(item => (
                   <div key={item.label} className="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-3">
-                    <div className="text-[#D4A017] flex-shrink-0">{item.icon}</div>
+                    <div className="text-[#DEC078] flex-shrink-0">{item.icon}</div>
                     <div className="min-w-0">
                       <p className="text-gray-400 text-xs">{item.label}</p>
                       <p className="text-white text-sm font-medium truncate">{item.value}</p>
@@ -195,13 +195,13 @@ export default function Configuracoes() {
           {/* Áreas de atuação */}
           <div className="bg-[#0f1629] border border-gray-200 rounded-2xl p-5">
             <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-              <Bot className="w-4 h-4 text-[#D4A017]" /> Áreas de Atuação
+              <Bot className="w-4 h-4 text-[#DEC078]" /> Áreas de Atuação
             </h3>
             <div className="flex flex-wrap gap-2">
               {DR_BEN_PROFILE.areas.map(area => (
                 <span key={area}
                   className="px-3 py-1.5 rounded-full text-xs font-medium border"
-                  style={{ background: 'rgba(212,160,23,0.10)', borderColor: 'rgba(212,160,23,0.30)', color: '#D4A017' }}>
+                  style={{ background: 'rgba(212,160,23,0.10)', borderColor: 'rgba(212,160,23,0.30)', color: '#DEC078' }}>
                   {area}
                 </span>
               ))}
@@ -228,7 +228,7 @@ export default function Configuracoes() {
                 <div key={key} className="bg-white/5 border border-gray-200 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-white text-sm font-semibold">{tpl.nome}</p>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#0f2044]/20 text-blue-300 border border-[#0f2044]/30">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#19385C]/20 text-blue-300 border border-[#19385C]/30">
                       {tpl.idioma}
                     </span>
                   </div>
@@ -270,7 +270,7 @@ export default function Configuracoes() {
             </div>
             <div className="h-2 bg-white/5 rounded-full overflow-hidden">
               <div className="h-full rounded-full transition-all"
-                style={{ width: `${(totalConfigured / totalFields) * 100}%`, background: '#D4A017' }} />
+                style={{ width: `${(totalConfigured / totalFields) * 100}%`, background: '#DEC078' }} />
             </div>
             <div className="grid grid-cols-3 gap-3 mt-4">
               {[
@@ -309,7 +309,7 @@ export default function Configuracoes() {
                         type={field.type === 'password' && !showKeys[field.key] ? 'password' : 'text'}
                         placeholder={field.placeholder}
                         defaultValue={field.status === 'configured' ? '••••••••••••••••' : ''}
-                        className="w-full px-3 py-2.5 pr-10 bg-white/5 border border-gray-200 rounded-xl text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#D4A017] font-mono"
+                        className="w-full px-3 py-2.5 pr-10 bg-white/5 border border-gray-200 rounded-xl text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#DEC078] font-mono"
                       />
                       {field.type === 'password' && (
                         <button type="button" onClick={() => toggleKey(field.key)}
