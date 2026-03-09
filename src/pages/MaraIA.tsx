@@ -204,8 +204,16 @@ export default function MaraIA() {
   const [respostaTeste, setRespostaTeste] = useState('')
   const [novasPalavras, setNovasPalavras] = useState('')
   const [statusZAPI, setStatusZAPI] = useState<'verificando' | 'online' | 'offline'>('verificando')
-  const [modoAusenteStatus, setModoAusenteStatus] = useState<ModoAusenteStatus>({ ativo: false, motivo: null, retorno: null, mensagem: null })
+  // Carrega estado inicial do localStorage para evitar flash de "presente" ao remontar
+  const [modoAusenteStatus, setModoAusenteStatus] = useState<ModoAusenteStatus>(() => {
+    try {
+      const saved = localStorage.getItem('mara-modo-ausente')
+      if (saved) return JSON.parse(saved)
+    } catch {}
+    return { ativo: false, motivo: null, retorno: null, mensagem: null }
+  })
   const [ativandoAusente, setAtivandoAusente] = useState(false)
+  const [erroAusente, setErroAusente] = useState<string | null>(null)
   const [testandoVoz, setTestandoVoz] = useState<'mara' | 'drben' | null>(null)
   const [audioUrl, setAudioUrl] = useState<string | null>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
@@ -250,6 +258,12 @@ export default function MaraIA() {
     } catch {}
   }
 
+  // Persistir modo ausente no localStorage toda vez que mudar
+  const setModoAusenteStatusPersistido = (status: ModoAusenteStatus) => {
+    setModoAusenteStatus(status)
+    try { localStorage.setItem('mara-modo-ausente', JSON.stringify(status)) } catch {}
+  }
+
   const verificarModoAusente = async () => {
     try {
       const d = await fetch('/api/mara-ausente').then(r => r.json())
@@ -260,7 +274,7 @@ export default function MaraIA() {
         return
       }
       if (typeof d.modo_ausente === 'boolean') {
-        setModoAusenteStatus({ ativo: d.modo_ausente, motivo: d.motivo, retorno: null, mensagem: null })
+        setModoAusenteStatusPersistido({ ativo: d.modo_ausente, motivo: d.motivo, retorno: null, mensagem: null })
       }
     } catch {
       // Em caso de erro de rede, mantém estado atual (não altera)
@@ -271,6 +285,7 @@ export default function MaraIA() {
   // ── Ativar / Desativar Modo Ausente ───────────────────────
   const ativarModoAusente = async () => {
     setAtivandoAusente(true)
+    setErroAusente(null)
     try {
       const motivo  = config.modoAusente.motivo
       const retorno = config.modoAusente.retorno
@@ -281,12 +296,15 @@ export default function MaraIA() {
       })
       const data = await res.json()
       if (data.ok) {
-        setModoAusenteStatus({ ativo: true, motivo, retorno: retorno || null, mensagem: null })
+        setModoAusenteStatusPersistido({ ativo: true, motivo, retorno: retorno || null, mensagem: null })
         setSalvo(true)
         setTimeout(() => setSalvo(false), 3000)
+      } else {
+        setErroAusente(data.mensagem || 'Erro ao ativar modo ausente')
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error(e)
+      setErroAusente('Erro de conexão — verifique sua internet')
     } finally {
       setAtivandoAusente(false)
     }
@@ -294,6 +312,7 @@ export default function MaraIA() {
 
   const desativarModoAusente = async () => {
     setAtivandoAusente(true)
+    setErroAusente(null)
     try {
       const res = await fetch('/api/mara-ausente', {
         method: 'POST',
@@ -302,9 +321,13 @@ export default function MaraIA() {
       })
       const data = await res.json()
       if (data.ok) {
-        setModoAusenteStatus({ ativo: false, motivo: null, retorno: null, mensagem: null })
+        setModoAusenteStatusPersistido({ ativo: false, motivo: null, retorno: null, mensagem: null })
+      } else {
+        setErroAusente(data.mensagem || 'Erro ao desativar modo ausente')
       }
-    } catch {} finally {
+    } catch (e: any) {
+      setErroAusente('Erro de conexão — verifique sua internet')
+    } finally {
       setAtivandoAusente(false)
     }
   }
@@ -688,7 +711,7 @@ export default function MaraIA() {
                 ? <Loader size={16} className="animate-spin" />
                 : <PauseCircle size={16} />
               }
-              🛡️ Ativar Modo Ausente
+              {ativandoAusente ? 'Ativando...' : '🛡️ Ativar Modo Ausente'}
             </button>
           ) : (
             <button
@@ -700,7 +723,7 @@ export default function MaraIA() {
                 ? <Loader size={16} className="animate-spin" />
                 : <PlayCircle size={16} />
               }
-              ✅ Estou de Volta — Desativar
+              {ativandoAusente ? 'Desativando...' : '✅ Estou de Volta — Desativar'}
             </button>
           )}
 
@@ -708,12 +731,20 @@ export default function MaraIA() {
             <div className={`w-2 h-2 rounded-full ${modoAusenteStatus.ativo ? 'bg-amber-500 animate-pulse' : 'bg-green-500'}`} />
             <p className="text-xs text-gray-600">
               {modoAusenteStatus.ativo
-                ? `MARA ativa — Motivo: ${modoAusenteStatus.motivo || 'ausente'}`
-                : 'Dr. Mauro presente — MARA apenas notifica'
+                ? `🛡️ MARA ativa — Motivo: ${modoAusenteStatus.motivo || 'ausente'}`
+                : '✅ Dr. Mauro presente — MARA apenas notifica'
               }
             </p>
           </div>
         </div>
+
+        {/* Mensagem de erro */}
+        {erroAusente && (
+          <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2">
+            <span className="text-red-500 text-sm">⚠️ {erroAusente}</span>
+            <button onClick={() => setErroAusente(null)} className="ml-auto text-red-400 hover:text-red-600 text-xs">✕</button>
+          </div>
+        )}
 
         {/* Comandos via WhatsApp */}
         <div className="mt-4 p-3 bg-[#f0f3fa] border border-[#c5d0e8] rounded-xl">

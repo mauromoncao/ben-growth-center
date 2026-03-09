@@ -41,29 +41,14 @@ async function getStatus() {
   return data?.connected === true ? 'open' : (data?.status ?? 'disconnected')
 }
 
-// Verificar e reconectar webhook da MARA
+// Configurar webhook da MARA (sempre — GET /webhooks não funciona nesta versão Z-API)
 async function verificarWebhookMara(log) {
   if (!MARA_INSTANCE_ID || !MARA_TOKEN) {
     log.push('⚠️ MARA: instância não configurada — pulando')
     return
   }
   try {
-    // Verificar webhook atual
-    const r = await fetch(`${MARA_BASE}/webhooks`, {
-      headers: maraHeaders(),
-      signal: AbortSignal.timeout(8000),
-    })
-    const webhooks = await r.json().catch(() => ({}))
-    const webhookAtual = webhooks?.value || webhooks?.url || ''
-    const webhookOk = webhookAtual === MARA_WEBHOOK_URL
-
-    if (webhookOk) {
-      log.push('✅ MARA webhook: OK')
-      return
-    }
-
-    // Reconectar webhook
-    log.push(`🔄 MARA webhook perdido (${webhookAtual || 'vazio'}) — reconfigurando...`)
+    // PUT direto — sem tentar ler antes (GET /webhooks retorna NOT_FOUND nesta versão)
     const put = await fetch(`${MARA_BASE}/update-every-webhooks`, {
       method: 'PUT',
       headers: maraHeaders(),
@@ -72,9 +57,9 @@ async function verificarWebhookMara(log) {
     })
     const result = await put.json().catch(() => ({}))
     if (result?.value === true) {
-      log.push('✅ MARA webhook: reconectado automaticamente!')
+      log.push(`✅ MARA webhook: configurado → ${MARA_WEBHOOK_URL}`)
     } else {
-      log.push(`⚠️ MARA webhook: resultado inesperado — ${JSON.stringify(result)}`)
+      log.push(`⚠️ MARA webhook: resposta inesperada — ${JSON.stringify(result)}`)
     }
   } catch (e) {
     log.push(`❌ MARA webhook: erro — ${e.message}`)
