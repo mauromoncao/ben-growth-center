@@ -45,22 +45,18 @@ export default async function handler(req, res) {
     const agora = new Date()
     const BASE  = 'https://ben-growth-center.vercel.app'
 
-    // ── Verificar todos os serviços em paralelo ──────────────
+    // ── Verificar serviços críticos em paralelo ──────────────
     const checks = await Promise.all([
-      checar('WhatsApp Dr. Ben',  `${BASE}/api/whatsapp-evolution?action=status`,
-        d => d?.state === 'open'),
-      checar('Dr. Ben IA',        `${BASE}/api/whatsapp-evolution?action=status`,
-        d => !!d?.status),
-      checar('MARA IA Config',    `${BASE}/api/mara-config?action=get`,
-        d => d?.success === true),
-      checar('Secretaria',        `${BASE}/api/secretaria?action=status`,
-        d => d?.success === true),
-      checar('Bridge v2.0',       `${BASE}/api/bridge?action=status`,
-        d => d?.success === true),
-      checar('Meta Ads API',      `${BASE}/api/meta-ads?action=teste`,
-        d => !!d?.id),
-      checar('Google Ads API',    `${BASE}/api/google-ads?action=teste&account=escritorio`,
-        d => d?.status === 'ok'),
+      checar('WhatsApp Dr. Ben (Z-API)',  `${BASE}/api/whatsapp-keepalive`,
+        d => d?.action === 'healthy'),
+      checar('MARA IA Webhook',          `${BASE}/api/whatsapp-mara`,
+        d => !!d?.service),
+      checar('MARA Ausente API',         `${BASE}/api/mara-ausente`,
+        d => d?.ok === true),
+      checar('VPS Leads API',            `${BASE}/api/leads`,
+        d => Array.isArray(d) || d?.ok === true || d?.status === 'ok'),
+      checar('Diagnóstico Geral',        `${BASE}/api/diagnostico`,
+        d => !!d?.geral || !!d?.openai),
     ])
 
     const falhas   = checks.filter(c => !c.ok)
@@ -70,7 +66,7 @@ export default async function handler(req, res) {
     // ── Alertar só se houver falhas críticas ─────────────────
     let whatsappEnviado = false
     const falhasCriticas = falhas.filter(f =>
-      ['WhatsApp Dr. Ben', 'Dr. Ben IA', 'MARA IA Config'].includes(f.nome)
+      ['WhatsApp Dr. Ben (Z-API)', 'MARA IA Webhook', 'VPS Leads API'].includes(f.nome)
     )
 
     if (falhasCriticas.length > 0 && PLANTONISTA) {
