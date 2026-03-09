@@ -214,10 +214,13 @@ export default function MaraIA() {
     tempoMedioResposta: '< 3s', satisfacao: 97, totalLeads: 0,
   })
   // ── Restauração de foto de perfil ────────────────────────
-  const [restaurandoFoto, setRestaurandoFoto] = useState(false)
+  const [restaurandoFoto, setRestaurandoFoto]       = useState(false)
   const [resultadoRestauracao, setResultadoRestauracao] = useState<{
-    ok: boolean; mensagem: string; detalhes?: string
+    ok: boolean; mensagem: string; detalhes?: string; log?: string[]
   } | null>(null)
+  const [fotoUrlCustom, setFotoUrlCustom]           = useState('')
+  const [forcaRestart, setForcaRestart]             = useState(false)
+  const [logRestauraçao, setLogRestauracao]          = useState<string[]>([])
 
   // ── Carregar config e verificar status ───────────────────
   useEffect(() => {
@@ -381,28 +384,33 @@ export default function MaraIA() {
   const set = (campo: keyof ConfigMara, valor: any) =>
     setConfig(c => ({ ...c, [campo]: valor }))
 
-  // ── Restaurar Foto de Perfil do Dr. Mauro ───────────────
+  // ── Restaurar / Definir Foto de Perfil ─────────────────
   const restaurarFotoPerfil = async () => {
     setRestaurandoFoto(true)
     setResultadoRestauracao(null)
+    setLogRestauracao([])
     try {
+      const body: Record<string, unknown> = {}
+      if (fotoUrlCustom.trim()) body.foto_url = fotoUrlCustom.trim()
+      if (forcaRestart) body.restart = true
       const res = await fetch('/api/restaurar-foto', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
+        body: JSON.stringify(body),
       })
       const data = await res.json()
+      setLogRestauracao(data.log || [])
       setResultadoRestauracao({
         ok: data.ok,
-        mensagem: data.mensagem || (data.ok ? '✅ Foto restaurada com sucesso!' : '⚠️ Não foi possível restaurar automaticamente.'),
+        mensagem: data.mensagem || (data.ok ? '✅ Foto definida com sucesso!' : '⚠️ Não foi possível definir a foto automaticamente.'),
         detalhes: data.ok
-          ? `Método: ${data.metodo_usado || 'API Z-API'}`
-          : (data.alternativas ? data.alternativas[0] : undefined),
+          ? `Método: ${data.metodo_usado || 'API Z-API'} · URL: ${data.foto_definida || ''}`
+          : (data.alternativas ? data.alternativas[0] : 'Tente com "Forçar restart" ativado'),
       })
-    } catch (e) {
+    } catch {
       setResultadoRestauracao({
         ok: false,
-        mensagem: '❌ Erro de rede ao tentar restaurar a foto.',
+        mensagem: '❌ Erro de rede ao tentar definir a foto.',
         detalhes: 'Verifique se o servidor está online e tente novamente.',
       })
     } finally {
@@ -726,7 +734,7 @@ export default function MaraIA() {
       </div>
 
       {/* ══════════════════════════════════════════════════════ */}
-      {/* RESTAURAR FOTO DE PERFIL — PAINEL DE CORREÇÃO          */}
+      {/* DEFINIR FOTO DE PERFIL — PAINEL DE CORREÇÃO            */}
       {/* ══════════════════════════════════════════════════════ */}
       <div className="bg-white rounded-2xl border-2 border-orange-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 bg-orange-50 border-b border-orange-200 flex items-center gap-3">
@@ -734,9 +742,9 @@ export default function MaraIA() {
             <UserCircle size={16} className="text-white" />
           </div>
           <div className="flex-1">
-            <span className="font-semibold text-orange-800">🖼️ Restaurar Foto de Perfil — Dr. Mauro Monção</span>
+            <span className="font-semibold text-orange-800">🖼️ Definir Foto de Perfil do WhatsApp</span>
             <p className="text-xs text-orange-600 mt-0.5">
-              Corrige a foto que ficou travada no WhatsApp após configuração da MARA IA
+              Corrige a foto travada pela MARA IA — use a sua foto pessoal original
             </p>
           </div>
           <span className="text-xs bg-orange-100 text-orange-700 border border-orange-300 px-2 py-1 rounded-full font-bold">
@@ -745,40 +753,94 @@ export default function MaraIA() {
         </div>
 
         <div className="px-6 py-5 space-y-4">
-          {/* Diagnóstico */}
+
+          {/* O que aconteceu */}
           <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
             <p className="text-xs font-bold text-amber-800 mb-2">🔍 O que aconteceu:</p>
             <ul className="text-xs text-amber-700 space-y-1 list-none">
-              <li>• Durante o desenvolvimento do modo ausente, o sistema usou a API Z-API para definir automaticamente a foto do avatar da MARA no seu perfil</li>
-              <li>• O código foi removido, mas a foto já havia sido persistida pela Z-API no servidor da instância</li>
-              <li>• Por isso a foto parece travada — o WhatsApp sincroniza com o cache da instância Z-API</li>
+              <li>• Commits 4b31c23 → 9bcc622 → 5ffbabc → 8cd0f81 usaram <code className="bg-amber-100 px-1 rounded">PUT /profile-picture</code> via Z-API, substituindo a sua foto pessoal pelo avatar da MARA</li>
+              <li>• O código foi removido (commit 4998ce2), mas a foto ficou persistida no cache da instância Z-API</li>
+              <li>• <strong>session:false</strong> na instância indica que a sessão WhatsApp não estava ativa — bloqueando também alterações manuais no app</li>
+              <li>• A foto <code className="bg-amber-100 px-1 rounded">mauro-zapi.jpg</code> usada anteriormente foi <strong>criada pelo sistema</strong> (fundo azul, 400×400px) — não é a sua foto original</li>
             </ul>
           </div>
 
-          {/* Foto de referência */}
-          <div className="flex items-center gap-4 p-3 bg-gray-50 border border-gray-200 rounded-xl">
-            <img
-              src="https://ben-growth-center.vercel.app/mauro-zapi.jpg"
-              alt="Foto Dr. Mauro"
-              className="w-14 h-14 rounded-full object-cover border-2 border-[#19385C] shadow"
-              onError={e => {
-                (e.target as HTMLImageElement).src =
-                  'https://ui-avatars.com/api/?name=Dr+Mauro&background=19385C&color=ffffff&size=128&bold=true'
-              }}
-            />
-            <div>
-              <p className="text-sm font-semibold text-[#19385C]">Foto que será restaurada</p>
-              <p className="text-xs text-gray-500">Dr. Mauro Monção — foto oficial</p>
-              <code className="text-xs text-gray-400 mt-1 block">/mauro-zapi.jpg</code>
+          {/* Campo URL personalizada */}
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-700 block">
+              📷 URL da sua foto original (recomendado)
+            </label>
+            <p className="text-xs text-gray-500">
+              Cole aqui a URL pública da sua foto pessoal original. Deve ser uma imagem JPEG/PNG acessível publicamente (ex: Google Drive compartilhado, Dropbox, iCloud público, etc.).
+            </p>
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={fotoUrlCustom}
+                onChange={e => setFotoUrlCustom(e.target.value)}
+                placeholder="https://... (URL pública da sua foto)"
+                className="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              />
+              {fotoUrlCustom && (
+                <button
+                  onClick={() => setFotoUrlCustom('')}
+                  className="text-xs text-gray-400 hover:text-gray-600 px-2"
+                  title="Limpar URL"
+                >✕</button>
+              )}
             </div>
+            {fotoUrlCustom && (
+              <div className="flex items-center gap-3 p-2 bg-gray-50 border border-gray-200 rounded-lg">
+                <img
+                  src={fotoUrlCustom}
+                  alt="Preview"
+                  className="w-12 h-12 rounded-full object-cover border-2 border-orange-400 shadow"
+                  onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                />
+                <p className="text-xs text-gray-600">Preview da foto que será definida</p>
+              </div>
+            )}
+            {!fotoUrlCustom && (
+              <div className="flex items-center gap-3 p-2 bg-gray-50 border border-gray-200 rounded-lg">
+                <img
+                  src="https://ben-growth-center.vercel.app/mauro-zapi.jpg"
+                  alt="Foto padrão"
+                  className="w-12 h-12 rounded-full object-cover border-2 border-gray-300 shadow"
+                  onError={e => {
+                    (e.target as HTMLImageElement).src =
+                      'https://ui-avatars.com/api/?name=Dr+Mauro&background=19385C&color=ffffff&size=128&bold=true'
+                  }}
+                />
+                <div>
+                  <p className="text-xs text-gray-500 font-medium">Sem URL personalizada → usará <code className="bg-gray-100 px-1 rounded">mauro-zapi.jpg</code></p>
+                  <p className="text-xs text-orange-600">⚠️ Esta é a foto editada (fundo azul), não a sua original</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Opção forçar restart */}
+          <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+            <input
+              type="checkbox"
+              id="forca-restart"
+              checked={forcaRestart}
+              onChange={e => setForcaRestart(e.target.checked)}
+              className="mt-0.5 w-4 h-4 accent-[#19385C]"
+            />
+            <label htmlFor="forca-restart" className="text-xs text-blue-800 cursor-pointer">
+              <span className="font-bold block">⚡ Forçar restart da sessão Z-API antes de definir a foto</span>
+              <span className="text-blue-600">
+                Recomendado quando <code className="bg-blue-100 px-1 rounded">session:false</code> — reinicia a instância (~15s) para garantir que a foto seja sincronizada.
+                Se a foto voltou como ✅ mas não apareceu no WhatsApp, ative esta opção e tente novamente.
+              </span>
+            </label>
           </div>
 
           {/* Resultado */}
           {resultadoRestauracao && (
             <div className={`p-4 rounded-xl border ${
-              resultadoRestauracao.ok
-                ? 'bg-green-50 border-green-200'
-                : 'bg-red-50 border-red-200'
+              resultadoRestauracao.ok ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
             }`}>
               <p className={`text-sm font-semibold ${resultadoRestauracao.ok ? 'text-green-800' : 'text-red-800'}`}>
                 {resultadoRestauracao.mensagem}
@@ -788,37 +850,70 @@ export default function MaraIA() {
                   {resultadoRestauracao.detalhes}
                 </p>
               )}
+              {resultadoRestauracao.ok && (
+                <p className="text-xs text-green-700 mt-2 font-medium">
+                  ⏱️ Pode levar 1–2 minutos para atualizar. Feche e reabra o WhatsApp.
+                </p>
+              )}
               {!resultadoRestauracao.ok && (
                 <div className="mt-3 text-xs text-red-700 space-y-1">
-                  <p className="font-semibold">Alternativas manuais:</p>
-                  <p>1. Abra o WhatsApp no celular → Configurações → Toque na sua foto</p>
-                  <p>2. Verifique se a instância Z-API está conectada: <code className="bg-red-100 px-1 rounded">/api/mara-setup?action=status</code></p>
-                  <p>3. Reconecte via QR Code se necessário e tente novamente</p>
+                  <p className="font-semibold">Próximos passos:</p>
+                  <p>1. Ative "Forçar restart" acima e tente novamente</p>
+                  <p>2. Certifique-se que a URL da foto é pública e acessível sem login</p>
+                  <p>3. Abra o WhatsApp no celular → Configurações → Toque na sua foto → troque manualmente</p>
+                  <p>4. Verifique a instância: <code className="bg-red-100 px-1 rounded">/api/mara-setup?action=status</code></p>
                 </div>
+              )}
+              {/* Log detalhado colapsável */}
+              {logRestauraçao.length > 0 && (
+                <details className="mt-3">
+                  <summary className="text-xs cursor-pointer font-semibold text-gray-500 hover:text-gray-700">
+                    📋 Log detalhado ({logRestauraçao.length} etapas)
+                  </summary>
+                  <div className="mt-2 bg-gray-900 rounded-lg p-3 max-h-40 overflow-y-auto">
+                    {logRestauraçao.map((entry, i) => (
+                      <p key={i} className="text-xs text-green-300 font-mono leading-relaxed">{entry}</p>
+                    ))}
+                  </div>
+                </details>
               )}
             </div>
           )}
 
-          {/* Botão de ação */}
-          <div className="flex items-center gap-3">
+          {/* Botões de ação */}
+          <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={restaurarFotoPerfil}
               disabled={restaurandoFoto}
               className="flex items-center gap-2 px-6 py-3 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 transition disabled:opacity-60 shadow-sm"
             >
               {restaurandoFoto ? (
-                <><Loader size={16} className="animate-spin" /> Restaurando foto...</>
+                <><Loader size={16} className="animate-spin" /> {forcaRestart ? 'Reiniciando + definindo foto...' : 'Definindo foto...'}</>
               ) : (
-                <><RefreshCw size={16} /> Restaurar Foto do Perfil</>
+                <><RefreshCw size={16} /> {fotoUrlCustom ? 'Definir Minha Foto' : 'Restaurar Foto Padrão'}</>
               )}
             </button>
             {resultadoRestauracao?.ok && (
               <span className="text-xs text-green-600 font-semibold flex items-center gap-1">
                 <CheckCircle2 size={14} />
-                Foto restaurada! Verifique o WhatsApp.
+                Foto definida! Verifique o WhatsApp.
               </span>
             )}
           </div>
+
+          {/* Dica para obter URL pública da foto */}
+          <details className="mt-1">
+            <summary className="text-xs text-gray-400 cursor-pointer hover:text-gray-600 font-medium">
+              💡 Como obter uma URL pública da minha foto?
+            </summary>
+            <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-600 space-y-1.5">
+              <p><strong>Google Drive:</strong> Faça upload, clique em "Compartilhar" → "Qualquer pessoa com o link" → copie o ID do link e use <code className="bg-gray-100 px-1 rounded">https://drive.google.com/uc?export=view&id=ID_AQUI</code></p>
+              <p><strong>Imgur:</strong> Acesse <a href="https://imgur.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">imgur.com</a>, faça upload e copie o link direto da imagem (.jpg)</p>
+              <p><strong>Dropbox:</strong> Compartilhe o arquivo e troque <code className="bg-gray-100 px-1 rounded">?dl=0</code> por <code className="bg-gray-100 px-1 rounded">?raw=1</code> na URL</p>
+              <p><strong>iCloud Fotos:</strong> Compartilhe a foto e copie o link público gerado</p>
+            </div>
+          </details>
+
         </div>
       </div>
 
