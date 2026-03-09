@@ -140,12 +140,12 @@ function Secao({ titulo, icone, children, defaultOpen = true, badge, badgeColor 
         className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#0f2044] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-[#19385C] flex items-center justify-center">
             {icone}
           </div>
-          <span className="font-semibold text-[#0f2044]">{titulo}</span>
+          <span className="font-semibold text-[#19385C]">{titulo}</span>
           {badge && (
-            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${badgeColor || 'bg-[#D4A017] text-white'}`}>{badge}</span>
+            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${badgeColor || 'bg-[#DEC078] text-white'}`}>{badge}</span>
           )}
         </div>
         {aberto ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
@@ -176,19 +176,19 @@ function CapacidadeCard({ icon, titulo, desc, status }: {
 }) {
   const cores = {
     ativo: { bg: 'bg-green-50', border: 'border-green-200', badge: 'bg-green-100 text-green-700', label: '✅ Ativo' },
-    beta:  { bg: 'bg-[#f0f3fa]',  border: 'border-[#c5d0e8]',  badge: 'bg-[#e8edf7] text-[#0f2044]',   label: '🔬 Beta'  },
+    beta:  { bg: 'bg-[#f0f3fa]',  border: 'border-[#c5d0e8]',  badge: 'bg-[#e8edf7] text-[#19385C]',   label: '🔬 Beta'  },
     breve: { bg: 'bg-gray-50',  border: 'border-gray-200',  badge: 'bg-gray-100 text-gray-500',   label: '🔜 Em breve' },
   }
   const c = cores[status]
   return (
     <div className={`${c.bg} border ${c.border} rounded-xl p-4`}>
       <div className="flex items-start justify-between mb-2">
-        <div className="w-9 h-9 bg-[#0f2044] rounded-xl flex items-center justify-center shrink-0">
+        <div className="w-9 h-9 bg-[#19385C] rounded-xl flex items-center justify-center shrink-0">
           {icon}
         </div>
         <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${c.badge}`}>{c.label}</span>
       </div>
-      <p className="font-semibold text-[#0f2044] text-sm mt-2">{titulo}</p>
+      <p className="font-semibold text-[#19385C] text-sm mt-2">{titulo}</p>
       <p className="text-xs text-gray-500 mt-1 leading-relaxed">{desc}</p>
     </div>
   )
@@ -401,9 +401,9 @@ export default function MaraIA() {
       {/* ── Header ──────────────────────────────────────────── */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#0f2044] flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#0f2044] to-[#1a3a6e] rounded-xl flex items-center justify-center shadow-lg">
-              <Sparkles size={22} className="text-[#D4A017]" />
+          <h1 className="text-2xl font-bold text-[#19385C] flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#19385C] to-[#1a3a6e] rounded-xl flex items-center justify-center shadow-lg">
+              <Sparkles size={22} className="text-[#DEC078]" />
             </div>
             MARA IA — Secretária Executiva
           </h1>
@@ -422,7 +422,7 @@ export default function MaraIA() {
           <button
             onClick={salvarConfig}
             disabled={salvando}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#0f2044] text-white rounded-xl font-semibold hover:bg-[#1a3060] transition disabled:opacity-60"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#19385C] text-white rounded-xl font-semibold hover:bg-[#0f2044] transition disabled:opacity-60"
           >
             {salvando
               ? <><Loader size={16} className="animate-spin" /> Salvando...</>
@@ -437,15 +437,15 @@ export default function MaraIA() {
       {/* ══════════════════════════════════════════════════════ */}
       {/* PERFIL OFICIAL DA MARA IA                             */}
       {/* ══════════════════════════════════════════════════════ */}
-      <div className="bg-gradient-to-r from-[#0f2044] to-[#1a3a6e] rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-[#19385C] to-[#1a3a6e] rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
         {/* Detalhe decorativo */}
-        <div className="absolute top-0 right-0 w-48 h-48 bg-[#D4A017]/10 rounded-full -translate-y-24 translate-x-24" />
+        <div className="absolute top-0 right-0 w-48 h-48 bg-[#DEC078]/10 rounded-full -translate-y-24 translate-x-24" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 -translate-x-16" />
 
         <div className="relative flex flex-col lg:flex-row items-center lg:items-start gap-6">
           {/* Avatar */}
           <div className="relative shrink-0">
-            <div className="w-32 h-32 rounded-2xl border-4 border-[#D4A017] shadow-2xl overflow-hidden">
+            <div className="w-32 h-32 rounded-2xl border-4 border-[#DEC078] shadow-2xl overflow-hidden">
               <img
                 src={MARA_AVATAR_URL}
                 alt="MARA IA"
@@ -465,18 +465,18 @@ export default function MaraIA() {
           <div className="flex-1 text-center lg:text-left">
             <div className="flex items-center gap-3 justify-center lg:justify-start flex-wrap">
               <h2 className="text-3xl font-bold text-white">MARA IA</h2>
-              <span className="bg-[#D4A017] text-white text-xs px-3 py-1 rounded-full font-bold">
+              <span className="bg-[#DEC078] text-white text-xs px-3 py-1 rounded-full font-bold">
                 Secretária Executiva
               </span>
             </div>
-            <p className="text-[#D4A017] font-semibold text-sm mt-1">Dr. Mauro Monção · Advogados Associados</p>
+            <p className="text-[#DEC078] font-semibold text-sm mt-1">Dr. Mauro Monção · Advogados Associados</p>
             <p className="text-white/70 text-xs mt-1">22 anos · Brasileira · Formada em Gestão Jurídica · FGV São Paulo · 4 anos de experiência</p>
 
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="bg-white/10 rounded-xl p-3 border border-white/20">
                 <p className="text-white/60 text-xs mb-1">📱 Número Dedicado</p>
                 <p className="text-white font-bold text-lg">(86) 99948-4761</p>
-                <p className="text-[#D4A017] text-xs">Número conectado Z-API</p>
+                <p className="text-[#DEC078] text-xs">Número conectado Z-API</p>
               </div>
               <div className="bg-white/10 rounded-xl p-3 border border-white/20">
                 <p className="text-white/60 text-xs mb-1">🎙️ Voz ElevenLabs</p>
@@ -506,7 +506,7 @@ export default function MaraIA() {
               { tag: 'Eficiente',   emoji: '🎯' },
               { tag: 'Empática',    emoji: '💝' },
             ].map(({ tag, emoji }) => (
-              <span key={tag} className="text-xs bg-[#D4A017]/20 border border-[#D4A017]/40 text-[#D4A017] px-3 py-1 rounded-full text-center">
+              <span key={tag} className="text-xs bg-[#DEC078]/20 border border-[#DEC078]/40 text-[#DEC078] px-3 py-1 rounded-full text-center">
                 {emoji} {tag}
               </span>
             ))}
@@ -526,7 +526,7 @@ export default function MaraIA() {
               <div key={t.ctx} className="bg-white/10 rounded-lg p-2 text-center">
                 <p className="text-lg">{t.icon}</p>
                 <p className="text-white/60 text-[10px]">{t.ctx}</p>
-                <p className="text-[#D4A017] text-[10px] font-semibold">{t.resp}</p>
+                <p className="text-[#DEC078] text-[10px] font-semibold">{t.resp}</p>
               </div>
             ))}
           </div>
@@ -544,15 +544,15 @@ export default function MaraIA() {
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-              modoAusenteStatus.ativo ? 'bg-amber-500' : 'bg-[#0f2044]'
+              modoAusenteStatus.ativo ? 'bg-amber-500' : 'bg-[#19385C]'
             }`}>
               {modoAusenteStatus.ativo
                 ? <PauseCircle size={20} className="text-white" />
-                : <PlayCircle size={20} className="text-[#D4A017]" />
+                : <PlayCircle size={20} className="text-[#DEC078]" />
               }
             </div>
             <div>
-              <h3 className="font-bold text-[#0f2044] text-lg">🛡️ Modo Ausente da MARA IA</h3>
+              <h3 className="font-bold text-[#19385C] text-lg">🛡️ Modo Ausente da MARA IA</h3>
               <p className="text-xs text-gray-500">Quando ativo, MARA responde por você automaticamente no WhatsApp</p>
             </div>
           </div>
@@ -586,7 +586,7 @@ export default function MaraIA() {
                   : 'border-gray-100 bg-gray-50 hover:border-amber-200'
               }`}
             >
-              <p className="font-semibold text-sm text-[#0f2044]">{m.label}</p>
+              <p className="font-semibold text-sm text-[#19385C]">{m.label}</p>
               <p className="text-xs text-gray-500 mt-0.5">{m.desc}</p>
             </button>
           ))}
@@ -675,7 +675,7 @@ export default function MaraIA() {
 
         {/* Comandos via WhatsApp */}
         <div className="mt-4 p-3 bg-[#f0f3fa] border border-[#c5d0e8] rounded-xl">
-          <p className="text-xs font-semibold text-[#0f2044] mb-2">📱 Também funciona via WhatsApp — envie para a MARA:</p>
+          <p className="text-xs font-semibold text-[#19385C] mb-2">📱 Também funciona via WhatsApp — envie para a MARA:</p>
           <div className="flex flex-wrap gap-2">
             {[
               { cmd: '/ausente ferias 20/03', desc: 'Férias até 20/03' },
@@ -683,7 +683,7 @@ export default function MaraIA() {
               { cmd: '/ausente audiencia 15h', desc: 'Audiência até 15h' },
               { cmd: '/presente',              desc: 'Desativar' },
             ].map(c => (
-              <code key={c.cmd} className="text-xs bg-white border border-[#c5d0e8] text-[#0f2044] px-2 py-1 rounded-lg">
+              <code key={c.cmd} className="text-xs bg-white border border-[#c5d0e8] text-[#19385C] px-2 py-1 rounded-lg">
                 {c.cmd}
               </code>
             ))}
@@ -696,7 +696,7 @@ export default function MaraIA() {
       {/* ══════════════════════════════════════════════════════ */}
       <Secao
         titulo="🎙️ Vozes ElevenLabs — Dr. Ben & MARA IA"
-        icone={<Volume2 size={16} className="text-[#D4A017]" />}
+        icone={<Volume2 size={16} className="text-[#DEC078]" />}
         badge="TTS Ativo"
         badgeColor="bg-purple-100 text-purple-700"
       >
@@ -713,14 +713,14 @@ export default function MaraIA() {
           {/* Cards de voz */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Dr. Ben */}
-            <div className="p-4 rounded-xl border-2 border-[#0f2044] bg-gradient-to-br from-[#0f2044]/5 to-[#0f2044]/10">
+            <div className="p-4 rounded-xl border-2 border-[#19385C] bg-gradient-to-br from-[#19385C]/5 to-[#19385C]/10">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 bg-[#0f2044] rounded-xl flex items-center justify-center">
-                    <Scale size={16} className="text-[#D4A017]" />
+                  <div className="w-9 h-9 bg-[#19385C] rounded-xl flex items-center justify-center">
+                    <Scale size={16} className="text-[#DEC078]" />
                   </div>
                   <div>
-                    <p className="font-bold text-[#0f2044] text-sm">Dr. Ben</p>
+                    <p className="font-bold text-[#19385C] text-sm">Dr. Ben</p>
                     <p className="text-xs text-gray-400">Assistente Jurídico</p>
                   </div>
                 </div>
@@ -728,7 +728,7 @@ export default function MaraIA() {
               </div>
               <div className="mb-3">
                 <p className="text-xs text-gray-500 mb-1">Voice ID ElevenLabs:</p>
-                <code className="text-xs font-mono bg-gray-100 px-2 py-1 rounded-lg text-[#0f2044] break-all">{VOICE_DR_BEN}</code>
+                <code className="text-xs font-mono bg-gray-100 px-2 py-1 rounded-lg text-[#19385C] break-all">{VOICE_DR_BEN}</code>
               </div>
               <p className="text-xs text-gray-500 mb-3">
                 Voz masculina, profissional e acolhedora — ideal para atendimento jurídico de clientes.
@@ -736,7 +736,7 @@ export default function MaraIA() {
               <button
                 onClick={() => testarVoz('drben')}
                 disabled={testandoVoz !== null}
-                className="flex items-center gap-2 px-4 py-2 bg-[#0f2044] text-white rounded-xl text-xs font-semibold hover:bg-[#1a3060] transition disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-[#19385C] text-white rounded-xl text-xs font-semibold hover:bg-[#0f2044] transition disabled:opacity-50"
               >
                 {testandoVoz === 'drben'
                   ? <><Loader size={12} className="animate-spin" /> Gerando áudio...</>
@@ -746,14 +746,14 @@ export default function MaraIA() {
             </div>
 
             {/* MARA */}
-            <div className="p-4 rounded-xl border-2 border-[#D4A017] bg-gradient-to-br from-amber-50 to-yellow-50">
+            <div className="p-4 rounded-xl border-2 border-[#DEC078] bg-gradient-to-br from-amber-50 to-yellow-50">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 bg-[#D4A017] rounded-xl flex items-center justify-center">
+                  <div className="w-9 h-9 bg-[#DEC078] rounded-xl flex items-center justify-center">
                     <Sparkles size={16} className="text-white" />
                   </div>
                   <div>
-                    <p className="font-bold text-[#0f2044] text-sm">MARA IA</p>
+                    <p className="font-bold text-[#19385C] text-sm">MARA IA</p>
                     <p className="text-xs text-gray-400">Secretária Executiva</p>
                   </div>
                 </div>
@@ -761,7 +761,7 @@ export default function MaraIA() {
               </div>
               <div className="mb-3">
                 <p className="text-xs text-gray-500 mb-1">Voice ID ElevenLabs:</p>
-                <code className="text-xs font-mono bg-amber-100 px-2 py-1 rounded-lg text-[#0f2044] break-all">{VOICE_MARA}</code>
+                <code className="text-xs font-mono bg-amber-100 px-2 py-1 rounded-lg text-[#19385C] break-all">{VOICE_MARA}</code>
               </div>
               <p className="text-xs text-gray-500 mb-3">
                 Voz feminina, elegante e executiva — perfeita para a secretária pessoal do Dr. Mauro.
@@ -769,7 +769,7 @@ export default function MaraIA() {
               <button
                 onClick={() => testarVoz('mara')}
                 disabled={testandoVoz !== null}
-                className="flex items-center gap-2 px-4 py-2 bg-[#D4A017] text-white rounded-xl text-xs font-semibold hover:bg-amber-600 transition disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-[#DEC078] text-white rounded-xl text-xs font-semibold hover:bg-amber-600 transition disabled:opacity-50"
               >
                 {testandoVoz === 'mara'
                   ? <><Loader size={12} className="animate-spin" /> Gerando áudio...</>
@@ -786,7 +786,7 @@ export default function MaraIA() {
 
           {/* Preferências de áudio */}
           <div className="space-y-3">
-            <p className="text-sm font-semibold text-[#0f2044]">⚙️ Comportamento de Áudio</p>
+            <p className="text-sm font-semibold text-[#19385C]">⚙️ Comportamento de Áudio</p>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
@@ -794,7 +794,7 @@ export default function MaraIA() {
                 <select
                   value={config.audioPreferencia.drMauro}
                   onChange={e => setConfig(c => ({ ...c, audioPreferencia: { ...c.audioPreferencia, drMauro: e.target.value as any } }))}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044] bg-white"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#19385C] bg-white"
                 >
                   <option value="perguntar">🤔 Perguntar na primeira conversa do dia</option>
                   <option value="audio">🎙️ Sempre enviar em áudio</option>
@@ -807,7 +807,7 @@ export default function MaraIA() {
                 <select
                   value={config.audioPreferencia.clientes}
                   onChange={e => setConfig(c => ({ ...c, audioPreferencia: { ...c.audioPreferencia, clientes: e.target.value as any } }))}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044] bg-white"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#19385C] bg-white"
                 >
                   <option value="perguntar">🤔 Perguntar na 3ª mensagem do cliente</option>
                   <option value="audio">🎙️ Sempre enviar em áudio</option>
@@ -817,8 +817,8 @@ export default function MaraIA() {
             </div>
 
             <div className="p-3 bg-[#f0f3fa] border border-[#c5d0e8] rounded-xl flex items-start gap-2">
-              <Info size={14} className="text-[#0f2044] mt-0.5 shrink-0" />
-              <div className="text-xs text-[#0f2044]">
+              <Info size={14} className="text-[#19385C] mt-0.5 shrink-0" />
+              <div className="text-xs text-[#19385C]">
                 <p><strong>Como funciona:</strong> Quando configurado para "perguntar", o agente diz:</p>
                 <p className="mt-1 italic">"Posso enviar minhas próximas respostas em áudio? Prefere assim? 😊"</p>
                 <p className="mt-1">A resposta do interlocutor é salva permanentemente (sim → áudio, não → texto).</p>
@@ -830,13 +830,13 @@ export default function MaraIA() {
 
       {/* ── Papéis do Sistema ────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="p-5 rounded-2xl border-2 border-[#0f2044] bg-gradient-to-br from-[#0f2044]/5 to-[#0f2044]/10 relative overflow-hidden">
+        <div className="p-5 rounded-2xl border-2 border-[#19385C] bg-gradient-to-br from-[#19385C]/5 to-[#19385C]/10 relative overflow-hidden">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-[#0f2044] rounded-xl flex items-center justify-center">
-              <Scale size={20} className="text-[#D4A017]" />
+            <div className="w-10 h-10 bg-[#19385C] rounded-xl flex items-center justify-center">
+              <Scale size={20} className="text-[#DEC078]" />
             </div>
             <div>
-              <p className="font-bold text-[#0f2044] text-lg">Dr. Ben</p>
+              <p className="font-bold text-[#19385C] text-lg">Dr. Ben</p>
               <p className="text-xs text-gray-500">Assistente Jurídico do Escritório</p>
             </div>
           </div>
@@ -846,18 +846,18 @@ export default function MaraIA() {
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             {['Triagem 7 etapas', 'GPT-4o-mini', 'Z-API Cloud', 'ElevenLabs TTS'].map(t => (
-              <span key={t} className="text-xs bg-[#0f2044] text-white px-2 py-0.5 rounded-full">{t}</span>
+              <span key={t} className="text-xs bg-[#19385C] text-white px-2 py-0.5 rounded-full">{t}</span>
             ))}
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl border-2 border-[#D4A017] bg-gradient-to-br from-amber-50 to-yellow-50 relative overflow-hidden">
+        <div className="p-5 rounded-2xl border-2 border-[#DEC078] bg-gradient-to-br from-amber-50 to-yellow-50 relative overflow-hidden">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-[#D4A017] rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#DEC078] rounded-xl flex items-center justify-center">
               <Sparkles size={20} className="text-white" />
             </div>
             <div>
-              <p className="font-bold text-[#0f2044] text-lg">MARA IA</p>
+              <p className="font-bold text-[#19385C] text-lg">MARA IA</p>
               <p className="text-xs text-gray-500">Secretária Pessoal do Dr. Mauro</p>
             </div>
           </div>
@@ -867,7 +867,7 @@ export default function MaraIA() {
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             {['Notificação imediata', 'Modo Ausente', 'Comandos /leads', 'ElevenLabs TTS'].map(t => (
-              <span key={t} className="text-xs bg-[#D4A017] text-white px-2 py-0.5 rounded-full">{t}</span>
+              <span key={t} className="text-xs bg-[#DEC078] text-white px-2 py-0.5 rounded-full">{t}</span>
             ))}
           </div>
         </div>
@@ -876,8 +876,8 @@ export default function MaraIA() {
       {/* ── Status em Tempo Real ─────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-[#0f2044] flex items-center gap-2">
-            <Activity size={16} className="text-[#D4A017]" />
+          <h3 className="font-semibold text-[#19385C] flex items-center gap-2">
+            <Activity size={16} className="text-[#DEC078]" />
             Status do Sistema em Tempo Real
           </h3>
           <button
@@ -896,7 +896,7 @@ export default function MaraIA() {
             },
             { label: 'Dr. Ben',  icon: <CheckCircle size={14} className="text-green-600" />, status: '✅ Operacional', bg: 'bg-green-50 border-green-200' },
             { label: 'MARA IA',  icon: <Sparkles size={14} className="text-amber-500" />,    status: '✅ Online',       bg: 'bg-amber-50 border-amber-200' },
-            { label: 'GPT-4o',   icon: <Cpu size={14} className="text-[#0f2044]" />,           status: 'gpt-4o-mini',    bg: 'bg-[#f0f3fa] border-[#c5d0e8]' },
+            { label: 'GPT-4o',   icon: <Cpu size={14} className="text-[#19385C]" />,           status: 'gpt-4o-mini',    bg: 'bg-[#f0f3fa] border-[#c5d0e8]' },
             { label: 'TTS',      icon: <Volume2 size={14} className="text-purple-600" />,     status: '✅ ElevenLabs',   bg: 'bg-purple-50 border-purple-200' },
           ].map(s => (
             <div key={s.label} className={`rounded-xl p-3 border ${s.bg}`}>
@@ -912,7 +912,7 @@ export default function MaraIA() {
         {/* Leads estatísticas */}
         <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-            { label: 'Total Leads', valor: estatisticas.totalLeads,           suffix: '',  cor: 'text-[#0f2044]',   bg: 'bg-[#f0f3fa]',   icon: <Users size={16} className="text-[#0f2044]" />      },
+            { label: 'Total Leads', valor: estatisticas.totalLeads,           suffix: '',  cor: 'text-[#19385C]',   bg: 'bg-[#f0f3fa]',   icon: <Users size={16} className="text-[#19385C]" />      },
             { label: 'Taxa Resposta', valor: 97,                              suffix: '%', cor: 'text-green-600',  bg: 'bg-green-50',  icon: <TrendingUp size={16} className="text-green-500" /> },
             { label: 'Tempo Médio',  valor: estatisticas.tempoMedioResposta,  suffix: '',  cor: 'text-purple-600', bg: 'bg-purple-50', icon: <Zap size={16} className="text-purple-500" />       },
             { label: 'Satisfação',   valor: estatisticas.satisfacao,          suffix: '%', cor: 'text-amber-600',  bg: 'bg-amber-50',  icon: <Star size={16} className="text-amber-500" />       },
@@ -930,8 +930,8 @@ export default function MaraIA() {
 
       {/* ── Controle Geral ───────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-        <h3 className="font-semibold text-[#0f2044] mb-4 flex items-center gap-2">
-          <Settings2 size={16} className="text-[#D4A017]" />
+        <h3 className="font-semibold text-[#19385C] mb-4 flex items-center gap-2">
+          <Settings2 size={16} className="text-[#DEC078]" />
           Controle Geral
         </h3>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -966,7 +966,7 @@ export default function MaraIA() {
       </div>
 
       {/* ── Identidade do Dr. Ben ────────────────────────────── */}
-      <Secao titulo="Identidade do Dr. Ben" icone={<Bot size={16} className="text-[#D4A017]" />}>
+      <Secao titulo="Identidade do Dr. Ben" icone={<Bot size={16} className="text-[#DEC078]" />}>
         <div className="mt-4 space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
@@ -975,7 +975,7 @@ export default function MaraIA() {
                 type="text"
                 value={config.nome}
                 onChange={e => set('nome', e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#19385C]"
                 placeholder="Dr. Ben"
               />
             </div>
@@ -984,7 +984,7 @@ export default function MaraIA() {
               <select
                 value={config.tom}
                 onChange={e => set('tom', e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044] bg-white"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#19385C] bg-white"
               >
                 <option value="formal">🎩 Formal — Linguagem técnica e distante</option>
                 <option value="cordial">🤝 Cordial — Profissional e acolhedor (Recomendado)</option>
@@ -995,22 +995,22 @@ export default function MaraIA() {
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">Saudação Inicial</label>
             <textarea rows={2} value={config.saudacao} onChange={e => set('saudacao', e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]" />
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#19385C]" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">Mensagem de Despedida</label>
             <textarea rows={2} value={config.despedida} onChange={e => set('despedida', e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]" />
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#19385C]" />
           </div>
         </div>
       </Secao>
 
       {/* ── Prompt da IA ─────────────────────────────────────── */}
-      <Secao titulo="Instruções da IA — Prompt do Dr. Ben" icone={<Brain size={16} className="text-[#D4A017]" />} defaultOpen={false}>
+      <Secao titulo="Instruções da IA — Prompt do Dr. Ben" icone={<Brain size={16} className="text-[#DEC078]" />} defaultOpen={false}>
         <div className="mt-4">
           <div className="flex items-start gap-2 mb-3 p-3 bg-[#f0f3fa] border border-[#e8edf7] rounded-xl">
-            <Info size={14} className="text-[#0f2044] mt-0.5 shrink-0" />
-            <p className="text-xs text-[#0f2044]">
+            <Info size={14} className="text-[#19385C] mt-0.5 shrink-0" />
+            <p className="text-xs text-[#19385C]">
               Este é o <strong>"cérebro"</strong> do Dr. Ben. O fluxo de 7 etapas garante triagem completa antes de notificar a MARA IA.
             </p>
           </div>
@@ -1018,7 +1018,7 @@ export default function MaraIA() {
             rows={12}
             value={config.promptBase}
             onChange={e => set('promptBase', e.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#0f2044] bg-gray-50"
+            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#19385C] bg-gray-50"
           />
           <div className="flex items-center justify-between mt-2">
             <p className="text-xs text-gray-400">{config.promptBase.length} caracteres · GPT-4o-mini</p>
@@ -1031,7 +1031,7 @@ export default function MaraIA() {
       </Secao>
 
       {/* ── Áreas de Atuação ─────────────────────────────────── */}
-      <Secao titulo="Áreas de Atuação" icone={<Scale size={16} className="text-[#D4A017]" />} defaultOpen={false}>
+      <Secao titulo="Áreas de Atuação" icone={<Scale size={16} className="text-[#DEC078]" />} defaultOpen={false}>
         <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-3">
           {([
             { key: 'tributario',     label: 'Tributário',      emoji: '🧾', desc: 'Impostos, execuções, parcelamentos' },
@@ -1047,14 +1047,14 @@ export default function MaraIA() {
               key={a.key}
               onClick={() => setConfig(c => ({ ...c, areas: { ...c.areas, [a.key]: !c.areas[a.key] } }))}
               className={`cursor-pointer rounded-xl p-3 border-2 transition-all ${
-                config.areas[a.key] ? 'border-[#0f2044] bg-[#f0f3fa]' : 'border-gray-100 bg-white hover:border-gray-300'
+                config.areas[a.key] ? 'border-[#19385C] bg-[#f0f3fa]' : 'border-gray-100 bg-white hover:border-gray-300'
               }`}
             >
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xl">{a.emoji}</span>
                 <Toggle checked={config.areas[a.key]} onChange={v => setConfig(c => ({ ...c, areas: { ...c.areas, [a.key]: v } }))} />
               </div>
-              <p className={`font-semibold text-xs ${config.areas[a.key] ? 'text-[#0f2044]' : 'text-gray-400'}`}>{a.label}</p>
+              <p className={`font-semibold text-xs ${config.areas[a.key] ? 'text-[#19385C]' : 'text-gray-400'}`}>{a.label}</p>
               <p className="text-xs text-gray-400 mt-0.5">{a.desc}</p>
             </div>
           ))}
@@ -1062,7 +1062,7 @@ export default function MaraIA() {
       </Secao>
 
       {/* ── Horário de Atendimento ──────────────────────────── */}
-      <Secao titulo="Horário de Atendimento" icone={<Clock size={16} className="text-[#D4A017]" />} defaultOpen={false}>
+      <Secao titulo="Horário de Atendimento" icone={<Clock size={16} className="text-[#DEC078]" />} defaultOpen={false}>
         <div className="mt-4">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm text-gray-500">Fora do horário, o Dr. Ben informa o cliente e agenda para o próximo dia.</p>
@@ -1084,7 +1084,7 @@ export default function MaraIA() {
                     onChange={e => setConfig(c => ({ ...c, horario: { ...c.horario, [key]: e.target.value } }))}
                     disabled={isFds && !config.horario.ativoFimDeSemana}
                     placeholder="ex: 08:00–18:00 ou Fechado"
-                    className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#0f2044] disabled:bg-gray-100"
+                    className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#19385C] disabled:bg-gray-100"
                   />
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
                     config.horario[key as keyof typeof config.horario] === 'Fechado'
@@ -1100,7 +1100,7 @@ export default function MaraIA() {
       </Secao>
 
       {/* ── Triagem & Aviso MARA ─────────────────────────────── */}
-      <Secao titulo="Triagem Dr. Ben & Aviso MARA IA" icone={<Zap size={16} className="text-[#D4A017]" />} badge="Core">
+      <Secao titulo="Triagem Dr. Ben & Aviso MARA IA" icone={<Zap size={16} className="text-[#DEC078]" />} badge="Core">
         <div className="mt-4 space-y-5">
           <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-[#c5d0e8] rounded-xl">
             <div className="flex items-center justify-between mb-3">
@@ -1110,13 +1110,13 @@ export default function MaraIA() {
                   Após este número de trocas, Dr. Ben finaliza a triagem e a MARA IA avisa o Dr. Mauro no <strong>via WhatsApp pessoal</strong>
                 </p>
               </div>
-              <span className="text-[#0f2044] font-bold text-3xl w-14 text-center">{config.mensagensParaTriagem}</span>
+              <span className="text-[#19385C] font-bold text-3xl w-14 text-center">{config.mensagensParaTriagem}</span>
             </div>
             <input
               type="range" min={1} max={7} step={1}
               value={config.mensagensParaTriagem}
               onChange={e => set('mensagensParaTriagem', Number(e.target.value))}
-              className="w-full accent-[#0f2044]"
+              className="w-full accent-[#19385C]"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-1">
               <span>1 (notifica rápido)</span>
@@ -1153,7 +1153,7 @@ export default function MaraIA() {
                   }
                 }}
                 placeholder="Digite uma palavra e pressione Enter..."
-                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]"
+                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#19385C]"
               />
               <button
                 onClick={() => {
@@ -1162,7 +1162,7 @@ export default function MaraIA() {
                     setNovasPalavras('')
                   }
                 }}
-                className="px-4 py-2 bg-[#0f2044] text-white rounded-xl text-sm font-semibold hover:bg-[#1a3060] transition"
+                className="px-4 py-2 bg-[#19385C] text-white rounded-xl text-sm font-semibold hover:bg-[#0f2044] transition"
               >
                 + Adicionar
               </button>
@@ -1174,59 +1174,59 @@ export default function MaraIA() {
               <label className="block text-xs font-semibold text-gray-500 mb-1">Máx. mensagens por sessão</label>
               <input type="number" min={5} max={30} value={config.maxMensagensSesSao}
                 onChange={e => set('maxMensagensSesSao', Number(e.target.value))}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]" />
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#19385C]" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">Tempo máx. sessão (min)</label>
               <input type="number" min={5} max={120} value={config.tempoEspera}
                 onChange={e => set('tempoEspera', Number(e.target.value))}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]" />
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#19385C]" />
             </div>
           </div>
         </div>
       </Secao>
 
       {/* ── Capacidades da MARA IA ───────────────────────────── */}
-      <Secao titulo="Capacidades Completas da MARA IA" icone={<Sparkles size={16} className="text-[#D4A017]" />} badge="Novo" defaultOpen={false}>
+      <Secao titulo="Capacidades Completas da MARA IA" icone={<Sparkles size={16} className="text-[#DEC078]" />} badge="Novo" defaultOpen={false}>
         <div className="mt-4">
           <p className="text-sm text-gray-500 mb-4">
             A MARA IA é a central de inteligência do escritório Mauro Monção:
           </p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            <CapacidadeCard icon={<Bell size={16} className="text-[#D4A017]" />}
+            <CapacidadeCard icon={<Bell size={16} className="text-[#DEC078]" />}
               titulo="Notificação Instantânea de Leads" status="ativo"
               desc="Avisa o Dr. Mauro via WhatsApp após cada lead qualificado: nome, telefone, área jurídica, urgência e resumo completo." />
-            <CapacidadeCard icon={<PauseCircle size={16} className="text-[#D4A017]" />}
+            <CapacidadeCard icon={<PauseCircle size={16} className="text-[#DEC078]" />}
               titulo="Modo Ausente Inteligente" status="ativo"
               desc="5 motivos: férias, doente, audiência, viagem, reunião. Responde automaticamente e alerta urgências mesmo durante a ausência." />
-            <CapacidadeCard icon={<Volume2 size={16} className="text-[#D4A017]" />}
+            <CapacidadeCard icon={<Volume2 size={16} className="text-[#DEC078]" />}
               titulo="Respostas em Áudio (TTS)" status="ativo"
               desc="Integração com ElevenLabs — envia áudio realista com a voz da MARA ou Dr. Ben. Sistema pergunta preferência antes de ativar." />
-            <CapacidadeCard icon={<Brain size={16} className="text-[#D4A017]" />}
+            <CapacidadeCard icon={<Brain size={16} className="text-[#DEC078]" />}
               titulo="Memória de Conversa Contínua" status="ativo"
               desc="Mantém histórico das últimas 30 mensagens com o Dr. Mauro, garantindo continuidade natural nas interações." />
-            <CapacidadeCard icon={<Users size={16} className="text-[#D4A017]" />}
+            <CapacidadeCard icon={<Users size={16} className="text-[#DEC078]" />}
               titulo="CRM Automático de Leads" status="ativo"
               desc="Salva todos os leads automaticamente no banco com nome, telefone, área, urgência, primeiro contato e resumo." />
-            <CapacidadeCard icon={<Zap size={16} className="text-[#D4A017]" />}
+            <CapacidadeCard icon={<Zap size={16} className="text-[#DEC078]" />}
               titulo="Alerta de Urgência 24/7" status="ativo"
               desc="Detecta 'penhora', 'execução fiscal', 'prazo fatal' e notifica o Dr. Mauro imediatamente, mesmo em férias." />
-            <CapacidadeCard icon={<MessageSquare size={16} className="text-[#D4A017]" />}
+            <CapacidadeCard icon={<MessageSquare size={16} className="text-[#DEC078]" />}
               titulo="Triagem Jurídica em 7 Etapas" status="ativo"
               desc="Dr. Ben conduz o cliente por identificação, área jurídica, urgência e contato de forma natural e profissional." />
-            <CapacidadeCard icon={<ArrowRight size={16} className="text-[#D4A017]" />}
+            <CapacidadeCard icon={<ArrowRight size={16} className="text-[#DEC078]" />}
               titulo="Link Direto ao Cliente" status="ativo"
               desc="Notificação inclui wa.me direto para responder o cliente com um toque, sem precisar salvar o número." />
-            <CapacidadeCard icon={<BarChart2 size={16} className="text-[#D4A017]" />}
+            <CapacidadeCard icon={<BarChart2 size={16} className="text-[#DEC078]" />}
               titulo="Dashboard Analytics" status="beta"
               desc="Visualize leads por área, urgência, taxa de conversão e histórico completo no painel CRM." />
-            <CapacidadeCard icon={<FileText size={16} className="text-[#D4A017]" />}
+            <CapacidadeCard icon={<FileText size={16} className="text-[#DEC078]" />}
               titulo="Contratos Digitais (ZapSign)" status="breve"
               desc="Envio automático de contratos após qualificação. Cliente assina direto pelo WhatsApp." />
-            <CapacidadeCard icon={<Target size={16} className="text-[#D4A017]" />}
+            <CapacidadeCard icon={<Target size={16} className="text-[#DEC078]" />}
               titulo="Campanhas Jurídicas" status="breve"
               desc="Mensagens em massa para leads segmentados por área: tributário, previdenciário, trabalhista, etc." />
-            <CapacidadeCard icon={<Phone size={16} className="text-[#D4A017]" />}
+            <CapacidadeCard icon={<Phone size={16} className="text-[#DEC078]" />}
               titulo="Assumir Conversa" status="breve"
               desc="Dr. Mauro assume a conversa diretamente pelo CRM, pausando o Dr. Ben e respondendo pessoalmente." />
           </div>
@@ -1234,11 +1234,11 @@ export default function MaraIA() {
       </Secao>
 
       {/* ── Testar Dr. Ben ao Vivo ───────────────────────────── */}
-      <Secao titulo="Simular Conversa com Dr. Ben" icone={<Play size={16} className="text-[#D4A017]" />} defaultOpen={false}>
+      <Secao titulo="Simular Conversa com Dr. Ben" icone={<Play size={16} className="text-[#DEC078]" />} defaultOpen={false}>
         <div className="mt-4 space-y-4">
           <div className="p-3 bg-[#f0f3fa] border border-[#c5d0e8] rounded-xl flex items-start gap-2">
-            <Info size={14} className="text-[#0f2044] mt-0.5 shrink-0" />
-            <p className="text-xs text-[#0f2044]">
+            <Info size={14} className="text-[#19385C] mt-0.5 shrink-0" />
+            <p className="text-xs text-[#19385C]">
               Simule como o <strong>Dr. Ben</strong> responderia a um cliente via GPT-4o-mini.
             </p>
           </div>
@@ -1249,12 +1249,12 @@ export default function MaraIA() {
               onChange={e => setMsgTeste(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && testarDrBen()}
               placeholder='Ex: "Recebi uma multa da Receita Federal, o que fazer?"'
-              className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]"
+              className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#19385C]"
             />
             <button
               onClick={testarDrBen}
               disabled={testando || !msgTeste.trim()}
-              className="flex items-center gap-2 px-5 py-2.5 bg-[#0f2044] text-white rounded-xl text-sm font-semibold disabled:opacity-50 hover:bg-[#1a3060] transition"
+              className="flex items-center gap-2 px-5 py-2.5 bg-[#19385C] text-white rounded-xl text-sm font-semibold disabled:opacity-50 hover:bg-[#0f2044] transition"
             >
               {testando ? <Loader size={16} className="animate-spin" /> : <Play size={16} />}
               Testar
@@ -1263,8 +1263,8 @@ export default function MaraIA() {
           {respostaTeste && (
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Scale size={16} className="text-[#D4A017]" />
-                <span className="text-xs font-bold text-[#0f2044]">{config.nome} respondeu:</span>
+                <Scale size={16} className="text-[#DEC078]" />
+                <span className="text-xs font-bold text-[#19385C]">{config.nome} respondeu:</span>
               </div>
               <p className="text-sm text-gray-700 whitespace-pre-wrap">{respostaTeste}</p>
             </div>
@@ -1281,7 +1281,7 @@ export default function MaraIA() {
                 'Fui demitido sem justa causa',
               ].map(ex => (
                 <button key={ex} onClick={() => setMsgTeste(ex)}
-                  className="text-xs px-3 py-1.5 bg-white border border-gray-200 rounded-lg hover:border-[#0f2044] hover:text-[#0f2044] transition">
+                  className="text-xs px-3 py-1.5 bg-white border border-gray-200 rounded-lg hover:border-[#19385C] hover:text-[#19385C] transition">
                   {ex}
                 </button>
               ))}
@@ -1291,19 +1291,19 @@ export default function MaraIA() {
       </Secao>
 
       {/* ── Setup da Instância MARA Z-API ───────────────────── */}
-      <Secao titulo="Setup — Instância MARA Z-API" icone={<Zap size={16} className="text-[#D4A017]" />} badge="Novo" defaultOpen={true}>
+      <Secao titulo="Setup — Instância MARA Z-API" icone={<Zap size={16} className="text-[#DEC078]" />} badge="Novo" defaultOpen={true}>
         <div className="mt-4 space-y-5">
 
           {/* Credenciais da nova instância */}
           <div>
-            <p className="text-xs font-bold text-[#0f2044] uppercase tracking-wide mb-3 flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-[#0f2044] text-white flex items-center justify-center text-xs">1</span>
+            <p className="text-xs font-bold text-[#19385C] uppercase tracking-wide mb-3 flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-[#19385C] text-white flex items-center justify-center text-xs">1</span>
               Credenciais da Nova Instância MARA
             </p>
             <div className="overflow-x-auto rounded-xl border border-gray-200">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-[#0f2044] text-white">
+                  <tr className="bg-[#19385C] text-white">
                     <th className="px-4 py-3 text-left text-xs font-semibold">Campo</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold">Valor</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold">Status</th>
@@ -1318,7 +1318,7 @@ export default function MaraIA() {
                     { campo: 'Webhook URL',   valor: 'ben-growth-center.vercel.app/api/whatsapp-mara', status: 'ok' },
                   ].map((row, i) => (
                     <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                      <td className="px-4 py-3 font-semibold text-[#0f2044] text-xs">{row.campo}</td>
+                      <td className="px-4 py-3 font-semibold text-[#19385C] text-xs">{row.campo}</td>
                       <td className="px-4 py-3 font-mono text-xs text-gray-700 break-all">{row.valor}</td>
                       <td className="px-4 py-3">
                         <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
@@ -1338,14 +1338,14 @@ export default function MaraIA() {
 
           {/* Passo a passo */}
           <div>
-            <p className="text-xs font-bold text-[#0f2044] uppercase tracking-wide mb-3 flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-[#0f2044] text-white flex items-center justify-center text-xs">2</span>
+            <p className="text-xs font-bold text-[#19385C] uppercase tracking-wide mb-3 flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-[#19385C] text-white flex items-center justify-center text-xs">2</span>
               Passos para Ativar (em ordem)
             </p>
             <div className="overflow-x-auto rounded-xl border border-gray-200">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-[#D4A017] text-white">
+                  <tr className="bg-[#DEC078] text-white">
                     <th className="px-4 py-3 text-left text-xs font-semibold w-10">Passo</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold">Ação</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold">Onde</th>
@@ -1387,7 +1387,7 @@ export default function MaraIA() {
                   ].map((row, i) => (
                     <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                       <td className="px-4 py-3 text-center">
-                        <span className="w-7 h-7 rounded-full bg-[#0f2044] text-white text-xs font-bold flex items-center justify-center mx-auto">
+                        <span className="w-7 h-7 rounded-full bg-[#19385C] text-white text-xs font-bold flex items-center justify-center mx-auto">
                           {row.passo}
                         </span>
                       </td>
@@ -1407,14 +1407,14 @@ export default function MaraIA() {
 
           {/* Links rápidos de setup */}
           <div>
-            <p className="text-xs font-bold text-[#0f2044] uppercase tracking-wide mb-3 flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-[#0f2044] text-white flex items-center justify-center text-xs">3</span>
+            <p className="text-xs font-bold text-[#19385C] uppercase tracking-wide mb-3 flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-[#19385C] text-white flex items-center justify-center text-xs">3</span>
               Links Rápidos de Configuração
             </p>
             <div className="overflow-x-auto rounded-xl border border-gray-200">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-[#0f2044] text-white">
+                  <tr className="bg-[#19385C] text-white">
                     <th className="px-4 py-3 text-left text-xs font-semibold">Ação</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold">URL</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold w-20">Abrir</th>
@@ -1429,7 +1429,7 @@ export default function MaraIA() {
                     { acao: '🔌 Desconectar Instância',      url: '/api/mara-setup?action=desconectar' },
                   ].map((row, i) => (
                     <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                      <td className="px-4 py-3 text-xs font-semibold text-[#0f2044]">{row.acao}</td>
+                      <td className="px-4 py-3 text-xs font-semibold text-[#19385C]">{row.acao}</td>
                       <td className="px-4 py-3 font-mono text-xs text-gray-600">
                         https://ben-growth-center.vercel.app{row.url}
                       </td>
@@ -1438,7 +1438,7 @@ export default function MaraIA() {
                           href={`https://ben-growth-center.vercel.app${row.url}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-xs text-[#D4A017] font-semibold hover:underline"
+                          className="flex items-center gap-1 text-xs text-[#DEC078] font-semibold hover:underline"
                         >
                           Abrir <ExternalLink size={12} />
                         </a>
@@ -1452,7 +1452,7 @@ export default function MaraIA() {
 
           {/* Comandos do WhatsApp */}
           <div>
-            <p className="text-xs font-bold text-[#0f2044] uppercase tracking-wide mb-3 flex items-center gap-2">
+            <p className="text-xs font-bold text-[#19385C] uppercase tracking-wide mb-3 flex items-center gap-2">
               <span className="w-5 h-5 rounded-full bg-[#25D366] text-white flex items-center justify-center text-xs">W</span>
               Comandos MARA via WhatsApp
             </p>
@@ -1478,7 +1478,7 @@ export default function MaraIA() {
                   ].map((row, i) => (
                     <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                       <td className="px-4 py-3">
-                        <code className="text-xs font-mono bg-gray-100 text-[#0f2044] px-2 py-1 rounded font-bold">{row.cmd}</code>
+                        <code className="text-xs font-mono bg-gray-100 text-[#19385C] px-2 py-1 rounded font-bold">{row.cmd}</code>
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-700">{row.desc}</td>
                       <td className="px-4 py-3 text-xs text-gray-500 italic">{row.efeito}</td>
@@ -1491,7 +1491,7 @@ export default function MaraIA() {
 
           {/* Modo Ausente — Como funciona */}
           <div>
-            <p className="text-xs font-bold text-[#0f2044] uppercase tracking-wide mb-3 flex items-center gap-2">
+            <p className="text-xs font-bold text-[#19385C] uppercase tracking-wide mb-3 flex items-center gap-2">
               <span className="w-5 h-5 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs">⚡</span>
               Modo Ausente — Fluxo de Troca de Perfil
             </p>
@@ -1510,7 +1510,7 @@ export default function MaraIA() {
                     <td className="px-4 py-3 text-xs font-semibold text-green-700">🟢 Modo PRESENTE</td>
                     <td className="px-4 py-3 text-xs text-gray-800">Dr. Mauro Monção</td>
                     <td className="px-4 py-3 text-xs text-gray-600">Advogado | OAB/PI · CE · MA</td>
-                    <td className="px-4 py-3 text-xs font-semibold text-[#0f2044]">Você (Dr. Mauro)</td>
+                    <td className="px-4 py-3 text-xs font-semibold text-[#19385C]">Você (Dr. Mauro)</td>
                   </tr>
                   <tr className="bg-gray-50">
                     <td className="px-4 py-3 text-xs font-semibold text-red-600">🔴 Modo AUSENTE</td>
@@ -1533,13 +1533,13 @@ export default function MaraIA() {
       </Secao>
 
       {/* ── Variáveis de Ambiente ────────────────────────────── */}
-      <Secao titulo="Variáveis de Ambiente (Vercel)" icone={<Lock size={16} className="text-[#D4A017]" />} defaultOpen={false}>
+      <Secao titulo="Variáveis de Ambiente (Vercel)" icone={<Lock size={16} className="text-[#DEC078]" />} defaultOpen={false}>
         <div className="mt-4 space-y-4">
           <p className="text-xs text-gray-500 flex items-center gap-2">
             <ExternalLink size={12} />
             Configure em{' '}
             <a href="https://vercel.com" target="_blank" rel="noopener noreferrer"
-               className="text-[#D4A017] font-semibold hover:underline">
+               className="text-[#DEC078] font-semibold hover:underline">
               vercel.com → ben-growth-center → Settings → Environment Variables
             </a>
           </p>
@@ -1550,7 +1550,7 @@ export default function MaraIA() {
             <div className="overflow-x-auto rounded-xl border border-gray-200">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-[#0f2044] text-white">
+                  <tr className="bg-[#19385C] text-white">
                     <th className="px-4 py-3 text-left text-xs font-semibold">Variável</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold">Descrição</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold w-24">Status</th>
@@ -1567,7 +1567,7 @@ export default function MaraIA() {
                     { key: 'ELEVENLABS_API_KEY',   desc: 'ElevenLabs TTS — voz Dr. Ben + MARA',                 status: 'ok' },
                   ].map((v, i) => (
                     <tr key={v.key} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                      <td className="px-4 py-3"><code className="text-xs font-mono text-[#0f2044]">{v.key}</code></td>
+                      <td className="px-4 py-3"><code className="text-xs font-mono text-[#19385C]">{v.key}</code></td>
                       <td className="px-4 py-3 text-xs text-gray-600">{v.desc}</td>
                       <td className="px-4 py-3">
                         <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 font-semibold">✅ OK</span>
@@ -1661,7 +1661,7 @@ export default function MaraIA() {
         <button
           onClick={salvarConfig}
           disabled={salvando}
-          className="flex items-center gap-2 px-6 py-2.5 bg-[#0f2044] text-white rounded-xl font-semibold hover:bg-[#1a3060] transition disabled:opacity-60"
+          className="flex items-center gap-2 px-6 py-2.5 bg-[#19385C] text-white rounded-xl font-semibold hover:bg-[#0f2044] transition disabled:opacity-60"
         >
           {salvando
             ? <><Loader size={16} className="animate-spin" /> Salvando...</>

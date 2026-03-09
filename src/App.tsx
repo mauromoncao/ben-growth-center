@@ -134,7 +134,7 @@ function Sidebar() {
   return (
     <aside
       className="w-56 h-screen flex flex-col fixed left-0 top-0 z-40"
-      style={{ background: '#0f2044', borderRight: '1px solid #0a1830' }}
+      style={{ background: '#19385C', borderRight: '1px solid #0a1830' }}
     >
       {/* Logo / Brand */}
       <div className="px-4 py-4 flex-shrink-0" style={{ borderBottom: '1px solid #1a3060' }}>
@@ -142,7 +142,7 @@ function Sidebar() {
           {/* Círculo dourado com B */}
           <div
             className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ background: '#D4A017' }}
+            style={{ background: '#DEC078' }}
           >
             <span className="text-sm font-bold text-white">B</span>
           </div>
@@ -150,7 +150,7 @@ function Sidebar() {
             <h1 className="font-bold text-sm leading-tight" style={{ color: '#FFFFFF' }}>
               Ben Growth Center
             </h1>
-            <p className="text-[10px] font-medium tracking-wide" style={{ color: '#D4A017' }}>
+            <p className="text-[10px] font-medium tracking-wide" style={{ color: '#DEC078' }}>
               Centro de Inteligência Comercial
             </p>
           </div>
@@ -164,7 +164,7 @@ function Sidebar() {
           <div key={group.label}>
             <p
               className="text-[10px] font-semibold px-2 mb-1 tracking-wider uppercase"
-              style={{ color: '#D4A017' }}
+              style={{ color: '#DEC078' }}
             >
               {group.label}
             </p>
@@ -185,7 +185,7 @@ function Sidebar() {
                             background: '#0a1830',
                             color: '#FFFFFF',
                             fontWeight: 600,
-                            borderLeft: '3px solid #D4A017',
+                            borderLeft: '3px solid #DEC078',
                             paddingLeft: '9px',
                             paddingRight: '8px',
                           }
@@ -226,7 +226,7 @@ function Sidebar() {
           {/* Avatar dourado */}
           <div
             className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ background: '#D4A017', color: '#FFFFFF' }}
+            style={{ background: '#DEC078', color: '#FFFFFF' }}
           >
             <span className="text-[10px] font-bold">MM</span>
           </div>
@@ -234,7 +234,7 @@ function Sidebar() {
             <p className="text-xs font-semibold truncate" style={{ color: '#FFFFFF' }}>
               Mauro Monção
             </p>
-            <p className="text-[10px] truncate" style={{ color: '#c9b98a' }}>
+            <p className="text-[10px] truncate" style={{ color: 'rgba(197,208,232,0.80)' }}>
               OAB/PI · Tributarista
             </p>
           </div>
@@ -242,9 +242,9 @@ function Sidebar() {
             onClick={logout}
             title="Sair"
             className="p-1 rounded transition-colors flex-shrink-0"
-            style={{ color: '#D4A017' }}
+            style={{ color: '#DEC078' }}
             onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#FCA5A5')}
-            onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#D4A017')}
+            onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#DEC078')}
           >
             <LogOut className="w-3.5 h-3.5" />
           </button>
@@ -270,7 +270,7 @@ function TopBar() {
   return (
     <header
       className="h-14 fixed top-0 left-0 right-0 z-30 flex items-center"
-      style={{ background: '#0f2044', borderBottom: '1px solid #0a1830' }}
+      style={{ background: '#19385C', borderBottom: '1px solid #0a1830' }}
     >
       {/* Zona da Sidebar: briefcase centralizado em w-56 (224px) */}
       <div
@@ -282,10 +282,10 @@ function TopBar() {
 
       {/* Breadcrumb */}
       <div className="flex-1 flex items-center px-6">
-        <span className="text-xs font-semibold" style={{ color: '#D4A017' }}>
+        <span className="text-xs font-semibold" style={{ color: '#DEC078' }}>
           {crumb.section}
         </span>
-        <span className="mx-2 text-xs" style={{ color: '#F0C040' }}>›</span>
+        <span className="mx-2 text-xs" style={{ color: '#EDD090' }}>›</span>
         <span className="text-sm font-semibold" style={{ color: '#FFFFFF' }}>
           {crumb.page}
         </span>
@@ -297,7 +297,7 @@ function TopBar() {
         <button
           className="relative p-2 rounded-lg transition-colors"
           style={{ color: '#FFFFFF' }}
-          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#F0C040')}
+          onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#EDD090')}
           onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = '#FFFFFF')}
           title="Notificações"
         >
@@ -314,7 +314,7 @@ function TopBar() {
         {/* Avatar com iniciais — fundo azul institucional */}
         <div
           className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer select-none"
-          style={{ background: '#D4A017', color: '#FFFFFF' }}
+          style={{ background: '#DEC078', color: '#FFFFFF' }}
           title={user?.nome || 'Usuário'}
         >
           <span className="text-xs font-bold">{initials}</span>
@@ -327,13 +327,13 @@ function TopBar() {
 // ─── Layout ────────────────────────────────────────────────────
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex" style={{ background: '#F7F9FC', minHeight: '100vh' }}>
+    <div className="flex" style={{ background: '#F7F9FC', minHeight: '100vh', overflowX: 'hidden' }}>
       <Sidebar />
       {/* Conteúdo principal deslocado pela sidebar (w-56 = 224px) */}
-      <div className="flex-1" style={{ marginLeft: '224px' }}>
+      <div className="flex-1 min-w-0" style={{ marginLeft: '224px' }}>
         <TopBar />
         <main className="pt-14 min-h-screen" style={{ background: '#F7F9FC' }}>
-          <div className="p-6">{children}</div>
+          <div className="p-6 max-w-full">{children}</div>
         </main>
       </div>
     </div>

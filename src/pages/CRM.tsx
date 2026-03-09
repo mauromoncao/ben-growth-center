@@ -366,7 +366,7 @@ function ModalAgendamento({ lead, onClose, onConfirm }: {
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{background:"#e8edf7"}}>
-              <Video className="w-5 h-5" style={{color:"#0f2044"}} />
+              <Video className="w-5 h-5" style={{color:"#19385C"}} />
             </div>
             <div>
               <h3 className="font-bold text-gray-900">Agendar Reunião Google Meet</h3>
@@ -385,7 +385,7 @@ function ModalAgendamento({ lead, onClose, onConfirm }: {
               <input
                 value={assunto}
                 onChange={e => setAssunto(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f2044]/20"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#19385C]/20"
               />
             </div>
 
@@ -396,7 +396,7 @@ function ModalAgendamento({ lead, onClose, onConfirm }: {
                   <button
                     key={d.valor}
                     onClick={() => setDataSelecionada(d.valor)}
-                    className={`py-2 px-2 rounded-lg text-xs font-medium border transition-all ${dataSelecionada === d.valor ? 'bg-[#0f2044] text-white border-[#0f2044]' : 'border-gray-200 hover:border-[#0f2044] text-gray-700'}`}
+                    className={`py-2 px-2 rounded-lg text-xs font-medium border transition-all ${dataSelecionada === d.valor ? 'bg-[#19385C] text-white border-[#19385C]' : 'border-gray-200 hover:border-[#19385C] text-gray-700'}`}
                   >
                     {d.label}
                   </button>
@@ -411,7 +411,7 @@ function ModalAgendamento({ lead, onClose, onConfirm }: {
                   <button
                     key={h}
                     onClick={() => setHoraSelecionada(h)}
-                    className={`py-2 rounded-lg text-xs font-medium border transition-all ${horaSelecionada === h ? 'bg-[#0f2044] text-white border-[#0f2044]' : 'border-gray-200 hover:border-[#0f2044] text-gray-700'}`}
+                    className={`py-2 rounded-lg text-xs font-medium border transition-all ${horaSelecionada === h ? 'bg-[#19385C] text-white border-[#19385C]' : 'border-gray-200 hover:border-[#19385C] text-gray-700'}`}
                   >
                     {h}
                   </button>
@@ -420,8 +420,8 @@ function ModalAgendamento({ lead, onClose, onConfirm }: {
             </div>
 
             <div className="rounded-xl p-3 flex items-start gap-2" style={{background:"#e8edf7"}}>
-              <Video className="w-4 h-4 mt-0.5 flex-shrink-0" style={{color:"#0f2044"}} />
-              <p className="text-xs" style={{color:"#0f2044"}}>Link Google Meet será criado automaticamente e enviado para <strong>{lead.email}</strong> e WhatsApp do cliente.</p>
+              <Video className="w-4 h-4 mt-0.5 flex-shrink-0" style={{color:"#19385C"}} />
+              <p className="text-xs" style={{color:"#19385C"}}>Link Google Meet será criado automaticamente e enviado para <strong>{lead.email}</strong> e WhatsApp do cliente.</p>
             </div>
 
             <button
@@ -469,8 +469,8 @@ function ModalAgendamento({ lead, onClose, onConfirm }: {
 
             <div className="grid grid-cols-2 gap-2">
               <div className="rounded-lg p-3 text-center" style={{background:"#e8edf7"}}>
-                <Mail className="w-4 h-4 mx-auto mb-1" style={{color:"#0f2044"}} />
-                <p className="text-xs" style={{color:"#0f2044"}}>Email enviado<br/>para {lead.email}</p>
+                <Mail className="w-4 h-4 mx-auto mb-1" style={{color:"#19385C"}} />
+                <p className="text-xs" style={{color:"#19385C"}}>Email enviado<br/>para {lead.email}</p>
               </div>
               <div className="rounded-lg p-3 text-center" style={{background:"#e6f9f3"}}>
                 <MessageCircle className="w-4 h-4 mx-auto mb-1" style={{color:"#00b37e"}} />
@@ -603,8 +603,8 @@ function ModalContrato({ lead, onClose, onConfirm }: {
                 <p className="text-xs text-green-700">WhatsApp<br/>enviado</p>
               </div>
               <div className="rounded-lg p-3 text-center" style={{background:"#e8edf7"}}>
-                <Mail className="w-4 h-4 mx-auto mb-1" style={{color:"#0f2044"}} />
-                <p className="text-xs" style={{color:"#0f2044"}}>Email<br/>enviado</p>
+                <Mail className="w-4 h-4 mx-auto mb-1" style={{color:"#19385C"}} />
+                <p className="text-xs" style={{color:"#19385C"}}>Email<br/>enviado</p>
               </div>
             </div>
 
@@ -778,8 +778,8 @@ function ModalCobranca({ lead, onClose, onConfirm }: {
                 <p className="text-xs text-green-700">WhatsApp<br/>enviado</p>
               </div>
               <div className="rounded-lg p-3 text-center" style={{background:"#e8edf7"}}>
-                <Mail className="w-4 h-4 mx-auto mb-1" style={{color:"#0f2044"}} />
-                <p className="text-xs" style={{color:"#0f2044"}}>Email<br/>enviado</p>
+                <Mail className="w-4 h-4 mx-auto mb-1" style={{color:"#19385C"}} />
+                <p className="text-xs" style={{color:"#19385C"}}>Email<br/>enviado</p>
               </div>
             </div>
 
@@ -804,7 +804,7 @@ function LeadCard({ lead, onClick }: { lead: CRMLead; onClick: () => void }) {
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{background:"#e8edf7"}}>
-            <span className="font-bold text-sm" style={{color:"#0f2044"}}>{lead.nome[0]}</span>
+            <span className="font-bold text-sm" style={{color:"#19385C"}}>{lead.nome[0]}</span>
           </div>
           <div>
             <p className="font-semibold text-gray-900 text-sm">{lead.nome}</p>
@@ -822,7 +822,7 @@ function LeadCard({ lead, onClick }: { lead: CRMLead; onClick: () => void }) {
       {/* Indicadores de integração */}
       <div className="flex gap-1 mb-2">
         {(lead.reunioes?.length ?? 0) > 0 && (
-          <span className="text-xs px-1.5 py-0.5 rounded flex items-center gap-1" style={{background:"#e8edf7",color:"#0f2044"}}>
+          <span className="text-xs px-1.5 py-0.5 rounded flex items-center gap-1" style={{background:"#e8edf7",color:"#19385C"}}>
             <Video className="w-2.5 h-2.5" /> {lead.reunioes!.length}
           </span>
         )}
@@ -855,7 +855,7 @@ function LeadCard({ lead, onClick }: { lead: CRMLead; onClick: () => void }) {
           ) : null}
           <div className="flex items-center gap-1">
             <div className="w-12 h-1.5 bg-gray-200 rounded-full">
-              <div className="h-full rounded-full" style={{background:"#0f2044", width: `${lead.score}%`}} />
+              <div className="h-full rounded-full" style={{background:"#19385C", width: `${lead.score}%`}} />
             </div>
             <span className="text-xs text-gray-400">{lead.score}</span>
           </div>
@@ -911,7 +911,7 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
           {/* Header */}
           <div className="flex items-start justify-between p-5 border-b border-gray-100">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{background:"#0f2044"}}>
+              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{background:"#19385C"}}>
                 <span className="text-gray-900 font-bold text-lg">{lead.nome[0]}</span>
               </div>
               <div>
@@ -956,7 +956,7 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
               { id: 'historico', label: '📋 Histórico' },
             ].map(aba => (
               <button key={aba.id} onClick={() => setAbaAtiva(aba.id as any)}
-                className={`flex-1 py-3 text-sm font-medium transition-colors ${abaAtiva === aba.id ? 'text-[#0f2044] border-b-2 border-[#0f2044]' : 'text-gray-500 hover:text-gray-700'}`}>
+                className={`flex-1 py-3 text-sm font-medium transition-colors ${abaAtiva === aba.id ? 'text-[#19385C] border-b-2 border-[#19385C]' : 'text-gray-500 hover:text-gray-700'}`}>
                 {aba.label}
               </button>
             ))}
@@ -972,7 +972,7 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
                   <div key={i} className={`flex gap-2 ${msg.role === 'lead' ? 'justify-end' : 'justify-start'}`}>
                     {msg.role !== 'lead' && (
                       <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-1 ${msg.role === 'dr_ben' ? 'bg-amber-100' : 'bg-[#e8edf7]'}`}>
-                        {msg.role === 'dr_ben' ? <Bot className="w-4 h-4 text-amber-600" /> : <User className="w-4 h-4" style={{color:"#0f2044"}} />}
+                        {msg.role === 'dr_ben' ? <Bot className="w-4 h-4 text-amber-600" /> : <User className="w-4 h-4" style={{color:"#19385C"}} />}
                       </div>
                     )}
                     <div className={`max-w-xs rounded-2xl px-3 py-2 text-sm ${msg.role === 'lead' ? 'rounded-tr-sm' : 'rounded-tl-sm'}`}
@@ -1056,7 +1056,7 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
               <div className="space-y-3">
                 {/* BLOCO 1: Agendamento */}
                 <div className="rounded-xl p-4" style={{background:"#e8edf7",border:"1px solid #c5d0e8"}}>
-                  <p className="font-medium text-sm mb-3 flex items-center gap-2" style={{color:"#0f2044"}}>
+                  <p className="font-medium text-sm mb-3 flex items-center gap-2" style={{color:"#19385C"}}>
                     <Video className="w-4 h-4" /> Google Calendar & Meet
                   </p>
                   <div className="space-y-2">
@@ -1065,7 +1065,7 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
                       className="w-full flex items-center justify-between p-3 bg-white/5 rounded-xl border border-blue-200 hover:border-blue-400 hover:shadow-sm transition-all"
                     >
                       <div className="flex items-center gap-2">
-                        <CalendarCheck className="w-5 h-5" style={{color:"#0f2044"}} />
+                        <CalendarCheck className="w-5 h-5" style={{color:"#19385C"}} />
                         <div className="text-left">
                           <p className="text-sm font-medium text-white">Agendar Reunião de Fechamento</p>
                           <p className="text-xs text-gray-400">Cria evento no Calendar + link Meet automático</p>
@@ -1086,7 +1086,7 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
                               <p className="text-xs text-gray-400">{r.status}</p>
                             </div>
                             <a href={r.meetLink} target="_blank" rel="noreferrer"
-                              className="text-xs px-2 py-1 rounded flex items-center gap-1 transition-colors" style={{background:"#e8edf7",color:"#0f2044"}}>
+                              className="text-xs px-2 py-1 rounded flex items-center gap-1 transition-colors" style={{background:"#e8edf7",color:"#19385C"}}>
                               <Video className="w-3 h-3" /> Entrar
                             </a>
                           </div>
@@ -1226,13 +1226,13 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
                       <div key={i} className={`p-3 rounded-xl border ${e.lido ? 'bg-gray-50 border-gray-200' : 'bg-[#e8edf7] border-[#c5d0e8]'}`}>
                         <div className="flex items-center justify-between">
                           <p className="text-sm font-medium text-white">{e.assunto}</p>
-                          {!e.lido && <span className="w-2 h-2 rounded-full" style={{background:"#0f2044"}} />}
+                          {!e.lido && <span className="w-2 h-2 rounded-full" style={{background:"#19385C"}} />}
                         </div>
                         <p className="text-xs text-gray-400">{e.data}</p>
                       </div>
                     ))}
                     <div className="rounded-xl p-3 text-center" style={{background:"#e8edf7",border:"1px dashed #c5d0e8"}}>
-                      <p className="text-xs" style={{color:"#0f2044"}}>📧 Gmail integrado ao card — <strong>FASE B</strong></p>
+                      <p className="text-xs" style={{color:"#19385C"}}>📧 Gmail integrado ao card — <strong>FASE B</strong></p>
                       <p className="text-xs mt-1" style={{color:"#6B7280"}}>Ver e enviar emails diretamente daqui</p>
                     </div>
                   </div>
@@ -1248,10 +1248,10 @@ function FichaModal({ lead: initialLead, onClose, onUpdate }: {
                           {new Date(r.dataHora).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}
                         </p>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className={`text-xs px-2 py-0.5 rounded font-medium ${r.status === 'realizada' ? 'bg-emerald-100 text-emerald-700' : 'bg-[#e8edf7] text-[#0f2044]'}`}>
+                          <span className={`text-xs px-2 py-0.5 rounded font-medium ${r.status === 'realizada' ? 'bg-emerald-100 text-emerald-700' : 'bg-[#e8edf7] text-[#19385C]'}`}>
                             {r.status}
                           </span>
-                          <a href={r.meetLink} target="_blank" rel="noreferrer" className="text-xs hover:underline" style={{color:"#0f2044"}}>
+                          <a href={r.meetLink} target="_blank" rel="noreferrer" className="text-xs hover:underline" style={{color:"#19385C"}}>
                             {r.meetLink}
                           </a>
                         </div>
@@ -1392,7 +1392,7 @@ export default function CRM() {
           <h1 className="text-2xl font-bold" style={{ color: "#111827" }}>CRM — Gestão Comercial</h1>
           <p className="text-gray-500 text-sm mt-1">
             Pipeline · ZapSign · Asaas · Google Meet · {leads.length} leads ativos
-            {carregando && <span className="ml-2 animate-pulse" style={{color:"#D4A017"}}>● atualizando...</span>}
+            {carregando && <span className="ml-2 animate-pulse" style={{color:"#DEC078"}}>● atualizando...</span>}
           </p>
         </div>
         <div className="flex gap-3">
@@ -1400,7 +1400,7 @@ export default function CRM() {
             onClick={carregarLeads}
             disabled={carregando}
             title="Atualizar leads do WhatsApp"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm hover:bg-[#e8edf7] transition-colors disabled:opacity-50" style={{background:"#e8edf7",border:"1px solid #c5d0e8",color:"#0f2044"}}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm hover:bg-[#e8edf7] transition-colors disabled:opacity-50" style={{background:"#e8edf7",border:"1px solid #c5d0e8",color:"#19385C"}}
           >
             <RefreshCw className={`w-4 h-4 ${carregando ? 'animate-spin' : ''}`} />
             Atualizar
@@ -1429,9 +1429,9 @@ export default function CRM() {
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
         {[
           { label: 'Total Leads', value: leads.length, cor: 'text-gray-900', icon: '👥' },
-          { label: 'Novos', value: novos, cor: 'text-[#0f2044]', icon: '🆕' },
+          { label: 'Novos', value: novos, cor: 'text-[#19385C]', icon: '🆕' },
           { label: 'Aguardando', value: aguardando, cor: 'text-amber-600', icon: '⏳' },
-          { label: 'Reuniões Ativas', value: totalReunioes, cor: 'text-[#0f2044]', icon: '📅' },
+          { label: 'Reuniões Ativas', value: totalReunioes, cor: 'text-[#19385C]', icon: '📅' },
           { label: 'A Receber', value: formatCurrency(totalPendente), cor: 'text-amber-600', icon: '💳' },
           { label: 'Convertido', value: formatCurrency(totalValor), cor: 'text-emerald-600', icon: '🏆' },
         ].map(k => (
@@ -1447,14 +1447,14 @@ export default function CRM() {
       <div className="rounded-xl p-4" style={{ background: "#EFF6FF", border: "1px solid #BFDBFE" }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Zap className="w-5 h-5" style={{color:"#0f2044"}} />
+            <Zap className="w-5 h-5" style={{color:"#19385C"}} />
             <p className="font-medium text-sm" style={{color:"#1E40AF"}}>FASE A ativa — ZapSign · Asaas · Google Calendar/Meet</p>
           </div>
           <div className="flex items-center gap-2">
             {[
               { label: 'ZapSign', cor: 'bg-violet-500' },
               { label: 'Asaas', cor: 'bg-emerald-500' },
-              { label: 'Google', cor: 'bg-[#0f2044]' },
+              { label: 'Google', cor: 'bg-[#19385C]' },
             ].map(tag => (
               <span key={tag.label} className={`${tag.cor} text-white text-xs px-2 py-1 rounded-full`}>{tag.label}</span>
             ))}
@@ -1526,14 +1526,14 @@ export default function CRM() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <div className="w-16 h-1.5 bg-gray-200 rounded-full">
-                          <div className="h-full rounded-full" style={{background:"#0f2044", width: `${lead.score}%`}} />
+                          <div className="h-full rounded-full" style={{background:"#19385C", width: `${lead.score}%`}} />
                         </div>
                         <span className="text-xs text-gray-500">{lead.score}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1">
-                        {(lead.reunioes?.length ?? 0) > 0 && <span title="Reunião" className="text-xs px-1.5 py-0.5 rounded" style={{background:"#e8edf7",color:"#0f2044"}}>📅</span>}
+                        {(lead.reunioes?.length ?? 0) > 0 && <span title="Reunião" className="text-xs px-1.5 py-0.5 rounded" style={{background:"#e8edf7",color:"#19385C"}}>📅</span>}
                         {(lead.contratos?.length ?? 0) > 0 && <span title="Contrato" className="text-xs bg-violet-100 text-violet-600 px-1.5 py-0.5 rounded">✍️</span>}
                         {(lead.cobrancas?.length ?? 0) > 0 && <span title="Cobrança" className="text-xs bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded">💳</span>}
                       </div>
@@ -1542,7 +1542,7 @@ export default function CRM() {
                       {lead.valor ? <span className="text-emerald-600 font-medium">{formatCurrency(lead.valor)}</span> : <span className="text-gray-500">—</span>}
                     </td>
                     <td className="px-4 py-3">
-                      <button className="text-xs text-white px-3 py-1 rounded-lg transition-colors" style={{background:"#0f2044"}}>
+                      <button className="text-xs text-white px-3 py-1 rounded-lg transition-colors" style={{background:"#19385C"}}>
                         Abrir
                       </button>
                     </td>

@@ -146,11 +146,11 @@ const INTEGRACOES: IntegracaoUI[] = [
 
 // ─── Fluxo de automação visual ────────────────────────────────
 const FLUXO_COMERCIAL = [
-  { label: 'Lead chega', sub: 'WhatsApp · Instagram · Site', icone: '📩', cor: 'bg-[#e8edf7] text-[#0f2044]' },
+  { label: 'Lead chega', sub: 'WhatsApp · Instagram · Site', icone: '📩', cor: 'bg-[#e8edf7] text-[#19385C]' },
   { label: 'ManyChat', sub: 'Fluxo inicial + coleta de dados', icone: '🤖', cor: 'bg-sky-100 text-sky-700', fase: 'C' },
   { label: 'Dr. Ben qualifica', sub: 'Score automático de 0-100', icone: '⚡', cor: 'bg-amber-100 text-amber-700' },
   { label: 'Entra no CRM', sub: 'Card criado automaticamente', icone: '📊', cor: 'bg-navy-100 text-gold', fase: 'A' },
-  { label: 'Reunião agendada', sub: 'Google Calendar + Meet', icone: '📅', cor: 'bg-[#e8edf7] text-[#0f2044]', fase: 'A' },
+  { label: 'Reunião agendada', sub: 'Google Calendar + Meet', icone: '📅', cor: 'bg-[#e8edf7] text-[#19385C]', fase: 'A' },
   { label: 'Contrato enviado', sub: 'ZapSign — assinatura digital', icone: '✍️', cor: 'bg-violet-100 text-violet-700', fase: 'A' },
   { label: 'Cobrança gerada', sub: 'Asaas — Pix, Boleto, Cartão', icone: '💳', cor: 'bg-emerald-100 text-emerald-700', fase: 'A' },
   { label: 'Contrato salvo', sub: 'Google Drive — pasta cliente', icone: '💾', cor: 'bg-yellow-100 text-yellow-700', fase: 'B' },
@@ -162,7 +162,7 @@ function IntegracaoCard({ integracao }: { integracao: IntegracaoUI }) {
 
   const faseCor = {
     A: 'bg-emerald-100 text-emerald-700 border-emerald-300',
-    B: 'bg-[#e8edf7] text-[#0f2044] border-[#c5d0e8]',
+    B: 'bg-[#e8edf7] text-[#19385C] border-[#c5d0e8]',
     C: 'bg-purple-100 text-purple-700 border-purple-300',
   }[integracao.fase]
 
@@ -292,7 +292,7 @@ export default function Integracoes() {
           <p className="text-gray-500 text-xs mt-1">Fase A — Pendentes</p>
         </div>
         <div className="card text-center py-4">
-          <p className="text-2xl font-bold text-[#0f2044]">3</p>
+          <p className="text-2xl font-bold text-[#19385C]">3</p>
           <p className="text-gray-500 text-xs mt-1">Google APIs</p>
         </div>
         <div className="card text-center py-4">

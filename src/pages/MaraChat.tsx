@@ -9,8 +9,8 @@ import { Send, Mic, MicOff, Loader2, ChevronDown, Phone, Info } from 'lucide-rea
 
 // ─── Constantes ──────────────────────────────────────────────
 const MARA_AVATAR    = '/mara-avatar-circle.png'
-const NAVY           = '#0f2044'
-const GOLD           = '#D4A017'
+const NAVY           = '#19385C'
+const GOLD           = '#DEC078'
 const API_URL        = 'https://ben-growth-center.vercel.app'
 const PIN_STORAGE    = 'mara_chat_pin_ok'
 const PIN_CORRETO    = import.meta.env.VITE_MARA_PIN || '1234'
@@ -95,11 +95,13 @@ function Balao({ msg }: { msg: Mensagem }) {
         <div
           className={`px-4 py-2.5 shadow-sm text-sm leading-relaxed whitespace-pre-wrap ${
             isMARA
-              ? 'rounded-2xl rounded-bl-sm text-gray-800'
-              : 'rounded-2xl rounded-br-sm text-white'
+              ? 'rounded-2xl rounded-bl-sm'
+              : 'rounded-2xl rounded-br-sm'
           }`}
           style={{
-            background: isMARA ? '#f0f0f0' : `linear-gradient(135deg, ${NAVY}, #1a3060)`,
+            background: isMARA ? '#F5F5F5' : '#E9F2FF',
+            color: isMARA ? '#222222' : '#1A1A1A',
+            border: isMARA ? '1px solid #E5E7EB' : 'none',
           }}
           dangerouslySetInnerHTML={{
             __html: msg.texto
@@ -166,7 +168,7 @@ function TelaPIN({ onUnlock }: { onUnlock: () => void }) {
                  img.style.display = 'none'
                  if (img.parentElement) {
                    img.parentElement.style.background = NAVY
-                   img.parentElement.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#D4A017;font-size:40px;font-weight:700">M</div>'
+                   img.parentElement.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#DEC078;font-size:40px;font-weight:700">M</div>'
                  }
                }} />
         </div>

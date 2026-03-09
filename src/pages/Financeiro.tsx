@@ -308,7 +308,7 @@ const CobrancaCard = ({ pag, onRefresh }: { pag: AsaasPaymentResponse; onRefresh
           )}
           {pag.invoiceUrl && (
             <a href={pag.invoiceUrl} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-[#0f2044]/10 text-[#2d4a8a] hover:bg-[#0f2044]/20 transition-all">
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-[#19385C]/10 text-[#2d4a8a] hover:bg-[#19385C]/20 transition-all">
               <ExternalLink className="w-3 h-3" /> Link Pagamento
             </a>
           )}

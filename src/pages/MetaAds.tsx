@@ -124,9 +124,9 @@ const CampanhaCard = ({
           )}
           {conversoes > 0 && (
             <div className="flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 text-[#D4A017]" />
+              <Zap className="w-3.5 h-3.5 text-[#DEC078]" />
               <span className="text-xs text-gray-500">Conversões: </span>
-              <span className="text-xs font-bold text-[#D4A017]">{conversoes}</span>
+              <span className="text-xs font-bold text-[#DEC078]">{conversoes}</span>
             </div>
           )}
           {insight.cpc && (
@@ -210,7 +210,7 @@ export default function MetaAds() {
           </h1>
           <p className="text-gray-400 text-sm mt-1">
             Conta: <span className="font-mono text-gray-500">{META_AD_ACCOUNT_ID}</span>
-            {nomeUsuario && <span className="ml-2 text-[#D4A017]">· {nomeUsuario}</span>}
+            {nomeUsuario && <span className="ml-2 text-[#DEC078]">· {nomeUsuario}</span>}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -267,7 +267,7 @@ export default function MetaAds() {
           { label: 'Gasto (30d)',     value: fmtR(totalGasto),       icon: <DollarSign className="w-5 h-5" />, color: 'text-white',       bg: 'bg-white/5',           border: 'border-gray-200' },
           { label: 'Impressões',      value: fmtN(totalImpressoes),  icon: <Eye className="w-5 h-5" />,        color: 'text-blue-300',    bg: 'bg-blue-500/10',       border: 'border-blue-500/20' },
           { label: 'Cliques',         value: fmtN(totalCliques),     icon: <MousePointer className="w-5 h-5" />,color: 'text-purple-300', bg: 'bg-purple-500/10',     border: 'border-purple-500/20' },
-          { label: 'Conversões',      value: fmtN(totalConversoes),  icon: <Zap className="w-5 h-5" />,        color: 'text-[#D4A017]',   bg: 'bg-amber-500/10',      border: 'border-amber-500/20' },
+          { label: 'Conversões',      value: fmtN(totalConversoes),  icon: <Zap className="w-5 h-5" />,        color: 'text-[#DEC078]',   bg: 'bg-amber-500/10',      border: 'border-amber-500/20' },
         ].map(s => (
           <div key={s.label} className={`${s.bg} border ${s.border} rounded-2xl p-4`}>
             <div className="flex items-center gap-2 mb-2">
@@ -292,7 +292,7 @@ export default function MetaAds() {
           {gastos.mes && (
             <div className="bg-[#0f1629] border border-gray-200 rounded-2xl p-4">
               <p className="text-gray-400 text-xs font-medium mb-2">📆 Gasto no Mês</p>
-              <p className="text-2xl font-bold text-[#D4A017]">{fmtR(gastos.mes.spend)}</p>
+              <p className="text-2xl font-bold text-[#DEC078]">{fmtR(gastos.mes.spend)}</p>
               <p className="text-white/30 text-xs mt-1">{fmtN(gastos.mes.impressions)} impressões · {fmtN(gastos.mes.clicks)} cliques</p>
             </div>
           )}

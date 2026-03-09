@@ -64,7 +64,7 @@ function AgentCard({ agent, onExecute, executing }: {
           {agent.ativo && (
             isRunning ? (
               <div className="w-8 h-8 bg-[#f0f3fa] rounded-lg flex items-center justify-center">
-                <RefreshCw className="w-4 h-4 text-[#0f2044] animate-spin" />
+                <RefreshCw className="w-4 h-4 text-[#19385C] animate-spin" />
               </div>
             ) : (
               <button
@@ -106,8 +106,8 @@ function AgentCard({ agent, onExecute, executing }: {
       {isRunning && (
         <div className="mt-3 bg-[#f0f3fa] border border-[#c5d0e8] rounded-xl p-3">
           <div className="flex items-center gap-2 mb-2">
-            <RefreshCw className="w-4 h-4 text-[#0f2044] animate-spin" />
-            <span className="text-[#0f2044] text-sm font-medium">Executando {agent.nome}...</span>
+            <RefreshCw className="w-4 h-4 text-[#19385C] animate-spin" />
+            <span className="text-[#19385C] text-sm font-medium">Executando {agent.nome}...</span>
           </div>
           <div className="h-1.5 bg-[#e8edf7] rounded-full overflow-hidden">
             <div className="h-full bg-[#2d4a8a] rounded-full animate-pulse w-2/3" />
@@ -322,7 +322,7 @@ export default function Agentes() {
             <div key={activity.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors">
               <div className="mt-0.5 flex-shrink-0">
                 {activity.status === 'success' && <CheckCircle2 className="w-4 h-4 text-green-500" />}
-                {activity.status === 'running' && <RefreshCw className="w-4 h-4 text-[#0f2044] animate-spin" />}
+                {activity.status === 'running' && <RefreshCw className="w-4 h-4 text-[#19385C] animate-spin" />}
                 {activity.status === 'error' && <AlertCircle className="w-4 h-4 text-red-500" />}
                 {activity.status === 'scheduled' && <Clock className="w-4 h-4 text-gray-400" />}
               </div>

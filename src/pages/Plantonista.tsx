@@ -113,7 +113,7 @@ function AlertaPush({ onClose }: { onClose: () => void }) {
         {/* Lead info */}
         <div className="flex items-center gap-3 mb-3">
           <div className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ background: '#0f2044' }}>
+            style={{ background: '#19385C' }}>
             <span className="text-white font-bold text-base">{lead.nome[0]}</span>
           </div>
           <div className="flex-1 min-w-0">
@@ -194,10 +194,10 @@ export default function Plantonista() {
 
       {/* Plantonista ativo agora */}
       <div className="rounded-2xl p-5 text-white"
-        style={{ background: 'linear-gradient(135deg, #0f2044 0%, #1a3a6e 100%)', border: '1px solid #1e3a6e', boxShadow: '0 4px 20px rgba(15,32,68,0.3)' }}>
+        style={{ background: 'linear-gradient(135deg, #19385C 0%, #1a3a6e 100%)', border: '1px solid #1e3a6e', boxShadow: '0 4px 20px rgba(15,32,68,0.3)' }}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold flex items-center gap-2 text-white">
-            <Shield className="w-5 h-5" style={{ color: '#D4A017' }} /> Plantonista Agora
+            <Shield className="w-5 h-5" style={{ color: '#DEC078' }} /> Plantonista Agora
           </h2>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -206,7 +206,7 @@ export default function Plantonista() {
         </div>
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0"
-            style={{ background: '#D4A017' }}>
+            style={{ background: '#DEC078' }}>
             <span className="text-white font-bold text-xl">{plantonistaHoje.avatar}</span>
           </div>
           <div className="flex-1">
@@ -215,7 +215,7 @@ export default function Plantonista() {
             <p className="text-amber-300 text-sm mt-1 font-medium">{plantonistaHoje.telefone}</p>
           </div>
           <div className="text-right">
-            <p className="text-3xl font-bold" style={{ color: '#D4A017' }}>{plantonistaHoje.atendimentosHoje}</p>
+            <p className="text-3xl font-bold" style={{ color: '#DEC078' }}>{plantonistaHoje.atendimentosHoje}</p>
             <p className="text-blue-200 text-sm">atend. hoje</p>
           </div>
         </div>
@@ -385,7 +385,7 @@ export default function Plantonista() {
                 <p className="text-gray-400 text-xs">{dia.data}</p>
                 <div className="mt-2 flex items-center gap-2">
                   <div className="w-6 h-6 bg-navy-100 rounded-full flex items-center justify-center">
-                    <span className="text-[#0f2044] font-bold text-xs">{p.avatar}</span>
+                    <span className="text-[#19385C] font-bold text-xs">{p.avatar}</span>
                   </div>
                   <div>
                     <p className="text-gray-700 text-xs font-medium">{p.nome.split(' ')[1]}</p>

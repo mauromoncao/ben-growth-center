@@ -124,7 +124,7 @@ export default function IntegracaoJuris() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            <ArrowLeftRight className="w-6 h-6" style={{ color: '#D4A017' }} />
+            <ArrowLeftRight className="w-6 h-6" style={{ color: '#DEC078' }} />
             Integração com Ben Juris Center
           </h1>
           <p className="text-gray-500 text-sm mt-1">
@@ -143,7 +143,7 @@ export default function IntegracaoJuris() {
             onClick={handleSincronizar}
             disabled={sincronizando}
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:opacity-90"
-            style={{ background: '#D4A017', color: '#0f2044' }}
+            style={{ background: '#DEC078', color: '#19385C' }}
           >
             <RefreshCw className={`w-4 h-4 ${sincronizando ? 'animate-spin' : ''}`} />
             {sincronizando ? 'Sincronizando...' : 'Sincronizar Agora'}
@@ -263,13 +263,13 @@ export default function IntegracaoJuris() {
             className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-lg transition-all"
             style={
               abaAtiva === aba.id
-                ? { background: '#ffffff', color: '#0f2044', boxShadow: '0 1px 3px rgba(0,0,0,0.12)', border: '1px solid #e2e8f0' }
+                ? { background: '#ffffff', color: '#19385C', boxShadow: '0 1px 3px rgba(0,0,0,0.12)', border: '1px solid #e2e8f0' }
                 : { color: '#64748b', border: '1px solid transparent' }
             }
           >
             {aba.label}
             <span className="text-xs rounded-full px-2 py-0.5"
-              style={{ background: abaAtiva === aba.id ? '#0f2044' : '#e2e8f0', color: abaAtiva === aba.id ? '#fff' : '#64748b' }}>
+              style={{ background: abaAtiva === aba.id ? '#19385C' : '#e2e8f0', color: abaAtiva === aba.id ? '#fff' : '#64748b' }}>
               {aba.count}
             </span>
           </button>
@@ -422,8 +422,8 @@ export default function IntegracaoJuris() {
 
       {/* ── Diagrama visual de integração ──────────────────── */}
       <div className="rounded-xl border bg-white p-5" style={{ border: '1px solid #e2e8f0' }}>
-        <h3 className="font-semibold mb-4 flex items-center gap-2" style={{ color: '#0f2044' }}>
-          <ArrowLeftRight className="w-4 h-4" style={{ color: '#D4A017' }} />
+        <h3 className="font-semibold mb-4 flex items-center gap-2" style={{ color: '#19385C' }}>
+          <ArrowLeftRight className="w-4 h-4" style={{ color: '#DEC078' }} />
           Mapa de Integração — Dr. Ben Ecosystem
         </h3>
         <div className="flex items-center justify-between gap-4">
