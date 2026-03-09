@@ -556,12 +556,15 @@ export default async function handler(req, res) {
     console.log(`[MARA] ⛔ Webhook da instância Dr. Ben ignorado`)
     return res.json({ ok: true, ignorado: 'webhook_drben' })
   }
-  // 1b. Se o remetente é o Dr. Ben ou a própria instância MARA → ignorar
+  // 1b. Se o remetente é o Dr. Ben, o próprio Dr. Mauro ou a própria instância MARA → ignorar
+  // Isso evita loop: Dr. Ben avisa Dr. Mauro → MARA responde ao Dr. Ben → loop infinito
   const instanciaNum = DR_MAURO_NUM.replace(/\D/g, '')
+  const drMauroNorm  = instanciaNum.slice(-10)
   if (
     numero === instanciaNum ||
     numero === connectedPhone ||
-    numero.endsWith(drBenNorm)
+    numero.endsWith(drBenNorm) ||
+    numero.endsWith(drMauroNorm)
   ) {
     console.log(`[MARA] ⛔ Loop bloqueado — remetente é instância interna (${numero})`)
     return res.json({ ok: true, ignorado: 'loop_instancia_interna' })
