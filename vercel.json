@@ -101,6 +101,10 @@
       "destination": "/api/mara-ausente.js"
     },
     {
+      "source": "/api/restaurar-foto",
+      "destination": "/api/restaurar-foto.js"
+    },
+    {
       "source": "/api/perfil-drben",
       "destination": "/api/perfil-drben.js"
     },

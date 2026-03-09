@@ -213,6 +213,11 @@ export default function MaraIA() {
     mensagensHoje: 0, leadsGerados: 0, taxaRepasse: 0,
     tempoMedioResposta: '< 3s', satisfacao: 97, totalLeads: 0,
   })
+  // ── Restauração de foto de perfil ────────────────────────
+  const [restaurandoFoto, setRestaurandoFoto] = useState(false)
+  const [resultadoRestauracao, setResultadoRestauracao] = useState<{
+    ok: boolean; mensagem: string; detalhes?: string
+  } | null>(null)
 
   // ── Carregar config e verificar status ───────────────────
   useEffect(() => {
@@ -375,6 +380,35 @@ export default function MaraIA() {
 
   const set = (campo: keyof ConfigMara, valor: any) =>
     setConfig(c => ({ ...c, [campo]: valor }))
+
+  // ── Restaurar Foto de Perfil do Dr. Mauro ───────────────
+  const restaurarFotoPerfil = async () => {
+    setRestaurandoFoto(true)
+    setResultadoRestauracao(null)
+    try {
+      const res = await fetch('/api/restaurar-foto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
+      const data = await res.json()
+      setResultadoRestauracao({
+        ok: data.ok,
+        mensagem: data.mensagem || (data.ok ? '✅ Foto restaurada com sucesso!' : '⚠️ Não foi possível restaurar automaticamente.'),
+        detalhes: data.ok
+          ? `Método: ${data.metodo_usado || 'API Z-API'}`
+          : (data.alternativas ? data.alternativas[0] : undefined),
+      })
+    } catch (e) {
+      setResultadoRestauracao({
+        ok: false,
+        mensagem: '❌ Erro de rede ao tentar restaurar a foto.',
+        detalhes: 'Verifique se o servidor está online e tente novamente.',
+      })
+    } finally {
+      setRestaurandoFoto(false)
+    }
+  }
 
   const setAusente = (campo: keyof ConfigMara['modoAusente'], valor: any) =>
     setConfig(c => ({ ...c, modoAusente: { ...c.modoAusente, [campo]: valor } }))
@@ -687,6 +721,103 @@ export default function MaraIA() {
                 {c.cmd}
               </code>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════ */}
+      {/* RESTAURAR FOTO DE PERFIL — PAINEL DE CORREÇÃO          */}
+      {/* ══════════════════════════════════════════════════════ */}
+      <div className="bg-white rounded-2xl border-2 border-orange-200 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 bg-orange-50 border-b border-orange-200 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
+            <UserCircle size={16} className="text-white" />
+          </div>
+          <div className="flex-1">
+            <span className="font-semibold text-orange-800">🖼️ Restaurar Foto de Perfil — Dr. Mauro Monção</span>
+            <p className="text-xs text-orange-600 mt-0.5">
+              Corrige a foto que ficou travada no WhatsApp após configuração da MARA IA
+            </p>
+          </div>
+          <span className="text-xs bg-orange-100 text-orange-700 border border-orange-300 px-2 py-1 rounded-full font-bold">
+            Ação Pontual
+          </span>
+        </div>
+
+        <div className="px-6 py-5 space-y-4">
+          {/* Diagnóstico */}
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+            <p className="text-xs font-bold text-amber-800 mb-2">🔍 O que aconteceu:</p>
+            <ul className="text-xs text-amber-700 space-y-1 list-none">
+              <li>• Durante o desenvolvimento do modo ausente, o sistema usou a API Z-API para definir automaticamente a foto do avatar da MARA no seu perfil</li>
+              <li>• O código foi removido, mas a foto já havia sido persistida pela Z-API no servidor da instância</li>
+              <li>• Por isso a foto parece travada — o WhatsApp sincroniza com o cache da instância Z-API</li>
+            </ul>
+          </div>
+
+          {/* Foto de referência */}
+          <div className="flex items-center gap-4 p-3 bg-gray-50 border border-gray-200 rounded-xl">
+            <img
+              src="https://ben-growth-center.vercel.app/mauro-zapi.jpg"
+              alt="Foto Dr. Mauro"
+              className="w-14 h-14 rounded-full object-cover border-2 border-[#19385C] shadow"
+              onError={e => {
+                (e.target as HTMLImageElement).src =
+                  'https://ui-avatars.com/api/?name=Dr+Mauro&background=19385C&color=ffffff&size=128&bold=true'
+              }}
+            />
+            <div>
+              <p className="text-sm font-semibold text-[#19385C]">Foto que será restaurada</p>
+              <p className="text-xs text-gray-500">Dr. Mauro Monção — foto oficial</p>
+              <code className="text-xs text-gray-400 mt-1 block">/mauro-zapi.jpg</code>
+            </div>
+          </div>
+
+          {/* Resultado */}
+          {resultadoRestauracao && (
+            <div className={`p-4 rounded-xl border ${
+              resultadoRestauracao.ok
+                ? 'bg-green-50 border-green-200'
+                : 'bg-red-50 border-red-200'
+            }`}>
+              <p className={`text-sm font-semibold ${resultadoRestauracao.ok ? 'text-green-800' : 'text-red-800'}`}>
+                {resultadoRestauracao.mensagem}
+              </p>
+              {resultadoRestauracao.detalhes && (
+                <p className={`text-xs mt-1 ${resultadoRestauracao.ok ? 'text-green-600' : 'text-red-600'}`}>
+                  {resultadoRestauracao.detalhes}
+                </p>
+              )}
+              {!resultadoRestauracao.ok && (
+                <div className="mt-3 text-xs text-red-700 space-y-1">
+                  <p className="font-semibold">Alternativas manuais:</p>
+                  <p>1. Abra o WhatsApp no celular → Configurações → Toque na sua foto</p>
+                  <p>2. Verifique se a instância Z-API está conectada: <code className="bg-red-100 px-1 rounded">/api/mara-setup?action=status</code></p>
+                  <p>3. Reconecte via QR Code se necessário e tente novamente</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Botão de ação */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={restaurarFotoPerfil}
+              disabled={restaurandoFoto}
+              className="flex items-center gap-2 px-6 py-3 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 transition disabled:opacity-60 shadow-sm"
+            >
+              {restaurandoFoto ? (
+                <><Loader size={16} className="animate-spin" /> Restaurando foto...</>
+              ) : (
+                <><RefreshCw size={16} /> Restaurar Foto do Perfil</>
+              )}
+            </button>
+            {resultadoRestauracao?.ok && (
+              <span className="text-xs text-green-600 font-semibold flex items-center gap-1">
+                <CheckCircle2 size={14} />
+                Foto restaurada! Verifique o WhatsApp.
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -1492,41 +1623,41 @@ export default function MaraIA() {
           {/* Modo Ausente — Como funciona */}
           <div>
             <p className="text-xs font-bold text-[#19385C] uppercase tracking-wide mb-3 flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs">⚡</span>
-              Modo Ausente — Fluxo de Troca de Perfil
+              <span className="w-5 h-5 rounded-full bg-[#19385C] text-white flex items-center justify-center text-xs">⚡</span>
+              Modo Ausente — Como funciona o atendimento
             </p>
             <div className="overflow-x-auto rounded-xl border border-gray-200">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-orange-500 text-white">
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Evento</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Nome no WhatsApp</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold">Status</th>
+                  <tr className="bg-[#19385C] text-white">
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Situação</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold">Quem responde</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold">Observação</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   <tr className="bg-white">
                     <td className="px-4 py-3 text-xs font-semibold text-green-700">🟢 Modo PRESENTE</td>
-                    <td className="px-4 py-3 text-xs text-gray-800">Dr. Mauro Monção</td>
-                    <td className="px-4 py-3 text-xs text-gray-600">Advogado | OAB/PI · CE · MA</td>
                     <td className="px-4 py-3 text-xs font-semibold text-[#19385C]">Você (Dr. Mauro)</td>
+                    <td className="px-4 py-3 text-xs text-gray-500">Respostas normais — MARA apenas monitora</td>
                   </tr>
                   <tr className="bg-gray-50">
                     <td className="px-4 py-3 text-xs font-semibold text-red-600">🔴 Modo AUSENTE</td>
-                    <td className="px-4 py-3 text-xs text-gray-800">MARA — Assistente Dr. Mauro</td>
-                    <td className="px-4 py-3 text-xs text-gray-600">🤖 Respondendo por ele</td>
                     <td className="px-4 py-3 text-xs font-semibold text-purple-700">MARA IA (automático)</td>
+                    <td className="px-4 py-3 text-xs text-gray-500">Terceiros recebem atendimento da MARA — foto do perfil não muda</td>
                   </tr>
                   <tr className="bg-white">
-                    <td className="px-4 py-3 text-xs font-semibold text-blue-700">🔄 Ao retornar</td>
-                    <td className="px-4 py-3 text-xs text-gray-800">Dr. Mauro Monção</td>
-                    <td className="px-4 py-3 text-xs text-gray-600">Restaurado automaticamente</td>
-                    <td className="px-4 py-3 text-xs text-gray-600">Resumo de conversas enviado para você</td>
+                    <td className="px-4 py-3 text-xs font-semibold text-blue-700">🔄 Ao desativar</td>
+                    <td className="px-4 py-3 text-xs font-semibold text-[#19385C]">Você (Dr. Mauro)</td>
+                    <td className="px-4 py-3 text-xs text-gray-500">Resumo de conversas enviado para você via WhatsApp</td>
                   </tr>
                 </tbody>
               </table>
             </div>
+            <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
+              <span>ℹ️</span>
+              A foto do perfil permanece sempre a do Dr. Mauro — não é alterada pelo modo ausente.
+            </p>
           </div>
 
         </div>
