@@ -7,19 +7,24 @@
 
 export const config = { maxDuration: 60 }
 
-const PLANTONISTA   = process.env.PLANTONISTA_WHATSAPP || ''
-const EVOLUTION_URL = process.env.EVOLUTION_URL || ''
-const EVOLUTION_KEY = process.env.EVOLUTION_KEY || ''
-const INSTANCE      = process.env.EVOLUTION_INSTANCE || 'drben'
-const GEMINI_KEY    = process.env.GEMINI_API_KEY || ''
+const PLANTONISTA     = process.env.PLANTONISTA_WHATSAPP || ''
+const GEMINI_KEY      = process.env.GEMINI_API_KEY || ''
+const ZAPI_INSTANCE   = process.env.ZAPI_INSTANCE_ID || ''
+const ZAPI_TOKEN      = process.env.ZAPI_TOKEN || ''
+const ZAPI_CLIENT_TOK = process.env.ZAPI_CLIENT_TOKEN || ''
+const ZAPI_BASE       = `https://api.z-api.io/instances/${ZAPI_INSTANCE}/token/${ZAPI_TOKEN}`
 
+// Usa Z-API (instância Dr. Ben) para enviar notificações
 async function enviarWhatsApp(numero, mensagem) {
-  if (!EVOLUTION_URL || !numero) return false
+  if (!ZAPI_INSTANCE || !ZAPI_TOKEN || !numero) return false
   try {
-    const res = await fetch(`${EVOLUTION_URL}/message/sendText/${INSTANCE}`, {
+    const headers = { 'Content-Type': 'application/json' }
+    if (ZAPI_CLIENT_TOK) headers['Client-Token'] = ZAPI_CLIENT_TOK
+    const tel = numero.replace(/\D/g, '')
+    const res = await fetch(`${ZAPI_BASE}/send-text`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', apikey: EVOLUTION_KEY },
-      body: JSON.stringify({ number: numero, text: mensagem }),
+      headers,
+      body: JSON.stringify({ phone: tel, message: mensagem }),
     })
     return res.ok
   } catch { return false }
@@ -61,21 +66,21 @@ export default async function handler(req, res) {
     const semana   = `${agora.toLocaleDateString('pt-BR')} (${agora.toLocaleString('pt-BR', { weekday: 'long' })})`
 
     // ── Coletar métricas da semana ───────────────────────────
-    const [metaRes, googleRes, whatsappRes] = await Promise.allSettled([
+    const [metaRes, googleRes, keepaliveRes] = await Promise.allSettled([
       fetch('https://ben-growth-center.vercel.app/api/meta-ads?action=insights&days=7'),
       fetch('https://ben-growth-center.vercel.app/api/google-ads?action=insights&account=escritorio&days=7'),
-      fetch('https://ben-growth-center.vercel.app/api/whatsapp-evolution?action=status'),
+      fetch('https://ben-growth-center.vercel.app/api/whatsapp-keepalive'),
     ])
 
     const metaData     = metaRes.status === 'fulfilled' && metaRes.value.ok ? await metaRes.value.json() : null
     const googleData   = googleRes.status === 'fulfilled' && googleRes.value.ok ? await googleRes.value.json() : null
-    const whatsappData = whatsappRes.status === 'fulfilled' && whatsappRes.value.ok ? await whatsappRes.value.json() : null
+    const keepaliveData = keepaliveRes.status === 'fulfilled' && keepaliveRes.value.ok ? await keepaliveRes.value.json() : null
 
     const metricas = {
       semana,
-      meta_ads:    metaData    ? { status: 'ok', dados: metaData }    : { status: 'sem dados' },
-      google_ads:  googleData  ? { status: 'ok', dados: googleData }  : { status: 'sem dados' },
-      whatsapp:    whatsappData ? { status: whatsappData.state }       : { status: 'sem dados' },
+      meta_ads:    metaData      ? { status: 'ok', dados: metaData }      : { status: 'sem dados' },
+      google_ads:  googleData    ? { status: 'ok', dados: googleData }    : { status: 'sem dados' },
+      whatsapp:    keepaliveData ? { status: keepaliveData.action }        : { status: 'sem dados' },
     }
 
     // ── Gerar análise com Gemini ─────────────────────────────
@@ -91,7 +96,7 @@ export default async function handler(req, res) {
         `*Resumo da semana:*`,
         `• Meta Ads: ${metaData ? '✅ dados coletados' : '⚠️ sem dados'}`,
         `• Google Ads: ${googleData ? '✅ dados coletados' : '⚠️ sem dados'}`,
-        `• WhatsApp Dr. Ben: ${whatsappData?.state === 'open' ? '✅ online' : '⚠️ verificar'}`,
+        `• WhatsApp Dr. Ben (Z-API): ${keepaliveData?.action === 'healthy' ? '✅ online' : '⚠️ verificar'}`,
         ``,
       ]
       if (analise) {

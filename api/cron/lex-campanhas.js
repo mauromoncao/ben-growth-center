@@ -7,19 +7,24 @@
 
 export const config = { maxDuration: 60 }
 
-const GEMINI_KEY    = process.env.GEMINI_API_KEY || ''
-const PLANTONISTA   = process.env.PLANTONISTA_WHATSAPP || ''
-const EVOLUTION_URL = process.env.EVOLUTION_URL || ''
-const EVOLUTION_KEY = process.env.EVOLUTION_KEY || ''
-const INSTANCE      = process.env.EVOLUTION_INSTANCE || 'drben'
+const GEMINI_KEY      = process.env.GEMINI_API_KEY || ''
+const PLANTONISTA     = process.env.PLANTONISTA_WHATSAPP || ''
+const ZAPI_INSTANCE   = process.env.ZAPI_INSTANCE_ID || ''
+const ZAPI_TOKEN      = process.env.ZAPI_TOKEN || ''
+const ZAPI_CLIENT_TOK = process.env.ZAPI_CLIENT_TOKEN || ''
+const ZAPI_BASE       = `https://api.z-api.io/instances/${ZAPI_INSTANCE}/token/${ZAPI_TOKEN}`
 
+// Usa Z-API (instância Dr. Ben) para enviar notificações ao plantonista
 async function enviarWhatsApp(numero, mensagem) {
-  if (!EVOLUTION_URL || !numero) return false
+  if (!ZAPI_INSTANCE || !ZAPI_TOKEN || !numero) return false
   try {
-    const res = await fetch(`${EVOLUTION_URL}/message/sendText/${INSTANCE}`, {
+    const headers = { 'Content-Type': 'application/json' }
+    if (ZAPI_CLIENT_TOK) headers['Client-Token'] = ZAPI_CLIENT_TOK
+    const tel = numero.replace(/\D/g, '')
+    const res = await fetch(`${ZAPI_BASE}/send-text`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', apikey: EVOLUTION_KEY },
-      body: JSON.stringify({ number: numero, text: mensagem }),
+      headers,
+      body: JSON.stringify({ phone: tel, message: mensagem }),
     })
     return res.ok
   } catch { return false }
