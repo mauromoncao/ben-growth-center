@@ -52,15 +52,18 @@ async function verificarStatus() {
 }
 
 // ── Reiniciar sessão da instância Z-API ──
+// IMPORTANTE: Z-API /restart usa GET (não PUT/POST)
 async function reiniciarSessao() {
   try {
     const r = await fetch(`${MARA_BASE}/restart`, {
-      method: 'PUT',
+      method: 'GET',
       headers: zapiHeaders(),
-      signal: AbortSignal.timeout(15000),
+      signal: AbortSignal.timeout(20000),
     })
-    const d = await r.json().catch(() => null)
-    console.log('[RESTAURAR-FOTO] Restart sessão:', JSON.stringify(d))
+    const text = await r.text()
+    let d = null
+    try { d = JSON.parse(text) } catch { d = { raw: text } }
+    console.log('[RESTAURAR-FOTO] Restart sessão (GET):', JSON.stringify(d))
     return d
   } catch (e) {
     console.warn('[RESTAURAR-FOTO] Restart falhou:', e.message)
@@ -181,10 +184,11 @@ export default async function handler(req, res) {
 
     // Se sessão inativa OU force restart solicitado → reiniciar
     if (!sessionOk || forcaRestart) {
-      log.push('⚠️ Sessão inativa ou restart forçado — reiniciando instância Z-API...')
-      await reiniciarSessao()
-      log.push('⏳ Aguardando reconexão (15s)...')
-      await sleep(15000)
+      log.push('⚠️ Sessão inativa ou restart forçado — chamando GET /restart na Z-API...')
+      const restartRes = await reiniciarSessao()
+      log.push(`Restart respondeu: ${JSON.stringify(restartRes)}`)
+      log.push('⏳ Aguardando reconexão (20s)...')
+      await sleep(20000)
 
       const statusPos = await verificarStatus()
       log.push(`Status após restart: connected=${statusPos?.connected}, session=${statusPos?.session}`)
