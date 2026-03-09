@@ -159,6 +159,10 @@
     {
       "source": "/(.*)",
       "destination": "/index.html"
+    },
+    {
+      "source": "/api/mara-token-test",
+      "destination": "/api/mara-token-test.js"
     }
   ],
   "headers": [
