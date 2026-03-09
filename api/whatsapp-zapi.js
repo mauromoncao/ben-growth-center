@@ -808,14 +808,13 @@ export default async function handler(req, res) {
     }
 
     // ════════════════════════════════════════════════════
-    // MODO AUSENTE → MARA responde pelo Dr. Mauro
+    // MODO AUSENTE → Ignorar aqui, MARA (whatsapp-mara.js) já responde
+    // via instância dedicada (3EFBA328). Responder aqui causava DUPLA
+    // resposta e loop entre Dr. Ben ↔ MARA.
     // ════════════════════════════════════════════════════
     if (global.__modoAusente.ativo) {
-      console.log(`[MARA Ausente] Respondendo por Dr. Mauro para ${numero}`)
-      const resposta = await gerarRespostaModoAusente(texto, numero, pushName)
-      // Modo ausente sempre em texto (mais discreto)
-      await enviarMensagem(numero, resposta)
-      return res.status(200).json({ ok: true, agente: 'MARA_AUSENTE', respondido: true })
+      console.log(`[Dr. Ben] ⏭️ Modo ausente ativo — MARA (instância dedicada) já responde. Ignorando.`)
+      return res.status(200).json({ ok: true, ignorado: 'mara_dedicada_responde' })
     }
 
     // ════════════════════════════════════════════════════
