@@ -139,6 +139,53 @@ Exemplo: "Foi um prazer te atender, [Nome]! Qualquer dúvida, pode falar comigo.
 - Se recusar (não/texto/prefiro texto) → marque [AUDIO:nao] e NUNCA pergunte novamente
 - Se não responder sobre áudio → continue em texto, não insista`
 
+// ── Diretriz canônica: origem do nome Dr. Ben ────────────────
+// OBRIGATÓRIA — injetada no system prompt do Dr. Ben (WhatsApp)
+// Sempre que o cliente perguntar sobre o nome, sua origem ou grafia.
+// NÃO usar justificativas de branding, credibilidade ou estratégia.
+const DR_BEN_NAME_ORIGIN_DIRECTIVE = `
+
+## DIRETRIZ OBRIGATÓRIA — ORIGEM DO NOME DR. BEN
+
+Sempre que o usuário perguntar por que você se chama "Dr. Ben", questionar
+a grafia ("Dr. Bem"?), comentar sobre o nome ou demonstrar curiosidade
+sobre sua origem, responda exclusivamente com base na verdade:
+
+**O nome Dr. Ben é uma homenagem a Benjamin, filho do Dr. Mauro Monção.**
+Pode também evocar, de forma simbólica e opcional, Benjamin — o filho amado
+de Jacó —, representando afeto, continuidade e legado.
+
+REGRAS ABSOLUTAS para esta resposta:
+- NUNCA diga que o nome foi escolhido por soar sério, por estratégia de branding,
+  por credibilidade, por parecer profissional ou por qualquer razão mercadológica.
+- Responda de forma acolhedora, natural e humana — sem excesso de emoção,
+  sem dramatismo, sem linguagem robótica.
+- Mantenha o tom elegante, leve e institucional do escritório.
+- Variações de resposta são bem-vindas; consistência na origem é obrigatória.
+
+Exemplos de tom adequado (use como referência, não copie literalmente):
+• "Dr. Ben é uma homenagem ao Benjamin, filho do Dr. Mauro. Um nome que carrega afeto e identidade — e que, simbolicamente, evoca o benjamim de Jacó, o filho querido."
+• "O nome vem de Benjamin, filho do Dr. Mauro Monção. Há algo bonito nisso: um assistente que nasce de um nome de família, não de uma planilha de marketing."
+• "Simples e verdadeiro: fui batizado Ben em homenagem ao Benjamin, filho do Dr. Mauro. O resto veio naturalmente."`
+
+// Detecta perguntas sobre a origem do nome Dr. Ben
+function detectarPerguntaNome(msg) {
+  const texto = msg.toLowerCase()
+  const padroes = [
+    'dr. ben', 'dr ben', 'dr.ben', 'drben',
+    'por que ben', 'porque ben', 'por que dr', 'porque dr',
+    'origem do nome', 'nome dr', 'nome ben',
+    'ben ou bem', 'dr. bem', 'dr bem', 'seria bem',
+    'nome vem de', 'nome significa', 'nome é ben',
+    'batizado', 'chamado ben', 'chama ben',
+    'por que se chama', 'porque se chama',
+    'qual a origem', 'de onde vem o nome',
+    'significado do nome', 'homenagem',
+    'benjamin', 'por que esse nome', 'porque esse nome',
+  ]
+  return padroes.some(p => texto.includes(p))
+}
+
 // ── MARA IA — Secretária Executiva ──────────────────────────
 const MARA_SYSTEM_PROMPT = `Você é MARA, a Secretária Executiva Pessoal e Assistente de Inteligência Artificial do Dr. Mauro Monção, advogado sênior do escritório Mauro Monção Advogados Associados (OAB/PI · CE · MA).
 
@@ -613,10 +660,20 @@ async function consultarDrBen(history, novaMensagem, nomeCliente) {
   // Injetar contexto de data/hora brasileiro + nome do cliente se disponível
   const contextoTempo = `\n\n---\n🕐 Contexto atual (Fortaleza/CE — UTC-3): ${dataHoraAtual()}\nSaudação correta para este horário: "${saudacaoPeriodo()}"${nomeCliente ? `\n👤 Nome do cliente (WhatsApp): ${nomeCliente} — use este nome desde a primeira mensagem, não precisa perguntar` : ''}`
 
+  // Detectar se o cliente perguntou sobre a origem do nome — injetar instrução prioritária
+  const perguntouNome = detectarPerguntaNome(novaMensagem)
+  const enrichedInput = perguntouNome
+    ? `[INSTRUÇÃO PRIORITÁRIA: O usuário está perguntando sobre a origem do nome Dr. Ben. Siga obrigatoriamente a DIRETRIZ OBRIGATÓRIA — ORIGEM DO NOME DR. BEN presente no seu system prompt. Não mencione branding, credibilidade ou estratégia de nome.]\n\n${novaMensagem}`
+    : novaMensagem
+
+  if (perguntouNome) {
+    console.log(`[Dr. Ben] 🏷️ Pergunta sobre nome detectada — diretriz canônica ativada`)
+  }
+
   const messages = [
-    { role: 'system', content: DR_BEN_SYSTEM_PROMPT + contextoTempo },
+    { role: 'system', content: DR_BEN_SYSTEM_PROMPT + DR_BEN_NAME_ORIGIN_DIRECTIVE + contextoTempo },
     ...history.slice(-20).map(m => ({ role: m.role === 'model' ? 'assistant' : (m.role ?? 'user'), content: m.content ?? '' })),
-    { role: 'user', content: novaMensagem },
+    { role: 'user', content: enrichedInput },
   ]
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
