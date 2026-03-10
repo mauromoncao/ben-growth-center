@@ -1,6 +1,8 @@
 // Endpoint de diagnóstico — Dr. Ben via Z-API
 export const config = { maxDuration: 30 }
 
+const WEBHOOK_DR_BEN = 'https://ben-growth-center.vercel.app/api/whatsapp-zapi'
+
 async function testarOpenAI(key) {
   try {
     const r = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -44,6 +46,39 @@ async function testarVPS(url) {
   } catch (e) { return `❌ OFFLINE: ${e.message}` }
 }
 
+// Verifica E configura o webhook do Dr. Ben na Z-API
+async function verificarConfigurarWebhook(instanceId, token, clientToken) {
+  if (!instanceId || !token) return '❌ credenciais não configuradas'
+  try {
+    const headers = { 'Content-Type': 'application/json' }
+    if (clientToken) headers['Client-Token'] = clientToken
+
+    // Configurar webhook (PUT idempotente — seguro chamar sempre)
+    const put = await fetch(
+      `https://api.z-api.io/instances/${instanceId}/token/${token}/update-every-webhooks`,
+      {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          value: WEBHOOK_DR_BEN,
+          notifySentByMe: false,
+          notifyDelivery: false,
+          notifyRead: false,
+        }),
+        signal: AbortSignal.timeout(10000),
+      }
+    )
+    const result = await put.json().catch(() => ({}))
+    if (result?.value === true) {
+      return `✅ CONFIGURADO → ${WEBHOOK_DR_BEN}`
+    }
+    // Z-API pode retornar {value: false} quando já está igual — ainda é OK
+    return `⚠️ Z-API respondeu: ${JSON.stringify(result).slice(0, 100)} (webhook pode já estar correto)`
+  } catch (e) {
+    return `❌ ERRO ao configurar: ${e.message}`
+  }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
 
@@ -63,10 +98,12 @@ export default async function handler(req, res) {
     VPS_LEADS_URL:        VPS_LEADS         ? `✅ ${VPS_LEADS}`                         : '❌ NÃO DEFINIDA',
   }
 
-  const [openaiStatus, zapiStatus, vpsStatus] = await Promise.all([
-    OPENAI_KEY ? testarOpenAI(OPENAI_KEY) : Promise.resolve('❌ não configurado'),
-    ZAPI_INSTANCE_ID ? testarZAPI(ZAPI_INSTANCE_ID, ZAPI_TOKEN, ZAPI_CLIENT_TOKEN) : Promise.resolve('❌ não configurado'),
-    VPS_LEADS ? testarVPS(VPS_LEADS) : Promise.resolve('❌ não configurado'),
+  // Rodar verificações em paralelo — incluindo configuração de webhook
+  const [openaiStatus, zapiStatus, vpsStatus, webhookStatus] = await Promise.all([
+    OPENAI_KEY       ? testarOpenAI(OPENAI_KEY)                                                    : Promise.resolve('❌ não configurado'),
+    ZAPI_INSTANCE_ID ? testarZAPI(ZAPI_INSTANCE_ID, ZAPI_TOKEN, ZAPI_CLIENT_TOKEN)                 : Promise.resolve('❌ não configurado'),
+    VPS_LEADS        ? testarVPS(VPS_LEADS)                                                        : Promise.resolve('❌ não configurado'),
+    ZAPI_INSTANCE_ID ? verificarConfigurarWebhook(ZAPI_INSTANCE_ID, ZAPI_TOKEN, ZAPI_CLIENT_TOKEN) : Promise.resolve('❌ não configurado'),
   ])
 
   const tudo_ok = openaiStatus.startsWith('✅') && zapiStatus.startsWith('✅')
@@ -79,6 +116,7 @@ export default async function handler(req, res) {
     variaveis:  vars,
     openai:     openaiStatus,
     zapi:       zapiStatus,
+    webhook:    webhookStatus,
     vps_leads_api: vpsStatus,
     resumo: {
       sistema_operacional: tudo_ok,

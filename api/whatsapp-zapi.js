@@ -688,6 +688,40 @@ export default async function handler(req, res) {
       }
     }
 
+    // ── SETUP WEBHOOK — configura o webhook do Dr. Ben na Z-API ──
+    // Chamar GET /api/whatsapp-zapi?action=setup-webhook para forçar setup agora
+    if (action === 'setup-webhook') {
+      try {
+        const webhookUrl = 'https://ben-growth-center.vercel.app/api/whatsapp-zapi'
+        const headers = { 'Content-Type': 'application/json' }
+        if (ZAPI_CLIENT_TOKEN) headers['Client-Token'] = ZAPI_CLIENT_TOKEN
+        const put = await fetch(`${ZAPI_BASE}/update-every-webhooks`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({
+            value: webhookUrl,
+            notifySentByMe: false,
+            notifyDelivery: false,
+            notifyRead: false,
+          }),
+          signal: AbortSignal.timeout(12000),
+        })
+        const result = await put.json().catch(() => ({}))
+        const ok = result?.value === true
+        console.log(`[Dr. Ben] Webhook setup: ${JSON.stringify(result)}`)
+        return res.json({
+          ok,
+          webhook_url: webhookUrl,
+          zapi_response: result,
+          message: ok
+            ? `✅ Webhook configurado com sucesso → ${webhookUrl}`
+            : `⚠️ Z-API respondeu: ${JSON.stringify(result)} — verifique no painel Z-API se o webhook está correto`,
+        })
+      } catch (e) {
+        return res.json({ ok: false, erro: e.message })
+      }
+    }
+
     // Status do modo ausente
     if (action === 'modo-ausente') {
       return res.json({ ...global.__modoAusente })
@@ -720,6 +754,8 @@ export default async function handler(req, res) {
       modo_ausente:     global.__modoAusente.ativo,
       zapi:             ZAPI_INSTANCE_ID ? '✅ configurado' : '❌ faltando',
       token:            ZAPI_CLIENT_TOKEN ? '✅ ok' : '❌ ausente',
+      webhook_url:      'https://ben-growth-center.vercel.app/api/whatsapp-zapi',
+      setup_webhook:    'GET /api/whatsapp-zapi?action=setup-webhook',
     })
   }
 
