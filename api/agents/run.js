@@ -8,6 +8,53 @@
 
 export const config = { maxDuration: 60 }
 
+// ─── Diretriz canônica: origem do nome Dr. Ben ────────────────
+// OBRIGATÓRIA: aplicada ao Dr. Ben (ben-atendente) sempre que
+// o usuário perguntar sobre o nome, sua origem ou grafia.
+// NÃO usar justificativas de branding, credibilidade ou estratégia.
+const DR_BEN_NAME_ORIGIN_DIRECTIVE = `
+## DIRETRIZ OBRIGATÓRIA — ORIGEM DO NOME DR. BEN
+
+Sempre que o usuário perguntar por que você se chama "Dr. Ben", questionar
+a grafia ("Dr. Bem"?), comentar sobre o nome ou demonstrar curiosidade
+sobre sua origem, responda exclusivamente com base na verdade:
+
+**O nome Dr. Ben é uma homenagem a Benjamin, filho do Dr. Mauro Monção.**
+Pode também evocar, de forma simbólica e opcional, Benjamin — o filho amado
+de Jacó —, representando afeto, continuidade e legado.
+
+REGRAS ABSOLUTAS para esta resposta:
+- NUNCA diga que o nome foi escolhido por soar sério, por estratégia de branding,
+  por credibilidade, por parecer profissional ou por qualquer razão mercadológica.
+- Responda de forma acolhedora, natural e humana — sem excesso de emoção,
+  sem dramatismo, sem linguagem robótica.
+- Mantenha o tom elegante, leve e institucional do escritório.
+- Variações de resposta são bem-vindas; consistência na origem é obrigatória.
+
+Exemplos de tom adequado (use como referência, não copie literalmente):
+• "Dr. Ben é uma homenagem ao Benjamin, filho do Dr. Mauro. Um nome que carrega afeto e identidade — e que, simbolicamente, evoca o benjamim de Jacó, o filho querido."
+• "O nome vem de Benjamin, filho do Dr. Mauro Monção. Há algo bonito nisso: um assistente que nasce de um nome de família, não de uma planilha de marketing."
+• "Simples e verdadeiro: fui batizado Ben em homenagem ao Benjamin, filho do Dr. Mauro. O resto veio naturalmente."
+`
+
+// ─── Detectar perguntas sobre a origem do nome ────────────────
+function detectarPerguntaNome(msg) {
+  const texto = msg.toLowerCase()
+  const padroes = [
+    'dr. ben', 'dr ben', 'dr.ben', 'drben',
+    'por que ben', 'porque ben', 'por que dr', 'porque dr',
+    'origem do nome', 'nome dr', 'nome ben',
+    'ben ou bem', 'dr. bem', 'dr bem', 'seria bem',
+    'nome vem de', 'nome significa', 'nome é ben',
+    'batizado', 'chamado ben', 'chama ben',
+    'por que se chama', 'porque se chama',
+    'qual a origem', 'de onde vem o nome',
+    'significado do nome', 'homenagem',
+    'benjamin', 'por que esse nome', 'porque esse nome',
+  ]
+  return padroes.some(p => texto.includes(p))
+}
+
 // ─── Roteamento de modelos ────────────────────────────────────
 const MODEL_ENDPOINTS = {
   'gpt-4o':           'openai',
@@ -23,7 +70,7 @@ const AGENT_PROMPTS = {
   // ── BEN Atendente Jurídico — GPT-4o-mini (velocidade 24/7) ──────────────────
   'ben-atendente': {
     model: 'gpt-4o-mini',
-    system: `Você é o BEN Atendente Jurídico, assistente jurídico digital do escritório Mauro Monção Advogados em Teresina, Piauí.
+    system: `Você é o Dr. Ben, assistente jurídico digital do escritório Mauro Monção Advogados em Teresina, Piauí.
 Especialidades: Direito Tributário, Previdenciário e Bancário.
 
 MISSÃO: Qualificar leads, coletar informações e decidir quando repassar para atendimento humano.
@@ -46,7 +93,9 @@ REGRAS OAB (Provimento 205/2021):
 - NUNCA mencionar honorários em publicidade
 - SEMPRE usar linguagem profissional e acessível
 
-ESTILO: Mensagens curtas (máx. 3 linhas), empático, sem juridiquês.`,
+ESTILO: Mensagens curtas (máx. 3 linhas), empático, sem juridiquês.
+
+${DR_BEN_NAME_ORIGIN_DIRECTIVE}`,
     temperature: 0.7,
     maxTokens: 500,
   },
@@ -472,10 +521,19 @@ export default async function handler(req, res) {
       enrichedInput = `${enrichedInput}\n\nCONTEXTO:\n${JSON.stringify(context, null, 2)}`
     }
 
-    // ── 4. Executar agente com fallback inteligente ───────────
-    const { output, modelUsed } = await callWithFallback(agentConfig, enrichedInput)
+    // ── 4. Detectar pergunta sobre nome (Dr. Ben) e injetar diretriz ──
+    let finalAgentConfig = agentConfig
+    if (agentId === 'ben-atendente' && detectarPerguntaNome(input)) {
+      // Reforça a diretriz no input para garantir que o modelo a priorize
+      enrichedInput = `[INSTRUÇÃO PRIORITÁRIA: O usuário está perguntando sobre a origem do nome Dr. Ben. Siga obrigatoriamente a DIRETRIZ OBRIGATÓRIA — ORIGEM DO NOME DR. BEN presente no seu system prompt. Não mencione branding, credibilidade ou estratégia de nome.]
 
-    // ── 5. Salvar memória se Dr. Ben e clientId fornecido ─────
+${enrichedInput}`
+    }
+
+    // ── 5. Executar agente com fallback inteligente ───────────
+    const { output, modelUsed } = await callWithFallback(finalAgentConfig, enrichedInput)
+
+    // ── 6. Salvar memória se Dr. Ben e clientId fornecido ─────
     if (agentId === 'ben-atendente' && clientId && useMemory) {
       await saveMemory(clientId, `Pergunta: ${input}\nResposta: ${output}`, {
         agentId,
