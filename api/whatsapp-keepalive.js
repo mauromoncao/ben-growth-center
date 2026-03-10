@@ -1,13 +1,16 @@
 // ============================================================
 // WHATSAPP KEEPALIVE — Dr. Ben + MARA 24/7 via Z-API
 // Chamado pelo cron do Vercel a cada 5 minutos
-// Mantém conexão Dr. Ben ativa + reconecta webhook MARA
+// Mantém conexão Dr. Ben ativa + reconfigura webhook Dr. Ben E MARA
 // ============================================================
 
 const ZAPI_INSTANCE_ID  = process.env.ZAPI_INSTANCE_ID  || ''
 const ZAPI_TOKEN        = process.env.ZAPI_TOKEN        || ''
 const ZAPI_CLIENT_TOKEN = process.env.ZAPI_CLIENT_TOKEN || ''
 const ZAPI_BASE = `https://api.z-api.io/instances/${ZAPI_INSTANCE_ID}/token/${ZAPI_TOKEN}`
+
+// ── Webhook Dr. Ben ──────────────────────────────────────────
+const DR_BEN_WEBHOOK_URL = 'https://ben-growth-center.vercel.app/api/whatsapp-zapi'
 
 // ── Instância MARA ───────────────────────────────────────────
 const MARA_INSTANCE_ID  = process.env.MARA_ZAPI_INSTANCE_ID || ''
@@ -18,7 +21,7 @@ const MARA_WEBHOOK_URL  = 'https://ben-growth-center.vercel.app/api/whatsapp-mar
 
 const DR_MAURO = process.env.PLANTONISTA_WHATSAPP || ''
 
-async function zapiHeaders() {
+function zapiHeaders() {
   const h = { 'Content-Type': 'application/json' }
   if (ZAPI_CLIENT_TOKEN) h['Client-Token'] = ZAPI_CLIENT_TOKEN
   return h
@@ -33,7 +36,7 @@ function maraHeaders() {
 // Buscar status da instância Z-API Dr. Ben
 async function getStatus() {
   const r = await fetch(`${ZAPI_BASE}/status`, {
-    headers: await zapiHeaders(),
+    headers: zapiHeaders(),
     signal: AbortSignal.timeout(8000),
   })
   const data = await r.json()
@@ -41,25 +44,61 @@ async function getStatus() {
   return data?.connected === true ? 'open' : (data?.status ?? 'disconnected')
 }
 
-// Configurar webhook da MARA (sempre — GET /webhooks não funciona nesta versão Z-API)
-async function verificarWebhookMara(log) {
+// ── Configurar webhook do DR. BEN (principal — recebe mensagens clientes) ──
+async function configurarWebhookDrBen(log) {
+  if (!ZAPI_INSTANCE_ID || !ZAPI_TOKEN) {
+    log.push('⚠️ Dr. Ben: credenciais Z-API não configuradas — pulando webhook')
+    return false
+  }
+  try {
+    const put = await fetch(`${ZAPI_BASE}/update-every-webhooks`, {
+      method: 'PUT',
+      headers: zapiHeaders(),
+      body: JSON.stringify({
+        value: DR_BEN_WEBHOOK_URL,
+        notifySentByMe: false,
+        notifyDelivery: false,
+        notifyRead: false,
+      }),
+      signal: AbortSignal.timeout(10000),
+    })
+    const result = await put.json().catch(() => ({}))
+    if (result?.value === true) {
+      log.push(`✅ Dr. Ben webhook: configurado → ${DR_BEN_WEBHOOK_URL}`)
+      return true
+    }
+    // Z-API às vezes retorna { value: false } quando já está igual — também é OK
+    log.push(`⚠️ Dr. Ben webhook: resposta Z-API — ${JSON.stringify(result).slice(0, 120)}`)
+    return false
+  } catch (e) {
+    log.push(`❌ Dr. Ben webhook: erro — ${e.message}`)
+    return false
+  }
+}
+
+// ── Configurar webhook da MARA (sempre — GET /webhooks não funciona nesta versão Z-API) ──
+async function configurarWebhookMara(log) {
   if (!MARA_INSTANCE_ID || !MARA_TOKEN) {
     log.push('⚠️ MARA: instância não configurada — pulando')
     return
   }
   try {
-    // PUT direto — sem tentar ler antes (GET /webhooks retorna NOT_FOUND nesta versão)
     const put = await fetch(`${MARA_BASE}/update-every-webhooks`, {
       method: 'PUT',
       headers: maraHeaders(),
-      body: JSON.stringify({ value: MARA_WEBHOOK_URL, notifySentByMe: false }),
+      body: JSON.stringify({
+        value: MARA_WEBHOOK_URL,
+        notifySentByMe: false,
+        notifyDelivery: false,
+        notifyRead: false,
+      }),
       signal: AbortSignal.timeout(10000),
     })
     const result = await put.json().catch(() => ({}))
     if (result?.value === true) {
       log.push(`✅ MARA webhook: configurado → ${MARA_WEBHOOK_URL}`)
     } else {
-      log.push(`⚠️ MARA webhook: resposta inesperada — ${JSON.stringify(result)}`)
+      log.push(`⚠️ MARA webhook: resposta Z-API — ${JSON.stringify(result).slice(0, 120)}`)
     }
   } catch (e) {
     log.push(`❌ MARA webhook: erro — ${e.message}`)
@@ -73,7 +112,7 @@ async function avisarDrMauro(msg) {
   try {
     await fetch(`${ZAPI_BASE}/send-text`, {
       method: 'POST',
-      headers: await zapiHeaders(),
+      headers: zapiHeaders(),
       body: JSON.stringify({ phone: numero, message: msg }),
       signal: AbortSignal.timeout(8000),
     })
@@ -101,8 +140,13 @@ export default async function handler(req, res) {
     const state = await getStatus()
     log.push(`📊 Dr. Ben: ${state}`)
 
-    // ── Sempre verifica webhook MARA ─────────────────────────
-    await verificarWebhookMara(log)
+    // ── SEMPRE reconfigura webhooks Dr. Ben + MARA em paralelo ──
+    // Isso garante que, mesmo após redeploy do Vercel ou reset de instância Z-API,
+    // o webhook volta a funcionar automaticamente a cada 5 minutos.
+    await Promise.all([
+      configurarWebhookDrBen(log),
+      configurarWebhookMara(log),
+    ])
 
     if (state === 'open') {
       log.push('✅ Z-API online — Dr. Ben ativo 24/7')
@@ -111,6 +155,8 @@ export default async function handler(req, res) {
         action: 'healthy',
         state,
         service: 'Z-API',
+        webhook_drben: DR_BEN_WEBHOOK_URL,
+        webhook_mara:  MARA_WEBHOOK_URL,
         duration_ms: Date.now() - startTime,
         log,
         timestamp: new Date().toISOString()
