@@ -23,6 +23,7 @@ const MARA_TOKEN           = process.env.MARA_ZAPI_TOKEN        || process.env.Z
 const MARA_CLIENT_TOKEN    = process.env.MARA_ZAPI_CLIENT_TOKEN || process.env.ZAPI_CLIENT_TOKEN || ''
 const DR_MAURO_NUMERO      = process.env.PLANTONISTA_WHATSAPP   || ''
 const VPS_LEADS_URL        = process.env.VPS_LEADS_URL          || 'http://181.215.135.202:3001'
+const VPS_PORTAL_URL       = process.env.VPS_PORTAL_URL         || 'http://181.215.135.202:3600'
 const MARA_AVATAR_URL      = 'https://ben-growth-center.vercel.app/mara-avatar-circle.png'
 // Número do Dr. Ben — bloqueado para evitar loop entre instâncias
 const DR_BEN_NUMERO        = process.env.ZAPI_INSTANCE_ID ? '' : '5586994820054'
@@ -36,6 +37,41 @@ const DR_MAURO_NUM = DR_MAURO_NUMERO.replace(/\D/g, '')
 function getBaseUrl() {
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
   return 'https://ben-growth-center.vercel.app'
+}
+
+// ============================================================
+// ROTEAMENTO PORTAL DO CLIENTE
+// Verifica se o remetente é um cliente cadastrado no Portal
+// Se for → encaminha mensagem ao VPS Portal (porta 3600)
+// e retorna true para interromper o fluxo MARA
+// ============================================================
+async function rotearParaPortal(numero, texto, senderName) {
+  try {
+    const r = await fetch(`${VPS_PORTAL_URL}/webhook/whatsapp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        phone: numero,
+        text: { message: texto },
+        senderName,
+        fromMe: false,
+        canal: 'whatsapp',
+      }),
+      signal: AbortSignal.timeout(8000),
+    })
+    if (r.ok) {
+      const data = await r.json().catch(() => null)
+      // O VPS retorna { ok: true, cliente_encontrado: true } se o número pertence a um cliente
+      if (data?.cliente_encontrado || data?.procedimento_id) {
+        console.log(`[MARA-PORTAL] ✅ Mensagem roteada ao Portal do Cliente — ${numero}`)
+        return true // roteado com sucesso → interromper fluxo MARA
+      }
+    }
+    return false // não é cliente do portal → continuar fluxo MARA
+  } catch (e) {
+    console.warn(`[MARA-PORTAL] Falha ao rotear para Portal: ${e.message} — continuando fluxo MARA`)
+    return false
+  }
 }
 
 // ============================================================
@@ -568,6 +604,18 @@ export default async function handler(req, res) {
   ) {
     console.log(`[MARA] ⛔ Loop bloqueado — remetente é instância interna (${numero})`)
     return res.json({ ok: true, ignorado: 'loop_instancia_interna' })
+  }
+
+  // ── REGRA 1.5: Verificar se é cliente do Portal ─────────────
+  // Antes de entrar no fluxo MARA, rotear mensagens de clientes cadastrados
+  // no Portal do Cliente (VPS porta 3600) para o painel do escritório
+  // O roteamento é transparente: se for cliente → portal; se não → MARA
+  const roteadoPortal = await rotearParaPortal(numero, text, senderName)
+  if (roteadoPortal) {
+    // É cliente do portal → NÃO responder automaticamente com MARA
+    // O escritório responderá manualmente pelo Portal do Cliente
+    console.log(`[MARA] ✅ Mensagem de cliente do portal roteada — sem resposta MARA`)
+    return res.json({ ok: true, roteado_portal: true, numero })
   }
 
   // ── REGRA 2: Só atende terceiros quando modo ausente está ativo ──
