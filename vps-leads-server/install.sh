@@ -53,16 +53,22 @@ pm2 save --force 2>/dev/null || true
 env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u root --hp /root 2>/dev/null | tail -1 | bash 2>/dev/null || true
 
 echo ""
-echo "======================================"
-echo "OK Dr. Ben Leads API instalada!"
-echo "======================================"
+echo "========================================"
+echo "OK Dr. Ben Leads API + Monitor + DB!"
+echo "========================================"
 echo ""
 pm2 status dr-ben-leads
 
 echo ""
-echo "Endpoints:"
-echo "  Health: http://181.215.135.202:3001/health"
-echo "  Leads:  http://181.215.135.202:3001/leads"
+echo "Endpoints disponíveis:"
+echo "  Health:        http://181.215.135.202:3001/health"
+echo "  Leads:         http://181.215.135.202:3001/leads"
+echo "  Monitor Log:   POST http://181.215.135.202:3001/monitor/log"
+echo "  Monitor Stats: GET  http://181.215.135.202:3001/monitor/stats"
+echo "  DB Query:      POST http://181.215.135.202:3001/db/query"
+echo "  DB Stats:      GET  http://181.215.135.202:3001/db/stats"
+echo ""
+echo "Var de ambiente opcional: DB_TOKEN (em /opt/dr-ben-leads/.env)"
 echo ""
 
 # ── 7. Testar ────────────────────────────────────────────
