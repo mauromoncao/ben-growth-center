@@ -1,14 +1,21 @@
 // ============================================================
-// DR. BEN — API de Leads (VPS Hostinger)
+// DR. BEN — API de Leads + Monitor + DB Proxy (VPS Hostinger)
 // Porta: 3001
 // Banco: SQLite (./leads.db — persistente no disco)
 //
 // Rotas:
+//   GET    /health             — status do serviço
 //   GET    /leads              — listar todos os leads
 //   POST   /leads              — criar/atualizar lead
 //   POST   /leads/mensagem     — adicionar mensagem ao lead
 //   PATCH  /leads/:id          — atualizar status/dados
-//   GET    /health             — status do serviço
+//   DELETE /leads/:id          — remover lead
+//   GET    /mara-estado        — ler estado da MARA
+//   POST   /mara-estado        — salvar estado da MARA
+//   POST   /monitor/log        — registrar custo de chamada de agente
+//   GET    /monitor/stats      — resumo de uso e custos por agente
+//   POST   /db/query           — proxy SQL autenticado (agent_outputs, processos_contexto)
+//   GET    /db/stats           — estatísticas do banco
 // ============================================================
 
 const express = require('express')
@@ -379,9 +386,187 @@ app.post('/mara-estado', express.json(), (req, res) => {
   }
 })
 
+// ════════════════════════════════════════════════════════════
+// MONITOR/LOG — Recebe logs de custo dos agentes (Juris + Growth)
+// POST /monitor/log  { agentId, modelUsed, inputTokens, outputTokens, costUsd, elapsed_ms, source }
+// GET  /monitor/stats — resumo de uso
+// ════════════════════════════════════════════════════════════
+db.exec(`
+  CREATE TABLE IF NOT EXISTS monitor_logs (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    agent_id      TEXT,
+    model_used    TEXT,
+    input_tokens  INTEGER DEFAULT 0,
+    output_tokens INTEGER DEFAULT 0,
+    cost_usd      REAL    DEFAULT 0,
+    elapsed_ms    INTEGER DEFAULT 0,
+    source        TEXT    DEFAULT 'juris-center',
+    criado_em     TEXT
+  );
+  CREATE INDEX IF NOT EXISTS idx_ml_agent    ON monitor_logs(agent_id);
+  CREATE INDEX IF NOT EXISTS idx_ml_source   ON monitor_logs(source);
+  CREATE INDEX IF NOT EXISTS idx_ml_criado   ON monitor_logs(criado_em);
+`)
+
+app.post('/monitor/log', (req, res) => {
+  try {
+    const { agentId, modelUsed, inputTokens, outputTokens, costUsd, elapsed_ms, source, timestamp } = req.body || {}
+    db.prepare(`
+      INSERT INTO monitor_logs (agent_id, model_used, input_tokens, output_tokens, cost_usd, elapsed_ms, source, criado_em)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      agentId   || 'unknown',
+      modelUsed || 'unknown',
+      inputTokens  || 0,
+      outputTokens || 0,
+      costUsd      || 0,
+      elapsed_ms   || 0,
+      source    || 'juris-center',
+      timestamp || new Date().toISOString(),
+    )
+    res.json({ ok: true })
+  } catch (e) {
+    console.warn('[Monitor] log error:', e.message)
+    res.json({ ok: false, error: e.message })
+  }
+})
+
+app.get('/monitor/stats', (req, res) => {
+  try {
+    const { source, since } = req.query
+    let sql = `SELECT agent_id, model_used, COUNT(*) as chamadas,
+      SUM(input_tokens+output_tokens) as total_tokens,
+      ROUND(SUM(cost_usd),4) as custo_usd,
+      ROUND(AVG(elapsed_ms)) as tempo_medio_ms
+      FROM monitor_logs`
+    const params = []
+    const where = []
+    if (source) { where.push('source = ?'); params.push(source) }
+    if (since)  { where.push('criado_em >= ?'); params.push(since) }
+    if (where.length) sql += ' WHERE ' + where.join(' AND ')
+    sql += ' GROUP BY agent_id, model_used ORDER BY chamadas DESC'
+    const rows = db.prepare(sql).all(...params)
+    const total = db.prepare('SELECT COUNT(*) as n, ROUND(SUM(cost_usd),4) as custo FROM monitor_logs').get()
+    res.json({ ok: true, stats: rows, total_chamadas: total.n, custo_total_usd: total.custo })
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message })
+  }
+})
+
+// ════════════════════════════════════════════════════════════
+// DB/QUERY — Proxy SQL autenticado para Vercel Edge Functions
+// POST /db/query  { sql, params }  — Header: Authorization: Bearer <DB_TOKEN>
+// Executa queries no SQLite local (agent_outputs, processos_contexto)
+// ════════════════════════════════════════════════════════════
+const DB_TOKEN = process.env.DB_TOKEN || ''
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS agent_outputs (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    agent_id      TEXT    NOT NULL,
+    client_id     TEXT,
+    processo_num  TEXT,
+    input         TEXT,
+    output        TEXT,
+    model_used    TEXT,
+    input_tokens  INTEGER DEFAULT 0,
+    output_tokens INTEGER DEFAULT 0,
+    cost_usd      REAL    DEFAULT 0,
+    elapsed_ms    INTEGER DEFAULT 0,
+    created_at    TEXT    NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_ao_client   ON agent_outputs(client_id);
+  CREATE INDEX IF NOT EXISTS idx_ao_agent    ON agent_outputs(agent_id);
+  CREATE INDEX IF NOT EXISTS idx_ao_processo ON agent_outputs(processo_num);
+  CREATE INDEX IF NOT EXISTS idx_ao_created  ON agent_outputs(created_at);
+
+  CREATE TABLE IF NOT EXISTS processos_contexto (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    numero_cnj          TEXT    NOT NULL UNIQUE,
+    partes              TEXT,
+    area                TEXT,
+    resumo              TEXT,
+    ultima_movimentacao TEXT,
+    status              TEXT    DEFAULT 'ativo',
+    prazo_proximo       TEXT,
+    created_at          TEXT    NOT NULL DEFAULT (datetime('now')),
+    updated_at          TEXT    NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_pc_cnj    ON processos_contexto(numero_cnj);
+  CREATE INDEX IF NOT EXISTS idx_pc_status ON processos_contexto(status);
+`)
+
+// ── Utilitário: converter SQL PostgreSQL → SQLite ────────────
+// db.js envia queries com $1,$2,... e NOW() — convertemos para SQLite
+function pgToSqlite(sql) {
+  // 1. Substituir NOW() → datetime('now')
+  let s = sql.replace(/\bNOW\(\)/gi, "datetime('now')")
+  // 2. Substituir $1,$2,... → ? (em ordem)
+  s = s.replace(/\$\d+/g, '?')
+  // 3. ON CONFLICT (numero_cnj) DO UPDATE SET ... = EXCLUDED.col → SQLite syntax
+  // SQLite usa "excluded" (minúsculo) - já é compatível
+  return s
+}
+
+app.post('/db/query', (req, res) => {
+  try {
+    // Validar token se configurado
+    if (DB_TOKEN) {
+      const authHeader = req.headers.authorization || ''
+      const token = authHeader.replace('Bearer ', '').trim()
+      if (token !== DB_TOKEN) {
+        return res.status(401).json({ ok: false, error: 'Token inválido' })
+      }
+    }
+
+    const { sql, params = [] } = req.body || {}
+    if (!sql) return res.status(400).json({ ok: false, error: 'sql é obrigatório' })
+
+    // Segurança: apenas SELECT, INSERT, UPDATE — sem DROP/ALTER/DELETE em tabelas críticas
+    const sqlUpper = sql.trim().toUpperCase()
+    if (sqlUpper.startsWith('DROP') || sqlUpper.startsWith('ALTER') ||
+        (sqlUpper.startsWith('DELETE') && sqlUpper.includes('leads'))) {
+      return res.status(403).json({ ok: false, error: 'Operação não permitida' })
+    }
+
+    // Converter sintaxe PostgreSQL → SQLite
+    const sqliteSQL = pgToSqlite(sql)
+    const stmt = db.prepare(sqliteSQL)
+    let result
+
+    if (sqlUpper.startsWith('SELECT')) {
+      result = stmt.all(...params)
+    } else {
+      const info = stmt.run(...params)
+      result = [{ changes: info.changes, lastInsertRowid: info.lastInsertRowid }]
+    }
+
+    res.json(result)
+  } catch (e) {
+    console.warn('[DB/query] erro:', e.message, '| SQL:', sql?.slice(0, 100))
+    res.status(500).json({ ok: false, error: e.message })
+  }
+})
+
+app.get('/db/stats', (req, res) => {
+  try {
+    const outputs = db.prepare('SELECT COUNT(*) as n, ROUND(SUM(cost_usd),4) as custo FROM agent_outputs').get()
+    const processos = db.prepare('SELECT COUNT(*) as n FROM processos_contexto').get()
+    res.json({
+      ok: true,
+      agent_outputs: outputs.n,
+      custo_total_usd: outputs.custo,
+      processos_contexto: processos.n,
+    })
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message })
+  }
+})
+
 // ── Iniciar servidor ─────────────────────────────────────
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Dr. Ben Leads API rodando na porta ${PORT}`)
   console.log(`   SQLite: ${DB_PATH}`)
+  console.log(`   Rotas: /health | /leads | /monitor/log | /monitor/stats | /db/query | /db/stats`)
   console.log(`   Health: http://localhost:${PORT}/health`)
 })
