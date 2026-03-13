@@ -2,7 +2,7 @@
 // BEN GROWTH CENTER — BEN Agents API v5.0
 // Stack: OpenAI GPT-4o · Claude Haiku 4.5 · Perplexity
 //        Pinecone Memory (OpenAI embeddings)
-//        9 Agentes Growth Especializados
+//        7 Agentes Growth Especializados
 // Rota: POST /api/agents/run
 // ============================================================
 
@@ -247,53 +247,6 @@ FORMATO: emoji + situação + número + ação sugerida. Máximo 2 linhas por al
     maxTokens: 400,
   },
 
-  // ── BEN Revisor Jurídico — Claude Haiku (preciso + jurídico) ─────────
-  'ben-revisor-juridico': {
-    model: 'claude-haiku',
-    system: `Você é o BEN Revisor Jurídico, assistente de análise jurídica especializado.
-Escritório Mauro Monção — Teresina/PI.
-Especialidades: Direito Tributário (ICMS, PIS/COFINS, IRPJ), Previdenciário, Bancário.
-
-MISSÃO: Análise prévia de casos com estratégia e estimativa de viabilidade.
-
-PROCESSO:
-1. Identificar área do direito e subárea
-2. Legislação aplicável (CTN, CF/88, Lei 8.213, CDC)
-3. Jurisprudência relevante (STJ, STF, TRF)
-4. Pontos fortes e fracos do caso
-5. Estratégia: administrativa ou judicial
-6. Chance de êxito (%) com justificativa
-7. Documentos necessários
-
-FINALIZAR SEMPRE COM: "Análise preliminar — sujeita à revisão do Dr. Mauro Monção (OAB/PI)."`,
-    temperature: 0.2,
-    maxTokens: 2500,
-  },
-
-  // ── BEN Peticionista — Claude Haiku (redação jurídica formal) ────
-  'ben-peticionista': {
-    model: 'claude-haiku',
-    system: `Você é o BEN Peticionista, especialista em redação jurídica processual.
-Escritório Mauro Monção — Teresina/PI.
-
-MISSÃO: Gerar minutas de peças processuais de alta qualidade.
-
-TIPOS: Impugnação Administrativa, Mandado de Segurança, Ação Previdenciária,
-Recurso CARF, Petição Inicial Revisional, Embargos à Execução Fiscal, Recurso INSS.
-
-ESTRUTURA PADRÃO:
-1. Qualificação das partes
-2. DOS FATOS (narrativa clara e cronológica)
-3. DO DIREITO (fundamentação legal e jurisprudencial)
-4. DOS PEDIDOS (específicos e mensuráveis)
-5. DO VALOR DA CAUSA
-6. REQUERIMENTOS FINAIS
-
-REFERÊNCIAS: Citar CTN, CF/88, legislação específica, STJ/STF.
-FINALIZAR: "MINUTA — Revisão obrigatória pelo Dr. Mauro Monção (OAB/PI)"`,
-    temperature: 0.15,
-    maxTokens: 5000,
-  },
 }
 
 // ════════════════════════════════════════════════════════════
@@ -504,7 +457,7 @@ export default async function handler(req, res) {
     }
 
     // ── 2. Pesquisa jurídica em tempo real (Perplexity) ───────
-    if (useSearch && (agentId === 'ben-revisor-juridico' || agentId === 'ben-peticionista')) {
+    if (useSearch && false) { // nenhum agente growth usa Perplexity search atualmente
       try {
         searchContext = await callPerplexity(
           'Você é um pesquisador jurídico brasileiro. Busque jurisprudência e legislação atualizada.',
