@@ -79,7 +79,7 @@ interface ModoAusenteStatus {
 const CONFIG_PADRAO: ConfigMara = {
   nome: 'Dr. Ben',
   saudacao: 'Olá! 👋 Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção Advogados. Como posso te ajudar hoje?',
-  despedida: 'Foi um prazer atendê-lo! Se precisar de mais informações, estou à disposição. Tenha um ótimo dia! ⚖️',
+  despedida: 'Foi um prazer atendê-lo! Se precisar de mais informações, estou à disposição. Tenha um ótimo dia! 🔱',
   tom: 'cordial',
   promptBase: `Você é o Dr. Ben, assistente jurídico digital do escritório Mauro Monção Advogados Associados (OAB/PI · CE · MA), com sede em Parnaíba-PI.\n\nSua missão é realizar a triagem inicial do visitante, entender o problema jurídico e encaminhar para o advogado especialista correto. Você NÃO emite pareceres, NÃO representa o cliente e NÃO promete resultados.\n\n## FLUXO OBRIGATÓRIO (siga esta ordem):\n\n**ETAPA 1 – ABERTURA** (primeira mensagem)\nApresente-se de forma acolhedora e pergunte se pode fazer algumas perguntas rápidas.\n\n**ETAPA 2 – IDENTIFICAÇÃO**\nPergunte:\n- O atendimento é para você mesmo(a) ou para empresa/terceiro?\n- Você já é cliente do escritório ou é o primeiro contato?\n\n**ETAPA 3 – COLETA DA DEMANDA**\nPergunte: "Em poucas palavras, qual é o problema jurídico que você está enfrentando hoje?"\nOuça sem opinar. Não faça análise jurídica.\n\n**ETAPA 4 – CLASSIFICAÇÃO DA ÁREA**\nCom base no relato, infira a área: Tributário | Previdenciário | Bancário | Imobiliário | Família e Sucessões | Advocacia Pública | Trabalhista | Consumidor | Outros.\nConfirme com o usuário: "Pelo que você descreveu, isso parece estar ligado a [ÁREA]. Confere?"\n\n**ETAPA 5 – URGÊNCIA**\nPergunte: "Existe prazo próximo, risco imediato ou alguma situação urgente acontecendo agora?"\nClassifique internamente: low | medium | high | critical.\n\n**ETAPA 6 – COLETA DE CONTATO**\nDiga: "Para encaminharmos seu caso ao advogado especialista, preciso do seu nome e WhatsApp."\nColete nome e telefone (WhatsApp).\n\n**ETAPA 7 – ENCAMINHAMENTO**\nConfirme o recebimento, agradeça e informe que a equipe jurídica entrará em contato em breve.\nEncerre gentilmente.\n\n## REGRAS ABSOLUTAS:\n- NUNCA solicite CPF, CNPJ, RG, número de processo ou arquivos\n- NUNCA emita parecer, opinião jurídica ou análise do caso\n- NUNCA prometa resultados, prazos ou êxito\n- NUNCA recuse ou descarte um atendimento\n- Responda SEMPRE em português brasileiro\n- Seja cordial, profissional e objetivo\n- Mensagens curtas (máx. 3 parágrafos por resposta)`,
   areas: {
@@ -454,7 +454,7 @@ export default function MaraIA() {
   const motivosAusente = [
     { key: 'ferias',      label: '🏖️ Férias',     desc: 'Em descanso, retorno em data definida' },
     { key: 'doente',      label: '🤒 Indisposto',  desc: 'Saúde, sem data definida de retorno' },
-    { key: 'audiencia',   label: '⚖️ Audiência',   desc: 'Em audiência judicial, retorna em horas' },
+    { key: 'audiencia',   label: '🔱 Audiência',   desc: 'Em audiência judicial, retorna em horas' },
     { key: 'viagem',      label: '✈️ Viagem',      desc: 'Em viagem de trabalho ou pessoal' },
     { key: 'reuniao',     label: '🤝 Reunião',     desc: 'Em reunião, retorna em breve' },
     { key: 'fora_horario', label: '😴 Fora do Horário', desc: 'Resposta automática fora do expediente' },
@@ -1060,7 +1060,7 @@ export default function MaraIA() {
               </div>
 
               <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
-                <p className="text-xs font-semibold text-gray-600 mb-2">⚖️ Para Clientes (Dr. Ben)</p>
+                <p className="text-xs font-semibold text-gray-600 mb-2">🔱 Para Clientes (Dr. Ben)</p>
                 <select
                   value={config.audioPreferencia.clientes}
                   onChange={e => setConfig(c => ({ ...c, audioPreferencia: { ...c.audioPreferencia, clientes: e.target.value as any } }))}
@@ -1295,7 +1295,7 @@ export default function MaraIA() {
             { key: 'previdenciario', label: 'Previdenciário',  emoji: '👴', desc: 'Aposentadoria, INSS, benefícios' },
             { key: 'bancario',       label: 'Bancário',        emoji: '🏦', desc: 'Contratos, cobranças abusivas' },
             { key: 'trabalhista',    label: 'Trabalhista',     emoji: '👷', desc: 'Direitos, rescisões, FGTS' },
-            { key: 'civil',          label: 'Cível',           emoji: '⚖️', desc: 'Contratos, indenizações' },
+            { key: 'civil',          label: 'Cível',           emoji: '🔱', desc: 'Contratos, indenizações' },
             { key: 'empresarial',    label: 'Empresarial',     emoji: '🏢', desc: 'Empresas, contratos comerciais' },
             { key: 'imobiliario',    label: 'Imobiliário',     emoji: '🏠', desc: 'Compra, venda, locação' },
             { key: 'familia',        label: 'Família',         emoji: '👨‍👩‍👧', desc: 'Divórcio, herança, tutela' },

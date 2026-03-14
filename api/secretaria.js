@@ -350,7 +350,7 @@ async function enviarWhatsApp(para, mensagem) {
 // ── Formatar mensagem de confirmação ────────────────────────
 function montarConfirmacao(c) {
   const icones = {
-    audiencia: '⚖️',
+    audiencia: '🔱',
     reuniao: '🤝',
     consulta: '📋',
     prazo: '⏰',
@@ -426,7 +426,7 @@ export default async function handler(req, res) {
         return res.status(200).json({ success: true, compromissos: [], mensagem: msg })
       }
 
-      const icones = { audiencia: '⚖️', reuniao: '🤝', consulta: '📋', prazo: '⏰', ligacao: '📞', outro: '📅' }
+      const icones = { audiencia: '🔱', reuniao: '🤝', consulta: '📋', prazo: '⏰', ligacao: '📞', outro: '📅' }
       const titulo = action === 'hoje' ? '📅 *Agenda de Hoje:*\n\n' : `📅 *Próximos ${lista.length} Compromissos:*\n\n`
       const linhas = lista.slice(0, 10).map((c, i) =>
         `${i + 1}. ${icones[c.tipo] || '📅'} *${c.titulo}*\n   📆 ${formatarDataHora(c.dataHora)}`

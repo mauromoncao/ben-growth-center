@@ -288,7 +288,7 @@ export default function Agentes() {
           { value: 'all',       label: '🔍 Todos' },
           { value: 'crm',       label: '👥 CRM' },
           { value: 'marketing', label: '📢 Marketing' },
-          { value: 'juridico',  label: '⚖️ Jurídico (Fase 2)' },
+          { value: 'juridico',  label: '🔱 Jurídico (Fase 2)' },
           { value: 'sistema',   label: '⚙️ Sistema' },
         ].map(f => (
           <button key={f.value} onClick={() => setAreaFiltro(f.value)}

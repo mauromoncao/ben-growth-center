@@ -117,7 +117,7 @@ Diga: "[Nome], anotei tudo! Vou encaminhar seu caso agora para o advogado especi
 
 **ETAPA 7 – ENCERRAMENTO**
 Agradeça pelo contato, deseje um bom dia/tarde/noite (conforme horário) e encerre gentilmente.
-Exemplo: "Foi um prazer te atender, [Nome]! Qualquer dúvida, pode falar comigo. Até breve! ⚖️"
+Exemplo: "Foi um prazer te atender, [Nome]! Qualquer dúvida, pode falar comigo. Até breve! 🔱"
 
 ## REGRAS ABSOLUTAS:
 - NUNCA solicite CPF, CNPJ, RG, número de processo ou arquivos
@@ -452,7 +452,7 @@ async function maraAvisarDrMauro({ nome, telefone, numero, area, urgencia, resum
   const areaLabel = {
     tributario: '🧾 Tributário', previdenciario: '👴 Previdenciário',
     bancario: '🏦 Bancário', imobiliario: '🏠 Imobiliário',
-    familia: '👨‍👩‍👧 Família', publico: '⚖️ Advocacia Pública',
+    familia: '👨‍👩‍👧 Família', publico: '🔱 Advocacia Pública',
     trabalhista: '👷 Trabalhista', consumidor: '🛒 Consumidor', outros: '📋 Outros',
   }[area] ?? '📋 Outros'
   const hora = horaAtual()
@@ -487,7 +487,7 @@ async function processarComandoMara(texto, numero) {
     const motivo  = partes[1] || 'ferias'
     const retorno = partes.slice(2).join(' ') || null
     global.__modoAusente = { ativo: true, motivo, retorno, mensagem: null }
-    const labels = { ferias: '🏖️ Férias', doente: '🤒 Doente', audiencia: '⚖️ Audiência', viagem: '✈️ Viagem', reuniao: '🤝 Reunião' }
+    const labels = { ferias: '🏖️ Férias', doente: '🤒 Doente', audiencia: '🔱 Audiência', viagem: '✈️ Viagem', reuniao: '🤝 Reunião' }
     const label = labels[motivo] || '😴 Ausente'
     return `✅ *Modo Ausente ativado!*\n\n${label}${retorno ? ` — Retorno: ${retorno}` : ''}\n\nEstou respondendo por você agora, Dr. Mauro. Vou te alertar se chegar algo urgente. 🛡️\n\n_Use /presente para desativar._`
   }
@@ -510,7 +510,7 @@ async function processarComandoMara(texto, numero) {
       const urgEmoji = { critical: '🚨', high: '🔴', medium: '🟡', low: '🟢' }
       const linhas = leadsHoje.slice(0, 8).map((l, i) => {
         const urg = urgEmoji[l.urgencia] || '⚪'
-        return `${urg} *${i+1}. ${l.nome || 'Sem nome'}*\n   📞 ${l.telefone || l.numero || '—'} · ⚖️ ${l.area || 'Outros'}`
+        return `${urg} *${i+1}. ${l.nome || 'Sem nome'}*\n   📞 ${l.telefone || l.numero || '—'} · 🔱 ${l.area || 'Outros'}`
       })
       return `📋 *Leads de Hoje* (${leadsHoje.length})\n\n${linhas.join('\n\n')}\n\n_— MARA IA 🌟_`
     } catch {
@@ -527,7 +527,7 @@ async function processarComandoMara(texto, numero) {
       const urgentes = leads.filter(l => l.urgencia === 'high' || l.urgencia === 'critical')
       if (!urgentes.length) return `🟢 *Nenhum caso urgente no momento.*\n\n_— MARA IA 🌟_`
       const linhas = urgentes.slice(0, 5).map((l, i) =>
-        `🚨 *${i+1}. ${l.nome || 'Sem nome'}*\n   📞 ${l.telefone || l.numero || '—'}\n   ⚖️ ${l.area || 'Outros'} · 👉 https://wa.me/${(l.numero||'').replace(/\D/g,'')}`
+        `🚨 *${i+1}. ${l.nome || 'Sem nome'}*\n   📞 ${l.telefone || l.numero || '—'}\n   🔱 ${l.area || 'Outros'} · 👉 https://wa.me/${(l.numero||'').replace(/\D/g,'')}`
       )
       return `🚨 *Casos Urgentes* (${urgentes.length})\n\n${linhas.join('\n\n')}\n\n_— MARA IA 🌟_`
     } catch {
@@ -654,7 +654,7 @@ function extrairMarcadores(texto) {
 }
 
 async function consultarDrBen(history, novaMensagem, nomeCliente) {
-  const fallback = '⚖️ Olá! Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção Advogados. Estou com uma instabilidade técnica. Por favor, entre em contato: *(86) 99482-0054*'
+  const fallback = '🔱 Olá! Sou o Dr. Ben, assistente jurídico do escritório Mauro Monção Advogados. Estou com uma instabilidade técnica. Por favor, entre em contato: *(86) 99482-0054*'
   if (!OPENAI_KEY) return fallback
 
   // Injetar contexto de data/hora brasileiro + nome do cliente se disponível
@@ -735,7 +735,7 @@ export default async function handler(req, res) {
         if (ZAPI_CLIENT_TOKEN) headers['Client-Token'] = ZAPI_CLIENT_TOKEN
         const res2 = await fetch(`${ZAPI_BASE}/send-text`, {
           method: 'POST', headers,
-          body: JSON.stringify({ phone: para, message: '✅ *Dr. Ben está online!*\n\nZ-API funcionando. Pode me mandar uma mensagem! 🤖⚖️' }),
+          body: JSON.stringify({ phone: para, message: '✅ *Dr. Ben está online!*\n\nZ-API funcionando. Pode me mandar uma mensagem! 🤖🔱' }),
           signal: AbortSignal.timeout(10000),
         })
         const data = await res2.json()
@@ -788,7 +788,7 @@ export default async function handler(req, res) {
     if (action === 'ativar-ausente') {
       const motivo  = req.query.motivo  || 'ferias'
       const retorno = req.query.retorno || null
-      const labels  = { ferias: '🏖️ Férias', doente: '🤒 Indisposto', audiencia: '⚖️ Audiência', viagem: '✈️ Viagem', reuniao: '🤝 Reunião', fora_horario: '😴 Fora do horário' }
+      const labels  = { ferias: '🏖️ Férias', doente: '🤒 Indisposto', audiencia: '🔱 Audiência', viagem: '✈️ Viagem', reuniao: '🤝 Reunião', fora_horario: '😴 Fora do horário' }
       global.__modoAusente = { ativo: true, motivo, retorno, mensagem: null }
       console.log(`[DR_BEN] 🛡️ Modo Ausente ativado via dashboard: ${motivo}${retorno ? ` até ${retorno}` : ''}`)
       return res.json({ ok: true, ativo: true, motivo, retorno, label: labels[motivo] || motivo })

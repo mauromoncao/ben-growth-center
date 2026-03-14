@@ -303,7 +303,7 @@ function formatarLeads(leads, titulo = 'Leads') {
     const nome = l.nome || 'Não identificado'
     const area = l.area || 'Outros'
     const tel = l.telefone || l.numero || '—'
-    return `${urg} *${i + 1}. ${nome}*\n   📞 ${tel} · ⚖️ ${area}`
+    return `${urg} *${i + 1}. ${nome}*\n   📞 ${tel} · 🔱 ${area}`
   })
 
   return `📋 *${titulo}* (${leads.length} total)\n\n${linhas.join('\n\n')}`

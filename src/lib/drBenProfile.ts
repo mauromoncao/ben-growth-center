@@ -39,7 +39,7 @@ export const DR_BEN_PROFILE = {
 
 Estou disponível *24 horas* para te ajudar com:
 
-⚖️ Dívidas com a Receita Federal
+🔱 Dívidas com a Receita Federal
 🏦 Revisão de contratos bancários
 🏛️ Aposentadorias e benefícios INSS
 💼 Planejamento tributário
