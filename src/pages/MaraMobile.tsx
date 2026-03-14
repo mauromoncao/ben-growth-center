@@ -33,7 +33,7 @@ interface BeforeInstallPromptEvent extends Event {
 const MOTIVOS = [
   { key: 'ferias',       emoji: '🏖️', label: 'Férias',          cor: 'from-blue-500 to-cyan-500'   },
   { key: 'doente',       emoji: '🤒', label: 'Indisposto',      cor: 'from-rose-500 to-pink-500'   },
-  { key: 'audiencia',    emoji: '⚖️', label: 'Audiência',       cor: 'from-purple-500 to-violet-500'},
+  { key: 'audiencia',    emoji: '🔱', label: 'Audiência',       cor: 'from-purple-500 to-violet-500'},
   { key: 'viagem',       emoji: '✈️', label: 'Viagem',          cor: 'from-sky-500 to-blue-500'    },
   { key: 'reuniao',      emoji: '🤝', label: 'Reunião',         cor: 'from-amber-500 to-orange-500' },
   { key: 'fora_horario', emoji: '😴', label: 'Fora do Horário', cor: 'from-gray-500 to-slate-600'  },
@@ -45,7 +45,7 @@ const AREA_LABEL:     Record<string, string> = {
   tributario: '🧾 Tributário', previdenciario: '👴 Previdenciário',
   bancario: '🏦 Bancário',     trabalhista: '👷 Trabalhista',
   imobiliario: '🏠 Imobiliário', familia: '👨‍👩‍👧 Família',
-  publico: '⚖️ Adv. Pública',  consumidor: '🛒 Consumidor', outros: '📋 Outros',
+  publico: '🔱 Adv. Pública',  consumidor: '🛒 Consumidor', outros: '📋 Outros',
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -507,7 +507,7 @@ export default function MaraMobile() {
         const urg = lista.filter(l => l.urgencia === 'high' || l.urgencia === 'critical')
         if (!urg.length) { setCmdResp('🟢 Nenhum caso urgente!\nTudo tranquilo. 😌'); return }
         const linhas = urg.slice(0, 5).map((l, i) =>
-          `${i+1}. 🚨 ${l.nome || 'Sem nome'}\n   📞 ${l.telefone||l.numero||'—'}\n   ⚖️ ${AREA_LABEL[l.area||'outros']}`
+          `${i+1}. 🚨 ${l.nome || 'Sem nome'}\n   📞 ${l.telefone||l.numero||'—'}\n   🔱 ${AREA_LABEL[l.area||'outros']}`
         )
         setCmdResp(`🚨 Urgentes (${urg.length}):\n\n${linhas.join('\n\n')}`)
       } else if (cmd === '/resumo') {

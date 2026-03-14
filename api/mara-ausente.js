@@ -158,7 +158,7 @@ export default async function handler(req, res) {
 
       // Notificar Dr. Mauro no WhatsApp
       if (numero) {
-        const labels = { ferias: '🏖️ Férias', doente: '🤒 Indisposto', audiencia: '⚖️ Audiência', viagem: '✈️ Viagem', reuniao: '🤝 Reunião', fora_horario: '😴 Fora do horário' }
+        const labels = { ferias: '🏖️ Férias', doente: '🤒 Indisposto', audiencia: '🔱 Audiência', viagem: '✈️ Viagem', reuniao: '🤝 Reunião', fora_horario: '😴 Fora do horário' }
         await enviarMensagem(numero,
           `🤖 *MARA Ativada — Modo Ausente*\n\n` +
           `Motivo: ${labels[motivo] || motivo}\n\n` +

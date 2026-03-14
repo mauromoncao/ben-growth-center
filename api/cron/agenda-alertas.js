@@ -36,7 +36,7 @@ export default async function handler(req, res) {
         if (!jaAlertado && diffMin > 0 && diffMin <= minutosAntes && diffMin > minutosAntes - 16) {
           // Dentro da janela de alerta (±15 min)
           const icones = {
-            audiencia: '⚖️', reuniao: '🤝', consulta: '📋',
+            audiencia: '🔱', reuniao: '🤝', consulta: '📋',
             prazo: '⏰', ligacao: '📞', outro: '📅',
           }
 

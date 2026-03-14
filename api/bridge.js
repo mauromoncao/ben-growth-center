@@ -271,7 +271,7 @@ async function processarEventoRecebido(evento) {
         `🔴 ALERTA DE PRAZO — BEN JURIS\n\n` +
         `👤 Cliente: ${evento.payload?.cliente || 'N/A'}\n` +
         `📅 Prazo: ${evento.payload?.prazo || 'N/A'}\n` +
-        `⚖️ ${evento.payload?.descricao || 'Prazo processual crítico'}\n` +
+        `🔱 ${evento.payload?.descricao || 'Prazo processual crítico'}\n` +
         `🚨 Urgência: ${(evento.payload?.urgencia || 'ALTA').toUpperCase()}\n\n` +
         `⚡ Ação imediata necessária!`
       )
@@ -279,7 +279,7 @@ async function processarEventoRecebido(evento) {
     case 'PROCESSO_ABERTO':
       console.log('[Bridge] Processo aberto — sugere conteúdo:', evento.payload?.sugestaoConteudo)
       await whatsappPlantonista(
-        `⚖️ PROCESSO ABERTO — BEN JURIS\n\n` +
+        `🔱 PROCESSO ABERTO — BEN JURIS\n\n` +
         `👤 Cliente: ${evento.payload?.cliente || 'N/A'}\n` +
         `📁 Nº: ${evento.payload?.processo || 'N/A'}\n` +
         `📋 Área: ${evento.payload?.area || 'N/A'}\n\n` +

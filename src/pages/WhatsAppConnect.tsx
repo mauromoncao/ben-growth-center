@@ -197,7 +197,7 @@ export default function WhatsAppConnect() {
           <div className="space-y-3">
             {[
               { icon: '📱', title: 'Cliente manda mensagem', desc: 'Qualquer pessoa envia WhatsApp para (86) 9482-0054' },
-              { icon: '⚖️', title: 'Dr. Ben responde', desc: 'IA jurídica com GPT-4o-mini atende automaticamente 24/7' },
+              { icon: '🔱', title: 'Dr. Ben responde', desc: 'IA jurídica com GPT-4o-mini atende automaticamente 24/7' },
               { icon: '📋', title: 'Triagem em 7 etapas', desc: 'Dr. Ben coleta nome, telefone, área jurídica e urgência' },
               { icon: '🤖', title: 'MARA IA avisa Dr. Mauro', desc: 'Você recebe o resumo completo do lead no WhatsApp' },
             ].map((item, i) => (

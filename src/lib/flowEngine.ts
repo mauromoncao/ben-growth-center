@@ -111,7 +111,7 @@ export const FLUXO_QUALIFICACAO_TRIBUTARIO: Flow = {
       buttons: [
         { id: 'b1', label: '💼 Dívida com a Receita', nextStepId: 's3', payload: 'tributario_divida' },
         { id: 'b2', label: '📊 Reduzir impostos', nextStepId: 's3', payload: 'tributario_planejamento' },
-        { id: 'b3', label: '⚖️ Defesa fiscal/CARF', nextStepId: 's3', payload: 'tributario_defesa' },
+        { id: 'b3', label: '🔱 Defesa fiscal/CARF', nextStepId: 's3', payload: 'tributario_defesa' },
         { id: 'b4', label: '🏛️ Outro assunto', nextStepId: 's8', payload: 'outro' },
       ],
     },

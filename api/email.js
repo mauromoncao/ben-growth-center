@@ -103,7 +103,7 @@ const EMAIL_TEMPLATES = {
       <p style="color:#374151;">Seja bem-vindo ao escritório Mauro Monção Advogados Associados. Estamos prontos para auxiliá-lo.</p>
       <p style="color:#374151;">Nossa equipe especializada atua nas áreas de:</p>
       <ul style="color:#374151;">
-        <li>⚖️ Direito Tributário — Recuperação de créditos, defesa fiscal</li>
+        <li>🔱 Direito Tributário — Recuperação de créditos, defesa fiscal</li>
         <li>📋 Direito Previdenciário — Aposentadoria especial, revisão de benefícios</li>
         <li>🏦 Direito Bancário — Revisão de contratos, juros abusivos</li>
       </ul>

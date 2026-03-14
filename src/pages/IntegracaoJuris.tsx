@@ -255,7 +255,7 @@ export default function IntegracaoJuris() {
         {([
           { id: 'fluxo',     label: '⚡ Fluxo de Eventos',   count: MOCK_CROSS_EVENTS.length },
           { id: 'leads',     label: '🎯 Pipeline de Leads',  count: MOCK_LEADS_PIPELINE.length },
-          { id: 'processos', label: '⚖️ Sinais Juris',       count: MOCK_SINAIS_JURIS.length },
+          { id: 'processos', label: '🔱 Sinais Juris',       count: MOCK_SINAIS_JURIS.length },
         ] as const).map(aba => (
           <button
             key={aba.id}
@@ -312,7 +312,7 @@ export default function IntegracaoJuris() {
                   <div className="flex items-center gap-3 text-xs text-gray-500 mb-2">
                     <span>📞 {lead.telefone}</span>
                     <span>•</span>
-                    <span>⚖️ {lead.areaJuridica}</span>
+                    <span>🔱 {lead.areaJuridica}</span>
                     <span>•</span>
                     <span>📡 {lead.origem}</span>
                     <span>•</span>
@@ -338,7 +338,7 @@ export default function IntegracaoJuris() {
                     'bg-slate-100 text-slate-600 border-slate-200'
                   }`}>
                     {lead.statusJuris === 'cliente_ativo'   ? '✅ Cliente Ativo' :
-                     lead.statusJuris === 'processo_aberto' ? '⚖️ Processo Aberto' :
+                     lead.statusJuris === 'processo_aberto' ? '🔱 Processo Aberto' :
                      lead.statusJuris === 'triagem'         ? '🔍 Em Triagem' : '⏳ Aguardando'}
                   </span>
                   <p className="text-gray-400 text-xs mt-2">{lead.dataCaptura}</p>
@@ -466,7 +466,7 @@ export default function IntegracaoJuris() {
             <p className="font-bold text-sm mb-1" style={{ color: '#1e3a5f' }}>Ben Juris Center</p>
             <p className="text-xs mb-3 font-medium" style={{ color: '#2563eb' }}>Módulo 02</p>
             <div className="space-y-1 text-xs text-left">
-              {['📝 Dr. Ben Petições', '📋 Dr. Ben Contratos', '⚖️ Dr. Ben Análise', '🔍 Dr. Ben Auditoria'].map(a => (
+              {['📝 Dr. Ben Petições', '📋 Dr. Ben Contratos', '🔱 Dr. Ben Análise', '🔍 Dr. Ben Auditoria'].map(a => (
                 <p key={a} style={{ color: '#374151' }}>{a}</p>
               ))}
             </div>

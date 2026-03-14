@@ -330,7 +330,7 @@ export function getLabelEventType(tipo: CrossModuleEventType): string {
     LEAD_QUALIFICADO:      '🎯 Lead Qualificado',
     CLIENTE_ATIVO:         '✅ Cliente Ativo',
     CONTRATO_ASSINADO:     '📋 Contrato Assinado',
-    PROCESSO_ABERTO:       '⚖️ Processo Aberto',
+    PROCESSO_ABERTO:       '🔱 Processo Aberto',
     HONORARIO_PAGO:        '💰 Honorário Pago',
     ALERTA_PRAZO:          '🔴 Alerta de Prazo',
     CAMPANHA_ATIVADA:      '📢 Campanha Ativa',

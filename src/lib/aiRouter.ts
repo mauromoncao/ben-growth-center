@@ -362,7 +362,7 @@ LINGUAGEM: Ultra-concisa. Máximo 2 linhas por alerta.`,
   'ben-revisor-juridico': {
     id: 'ben-revisor-juridico',
     nome: 'BEN Revisor Jurídico',
-    emoji: '⚖️',
+    emoji: '🔱',
     descricao: 'Analisa casos recebidos no CRM, sugere estratégia e estima chances de êxito. (Fase 2)',
     modelo: 'claude-haiku-4-5',
     modeloFallback: 'gpt-4o',
